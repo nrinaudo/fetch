@@ -2,8 +2,12 @@ package com.nrinaudo.fetch
 
 import java.net.{ProtocolException, HttpURLConnection}
 import javax.net.ssl.HttpsURLConnection
+import scala.collection.JavaConverters._
 
 object HttpClient {
+  /** Default chunk size (in bytes) when chunked transfer encoding is used. */
+  val DefaultChunkSize = 4096
+
   private lazy val methodField = {
     val field = classOf[HttpURLConnection].getDeclaredField("method")
     field.setAccessible(true)
@@ -15,7 +19,7 @@ object HttpClient {
  * @author Nicolas Rinaudo
  */
 case class HttpClient(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedirect: Boolean = false,
-                      chunkSize: Int = 4096) {
+                      chunkSize: Int = HttpClient.DefaultChunkSize) {
   /** Configures the specified connection to this client's preferences. */
   private def configure(con: HttpURLConnection) {
     con.setConnectTimeout(connectTimeout)
@@ -53,15 +57,20 @@ case class HttpClient(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedi
     }
 
     // Headers.
-    request.headers.foreach {case (name, value) => con.setRequestProperty(name, value)}
+    request.headers.foreach {case (name, value) => con.setRequestProperty(name, value.mkString(", "))}
 
     con.connect()
 
     // Writes the request body if necessary.
-    request.body.foreach {body => body.write(con.getOutputStream)}
+    request.body.foreach {body =>
+      val out = con.getOutputStream
+      try {body.write(out)}
+      finally {out.close()}
+    }
 
     val status = Status(con.getResponseCode)
     new Response(status,
+      con.getHeaderFields.asScala.mapValues(_.asScala.toList).toMap,
       new ResponseEntity(Option(con.getContentType).map {MimeType(_)},
       if(status.isError) con.getErrorStream else con.getInputStream)
     )

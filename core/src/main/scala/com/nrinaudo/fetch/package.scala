@@ -9,15 +9,17 @@ import java.net.URL
  * @author Nicolas Rinaudo
  */
 package object fetch {
+  // - Package constants -----------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
   val         DefaultCharset = Charset.forName("UTF-8")
-  private val BufferSize     = 2048
+  private val BufferSize     = 4096
+
+  type Headers = Map[String, List[String]]
 
 
-  private def withClose[U](c: Closeable)(a: => U) {
-    try {a}
-    finally {c.close()}
-  }
 
+  // - IO helper methods -----------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
   /** Writes the content of the specified input stream to the specified output stream.
     * Note that this method does not wrap its arguments in buffered streams. It will, however, close both its arguments
     * upon completion (whether successful or not).
@@ -30,12 +32,7 @@ package object fetch {
           loop(buffer)
         case _ =>
       }
-
-    withClose(in) {
-      withClose(out) {
-        loop(new Array[Byte](BufferSize))
-      }
-    }
+    loop(new Array[Byte](BufferSize))
   }
 
   /** Writes the content of the specified reader to the specified writer.
@@ -50,12 +47,7 @@ package object fetch {
           loop(buffer)
         case _ =>
       }
-
-    withClose(in) {
-      withClose(out) {
-        loop(new Array[Char](BufferSize))
-      }
-    }
+    loop(new Array[Char](BufferSize))
   }
 
 
