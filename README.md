@@ -1,5 +1,6 @@
-fetch
-=====
+# fetch
+
+[![Build Status](https://travis-ci.org/nrinaudo/fetch.svg?branch=master)](https://travis-ci.org/nrinaudo/fetch)
 
 Simple Scala wrapper for `java.net.URLConnection`.
 
