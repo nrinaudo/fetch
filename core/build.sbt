@@ -9,18 +9,13 @@ version := "0.1"
 scalaVersion := "2.10.3"
 
 
-
 // - Compilation -------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 scalacOptions += "-deprecation"
 
 scalacOptions += "-unchecked"
 
-scalacOptions += "-feature"
-
 javaOptions := Seq("-Djava.awt.headless=true")
-
-crossPaths := false
 
 
 

@@ -9,7 +9,7 @@ import unfiltered.response.{Status => SStatus, HttpResponse, ResponseWriter, Res
 import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary._
 import java.io.{InputStreamReader, StringReader, Reader, OutputStreamWriter}
-import java.util.zip.{InflaterInputStream, ZipInputStream, GZIPInputStream}
+import java.util.zip.{InflaterInputStream, GZIPInputStream}
 
 class ReaderResponse(val reader: Reader) extends ResponseWriter {
   override def respond(res: HttpResponse[Any]): Unit = {

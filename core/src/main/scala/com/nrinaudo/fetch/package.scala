@@ -21,10 +21,9 @@ package object fetch {
   // - IO helper methods -----------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Writes the content of the specified input stream to the specified output stream.
-    * Note that this method does not wrap its arguments in buffered streams. It will, however, close both its arguments
-    * upon completion (whether successful or not).
+    * Note that this method does not wrap its arguments in buffered streams, nor will it close either stream.
     */
-  def writeAll(in: InputStream, out: OutputStream) {
+  def writeBytes(in: InputStream, out: OutputStream) {
     def loop(buffer: Array[Byte]): Unit =
       in.read(buffer, 0, buffer.length) match {
         case count if count  > 0 =>
@@ -36,10 +35,9 @@ package object fetch {
   }
 
   /** Writes the content of the specified reader to the specified writer.
-    * Note that this method does not wrap its arguments in buffered implementations. It will, however, cloe both its
-    * arguments upon completion (whether successful or not).
-      */
-  def writeAll(in: Reader, out: Writer) = {
+    * Note that this method does not wrap its arguments in buffered implementations, nor will it close either stream.
+    */
+  def writeChars(in: Reader, out: Writer) = {
     def loop(buffer: Array[Char]): Unit =
       in.read(buffer, 0, buffer.length) match {
         case count if count  > 0 =>

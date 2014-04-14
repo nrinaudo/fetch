@@ -2,7 +2,7 @@ package com.nrinaudo.fetch
 
 import java.io._
 import scala.Some
-import java.util.zip.{DeflaterOutputStream, GZIPOutputStream}
+import java.util.zip.DeflaterOutputStream
 
 
 // - Raw entities ------------------------------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ trait RequestEntity {
 class StreamEntity(val in: InputStream, override val mimeType: MimeType = MimeType.ApplicationOctetSteam) extends RequestEntity {
   override def length: Option[Int] = None
 
-  override def write(out: OutputStream) = writeAll(in, out)
+  override def write(out: OutputStream) = writeBytes(in, out)
 }
 
 class FileEntity(val file: File, override val mimeType: MimeType = MimeType.ApplicationOctetSteam) extends RequestEntity {
@@ -31,7 +31,7 @@ class FileEntity(val file: File, override val mimeType: MimeType = MimeType.Appl
 
   override def write(out: OutputStream) = {
     val in = new BufferedInputStream(new FileInputStream(file))
-    try {writeAll(in, out)}
+    try {writeBytes(in, out)}
     finally {in.close()}
   }
 }
@@ -88,7 +88,7 @@ class ReaderEntity(in: Reader, mimeType: MimeType = MimeType.TextPlain) extends 
   override def length: Option[Int] = None
 
   override def write(out: Writer) {
-    try {writeAll(in, out)}
+    try {writeChars(in, out)}
     finally {in.close()}
   }
 }

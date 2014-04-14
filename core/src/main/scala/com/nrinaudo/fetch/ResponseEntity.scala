@@ -20,7 +20,7 @@ class ResponseEntity(val mime: Option[MimeType], val stream: InputStream) {
     */
   def text(): String = {
     val writer = new StringWriter()
-    try {writeAll(new InputStreamReader(stream, charset getOrElse DefaultCharset), writer)}
+    try {writeChars(new InputStreamReader(stream, charset getOrElse DefaultCharset), writer)}
     finally {stream.close()}
     writer.toString
   }
