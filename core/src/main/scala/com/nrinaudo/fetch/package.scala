@@ -26,7 +26,7 @@ package object fetch {
   def writeBytes(in: InputStream, out: OutputStream) {
     def loop(buffer: Array[Byte]): Unit =
       in.read(buffer, 0, buffer.length) match {
-        case count if count  > 0 =>
+        case count if count > 0 =>
           out.write(buffer, 0, count)
           loop(buffer)
         case _ =>
@@ -40,7 +40,7 @@ package object fetch {
   def writeChars(in: Reader, out: Writer) = {
     def loop(buffer: Array[Char]): Unit =
       in.read(buffer, 0, buffer.length) match {
-        case count if count  > 0 =>
+        case count if count > 0 =>
           out.write(buffer, 0, count)
           loop(buffer)
         case _ =>

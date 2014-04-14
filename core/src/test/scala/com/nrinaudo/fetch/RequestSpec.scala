@@ -5,11 +5,12 @@ import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import unfiltered.filter.Planify
 import unfiltered.request._
-import unfiltered.response.{Status => SStatus, HttpResponse, ResponseWriter, ResponseString}
+import unfiltered.response.{Status => SStatus, _}
 import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary._
 import java.io.{InputStreamReader, StringReader, Reader, OutputStreamWriter}
 import java.util.zip.{InflaterInputStream, GZIPInputStream}
+import unfiltered.response.ResponseString
 
 class ReaderResponse(val reader: Reader) extends ResponseWriter {
   override def respond(res: HttpResponse[Any]): Unit = {
@@ -19,7 +20,9 @@ class ReaderResponse(val reader: Reader) extends ResponseWriter {
 
   override def write(writer: OutputStreamWriter) {
     var c = -1
-    while({c = reader.read; c > 0}) writer.write(c)
+    while({c = reader.read; c >= 0}) {
+      writer.write(c)
+    }
     reader.close()
   }
 }
@@ -35,6 +38,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers wit
       case req @ Path(Seg("body" :: Nil))       => new ReaderResponse(req.reader)
       case req @ Path(Seg("auth" :: Nil))       => req match {
         case BasicAuth(user, pwd) => new ResponseString(user + "\n" + pwd)
+        case _                    => Unauthorized ~> WWWAuthenticate("""Basic realm="/"""")
       }
 
       // Note: due to a bug in Unfiltered, we'll be assuming the charset is UTF-8.
@@ -65,6 +69,15 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers wit
 
   def nonEmpty(gen: Gen[String]) = gen.suchThat {!_.isEmpty}
 
+  def entity = nonEmpty(arbitrary[String])
+
+  // Note that this is not entirely correct: according to the RFC, password are allowed to contain a ':'. This is not
+  // properly handled in version 0.7.1 of unfiltered, however (the issue is fixed in github, but not yet released).
+  def authCredentials = for {
+    user <- nonEmpty(arbitrary[String]).suchThat {!_.contains(':')}
+    pwd <- nonEmpty(arbitrary[String]).suchThat {!_.contains(':')}
+  } yield (user, pwd)
+
   describe("A Request") {
     it("should send the correct HTTP method") {
       forAll(httpMethod) { method =>
@@ -85,31 +98,31 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers wit
     }
 
     it("should submit entities whose size is known correctly") {
-      forAll(arbitrary[String]) {text =>
+      forAll(entity) {text =>
         client(request("body").PUT.body(text)).body.text() should be(text)
       }
     }
 
     it("should submit entities whose size is not known correctly") {
-      forAll(arbitrary[String]) {text =>
+      forAll(entity) {text =>
         client(request("body").PUT.body(new StringReader(text))).body.text() should be(text)
       }
     }
 
     it("should submit gzipped entities correctly") {
-      forAll(arbitrary[String]) {text =>
+      forAll(entity) {text =>
         client(request("compress/gzip").PUT.body(new StringReader(text)).gzip).body.text() should be(text)
       }
     }
 
     it("should submit deflated entities correctly") {
-      forAll(arbitrary[String]) {text =>
+      forAll(entity) {text =>
         client(request("compress/deflate").PUT.body(new StringReader(text)).deflate).body.text() should be(text)
       }
     }
 
     it("should send basic auth credentials properly") {
-      forAll(nonEmpty(arbitrary[String]), nonEmpty(arbitrary[String])) {(user, pwd) =>
+      forAll(authCredentials) {case (user, pwd) =>
         client(request("auth").auth(user, pwd)).body.text() should be(user + "\n" + pwd)
       }
     }
