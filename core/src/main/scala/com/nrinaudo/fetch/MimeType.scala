@@ -29,6 +29,7 @@ object MimeType {
 
   val TextPlain = MimeType("text", "plain")
   val ApplicationOctetSteam = MimeType("application", "octet-stream")
+  val Json = MimeType("application", "json")
 
   def apply(str: String): MimeType = str match {
     case MimePattern(main, sub, ps) => MimeType(main, sub, params(ps))
