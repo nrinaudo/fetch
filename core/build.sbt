@@ -1,14 +1,9 @@
+import SonatypeKeys._
 
 sonatypeSettings
 
 name := "fetch"
 
-organization := "com.nrinaudo"
-
-
-
-// - Dependencies ------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
 libraryDependencies += "commons-codec"   % "commons-codec"     % "1.5"
 
 libraryDependencies += "org.scalatest"  %% "scalatest"         % "1.9.1"  % "test"
