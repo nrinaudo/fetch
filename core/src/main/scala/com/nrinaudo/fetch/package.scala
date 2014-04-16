@@ -11,9 +11,11 @@ import java.net.URL
 package object fetch {
   // - Package constants -----------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
+  /** Charset used for request or response entities when none is specified. */
   val         DefaultCharset = Charset.forName("UTF-8")
+  /** Size of the buffer used when processing streams. */
   private val BufferSize     = 4096
-
+  /** Represents a request or response's HTTP headers. */
   type Headers = Map[String, List[String]]
 
 
@@ -55,4 +57,5 @@ package object fetch {
   implicit def readerToEntity(reader: Reader)  = new ReaderEntity(reader)
   implicit def streamToEntity(in: InputStream) = new StreamEntity(in)
   implicit def stringToURL(str: String)        = new URL(str)
+  implicit def urlToURL(url: Url)              = new URL(url.toString)
 }

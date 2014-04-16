@@ -1,8 +1,6 @@
 package com.nrinaudo.fetch
 
 import org.apache.commons.codec.binary.Base64
-import java.io.OutputStream
-import java.util.zip._
 import scala.Some
 
 /**
@@ -11,7 +9,8 @@ import scala.Some
 case class Request(url:     java.net.URL,
                    method:  String                = "GET",
                    body:    Option[RequestEntity] = None,
-                   headers: Headers               = Map()) {
+                   headers: Headers               = Map(),
+                   encoding: Encoding             = Encoding.Identity) {
   // - HTTP methods ----------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def method(method: String): Request = copy(method = method)
@@ -44,21 +43,14 @@ case class Request(url:     java.net.URL,
   // -------------------------------------------------------------------------------------------------------------------
   def body(entity: RequestEntity) = copy(body = Some(entity))
 
-  /** Compresses the request entity using the specified algorithm.
-    * Note that not all servers support all compression algorithms. Perform an OPTION call on the target resource if
-    * unsure.
-    * @see http://tools.ietf.org/html/rfc2616#section-3.5
-    */
-  def contentEncoding(name: String, f: OutputStream => DeflaterOutputStream) =
-    body map {entity =>
-      header("Content-Encoding", name).body(new DeflatedEntity(entity, f))
-    } getOrElse {throw new IllegalStateException("Cannot specify a content encoding for a request without entity body")}
+  /** Encodes the request using the specified encoding. */
+  def encode(encoding: Encoding) = copy(encoding = encoding)
 
   /** Compresses the request entity using GZIP. */
-  def gzip = contentEncoding("gzip", (out) => new GZIPOutputStream(out))
+  def gzip = encode(Encoding.Gzip)
 
   /** Compresses the request entity using the deflate compression mechanism. */
-  def deflate = contentEncoding("deflate", (out) => new DeflaterOutputStream(out))
+  def deflate = encode(Encoding.Deflate)
 
 
 

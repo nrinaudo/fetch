@@ -54,6 +54,8 @@ case class HttpClient(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedi
       con.setDoOutput(true)
       body.length map con.setFixedLengthStreamingMode getOrElse con.setChunkedStreamingMode(chunkSize)
       con.setRequestProperty("Content-Type", body.mimeType.toString)
+      if(request.encoding != Encoding.Identity)
+        con.setRequestProperty("Content-Encoding", request.encoding.name)
     }
 
     // Headers.
@@ -63,7 +65,7 @@ case class HttpClient(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedi
 
     // Writes the request body if necessary.
     request.body.foreach {body =>
-      val out = con.getOutputStream
+      val out = request.encoding.encode(con.getOutputStream)
       try {body.write(out)}
       finally {out.close()}
     }
