@@ -4,6 +4,7 @@ import org.json4s._
 import com.nrinaudo.fetch.ResponseEntity.EntityParser
 import org.json4s.native.Serialization._
 import scala.language.implicitConversions
+import org.json4s.native.JsonMethods
 
 /**
  * @author Nicolas Rinaudo
@@ -12,9 +13,6 @@ package object json4s {
   implicit def jsonToEntity(json: JValue)(implicit formats: Formats) = RequestEntity.chars {out => write(json, out)}
       .mimeType(MimeType.Json.charset(DefaultCharset))
 
-  implicit val Parser: EntityParser[JValue] = (entity: ResponseEntity) => {
-    val reader = entity.reader
-    try {org.json4s.native.JsonMethods.parse(ReaderInput(reader))}
-    finally {reader.close()}
-  }
+  implicit val Parser: EntityParser[JValue] = (entity: ResponseEntity) =>
+    entity.withReader {in => JsonMethods.parse(ReaderInput(in))}
 }

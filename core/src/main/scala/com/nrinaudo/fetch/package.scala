@@ -4,6 +4,7 @@ import java.io._
 import java.nio.charset.Charset
 import scala.language.implicitConversions
 import java.net.URL
+import com.nrinaudo.fetch.ResponseEntity.EntityParser
 
 /**
  * @author Nicolas Rinaudo
@@ -59,4 +60,10 @@ package object fetch {
   implicit def fileToEntity(file: File)        = RequestEntity(file)
   implicit def stringToURL(str: String)        = new URL(str)
   implicit def urlToURL(url: Url)              = new URL(url.toString)
+
+  implicit val TextEntityParser: EntityParser[String] = (entity: ResponseEntity) => {
+    val writer = new StringWriter()
+    entity.withReader(writeChars(_, writer))
+    writer.toString
+  }
 }

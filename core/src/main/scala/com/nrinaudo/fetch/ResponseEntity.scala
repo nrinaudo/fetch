@@ -1,7 +1,7 @@
 package com.nrinaudo.fetch
 
 import java.nio.charset.Charset
-import java.io.{StringWriter, InputStreamReader, InputStream}
+import java.io.{Reader, InputStreamReader, InputStream}
 import com.nrinaudo.fetch.ResponseEntity.EntityParser
 
 object ResponseEntity {
@@ -13,8 +13,10 @@ object ResponseEntity {
  * @param mime   MIME type of the entity.
  * @param stream stream from which to read the content of the entity.
  */
-class ResponseEntity(val mime: Option[MimeType], val stream: InputStream) {
-  def as[T : EntityParser] = implicitly[EntityParser[T]].apply(this)
+class ResponseEntity(val mime: Option[MimeType], private val stream: InputStream) {
+  def as[T : EntityParser] =
+    try {implicitly[EntityParser[T]].apply(this)}
+    finally {stream.close()}
 
   /** Charset in which the entity is written, if any. */
   def charset: Option[Charset] = for {
@@ -22,15 +24,21 @@ class ResponseEntity(val mime: Option[MimeType], val stream: InputStream) {
     charset <- m.charset
   } yield charset
 
-  def reader = new InputStreamReader(stream, charset getOrElse DefaultCharset)
-
-  /** Reads the content of the response and returns it as a string.
-    * Note that the underlying stream will be closed after this.
+  /** Executes the specified function on this response entity.
+    *
+    * This method will take care of closing the underlying stream.
     */
-  def text(): String = {
-    val writer = new StringWriter()
-    try {writeChars(reader, writer)}
+  def withStream[T](f: InputStream => T) =
+    try {f(stream)}
     finally {stream.close()}
-    writer.toString
+
+  /** Executes the specified function on this response entity.
+    *
+    * This method will take care of closing the underlying stream.
+    */
+  def withReader[T](f: Reader => T) = {
+    val reader = new InputStreamReader(stream, charset getOrElse DefaultCharset)
+    try {f(reader)}
+    finally {reader.close()}
   }
 }

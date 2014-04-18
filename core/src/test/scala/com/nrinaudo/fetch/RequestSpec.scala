@@ -81,7 +81,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers wit
   describe("A Request") {
     it("should send the correct HTTP method") {
       forAll(httpMethod) { method =>
-        client(request("method").method(method)).body.text() should be(method)
+        client(request("method").method(method)).body.as[String] should be(method)
       }
     }
 
@@ -93,37 +93,37 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers wit
 
     it("should read simple entity bodies correctly") {
       forAll(nonEmpty(Gen.identifier)) { text =>
-        client(request("echo/" + text)).body.text() should be(text)
+        client(request("echo/" + text)).body.as[String] should be(text)
       }
     }
 
     it("should submit entities whose size is known correctly") {
       forAll(entity) {text =>
-        client(request("body").PUT.body(text)).body.text() should be(text)
+        client(request("body").PUT.body(text)).body.as[String] should be(text)
       }
     }
 
     it("should submit entities whose size is not known correctly") {
       forAll(entity) {text =>
-        client(request("body").PUT.body(new StringReader(text))).body.text() should be(text)
+        client(request("body").PUT.body(new StringReader(text))).body.as[String] should be(text)
       }
     }
 
     it("should submit gzipped entities correctly") {
       forAll(entity) {text =>
-        client(request("compress/gzip").PUT.body(new StringReader(text).gzip)).body.text() should be(text)
+        client(request("compress/gzip").PUT.body(new StringReader(text).gzip)).body.as[String] should be(text)
       }
     }
 
     it("should submit deflated entities correctly") {
       forAll(entity) {text =>
-        client(request("compress/deflate").PUT.body(new StringReader(text).deflate)).body.text() should be(text)
+        client(request("compress/deflate").PUT.body(new StringReader(text).deflate)).body.as[String] should be(text)
       }
     }
 
     it("should send basic auth credentials properly") {
       forAll(authCredentials) {case (user, pwd) =>
-        client(request("auth").auth(user, pwd)).body.text() should be(user + "\n" + pwd)
+        client(request("auth").auth(user, pwd)).body.as[String] should be(user + "\n" + pwd)
       }
     }
   }
