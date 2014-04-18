@@ -9,8 +9,7 @@ import scala.Some
 case class Request(url:     java.net.URL,
                    method:  String                = "GET",
                    body:    Option[RequestEntity] = None,
-                   headers: Headers               = Map(),
-                   encoding: Encoding             = Encoding.Identity) {
+                   headers: Headers               = Map()) {
   // - HTTP methods ----------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def method(method: String): Request = copy(method = method)
@@ -42,15 +41,6 @@ case class Request(url:     java.net.URL,
   // - Entity body manipulation ----------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def body(entity: RequestEntity) = copy(body = Some(entity))
-
-  /** Encodes the request using the specified encoding. */
-  def encode(encoding: Encoding) = copy(encoding = encoding)
-
-  /** Compresses the request entity using GZIP. */
-  def gzip = encode(Encoding.Gzip)
-
-  /** Compresses the request entity using the deflate compression mechanism. */
-  def deflate = encode(Encoding.Deflate)
 
 
 

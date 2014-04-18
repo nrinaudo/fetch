@@ -53,9 +53,10 @@ package object fetch {
 
   // - Implicit conversions --------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  implicit def stringToEntity(str: String)     = new StringEntity(str)
-  implicit def readerToEntity(reader: Reader)  = new ReaderEntity(reader)
-  implicit def streamToEntity(in: InputStream) = new StreamEntity(in)
+  implicit def stringToEntity(str: String)     = RequestEntity(str)
+  implicit def readerToEntity(reader: Reader)  = RequestEntity(reader)
+  implicit def streamToEntity(in: InputStream) = RequestEntity(in)
+  implicit def fileToEntity(file: File)        = RequestEntity(file)
   implicit def stringToURL(str: String)        = new URL(str)
   implicit def urlToURL(url: Url)              = new URL(url.toString)
 }

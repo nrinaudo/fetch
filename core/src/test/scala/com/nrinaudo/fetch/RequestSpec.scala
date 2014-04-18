@@ -111,15 +111,14 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers wit
 
     it("should submit gzipped entities correctly") {
       forAll(entity) {text =>
-        client(request("compress/gzip").PUT.body(new StringReader(text)).gzip).body.text() should be(text)
+        client(request("compress/gzip").PUT.body(new StringReader(text).gzip)).body.text() should be(text)
       }
     }
 
     it("should submit deflated entities correctly") {
-      //forAll(entity) {text =>
-      val text = "this is a test"
-      client(request("compress/deflate").PUT.body(new StringReader(text)).deflate).body.text() should be(text)
-      //}
+      forAll(entity) {text =>
+        client(request("compress/deflate").PUT.body(new StringReader(text).deflate)).body.text() should be(text)
+      }
     }
 
     it("should send basic auth credentials properly") {
