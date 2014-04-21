@@ -11,6 +11,7 @@ import Arbitrary._
 import java.io.{InputStreamReader, StringReader, Reader, OutputStreamWriter}
 import java.util.zip.{InflaterInputStream, GZIPInputStream}
 import unfiltered.response.ResponseString
+import com.nrinaudo.fetch.net.UrlEngine
 
 class ReaderResponse(val reader: Reader) extends ResponseWriter {
   override def respond(res: HttpResponse[Any]): Unit = {
@@ -53,7 +54,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers wit
     }
   })
 
-  val client = HttpClient()
+  implicit val engine = UrlEngine()
 
   def request(path: String) = Request(server.url + path)
 
@@ -81,49 +82,49 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers wit
   describe("A Request") {
     it("should send the correct HTTP method") {
       forAll(httpMethod) { method =>
-        client(request("method").method(method)).body.as[String] should be(method)
+        request("method").method(method).apply().body.as[String] should be(method)
       }
     }
 
     it("should receive the expected status code when querying a resource") {
       forAll(Gen.choose(200, 599)) {code =>
-        client(request("status/" + code)).status should be(Status(code))
+        request("status/" + code)().status should be(Status(code))
       }
     }
 
     it("should read simple entity bodies correctly") {
       forAll(nonEmpty(Gen.identifier)) { text =>
-        client(request("echo/" + text)).body.as[String] should be(text)
+        request("echo/" + text)().body.as[String] should be(text)
       }
     }
 
     it("should submit entities whose size is known correctly") {
       forAll(entity) {text =>
-        client(request("body").PUT.body(text)).body.as[String] should be(text)
+        request("body").PUT(text).body.as[String] should be(text)
       }
     }
 
     it("should submit entities whose size is not known correctly") {
       forAll(entity) {text =>
-        client(request("body").PUT.body(new StringReader(text))).body.as[String] should be(text)
+        request("body").PUT(new StringReader(text)).body.as[String] should be(text)
       }
     }
 
     it("should submit gzipped entities correctly") {
       forAll(entity) {text =>
-        client(request("compress/gzip").PUT.body(new StringReader(text).gzip)).body.as[String] should be(text)
+        request("compress/gzip").PUT(new StringReader(text).gzip).body.as[String] should be(text)
       }
     }
 
     it("should submit deflated entities correctly") {
       forAll(entity) {text =>
-        client(request("compress/deflate").PUT.body(new StringReader(text).deflate)).body.as[String] should be(text)
+        request("compress/deflate").PUT(new StringReader(text).deflate).body.as[String] should be(text)
       }
     }
 
     it("should send basic auth credentials properly") {
       forAll(authCredentials) {case (user, pwd) =>
-        client(request("auth").auth(user, pwd)).body.as[String] should be(user + "\n" + pwd)
+        request("auth").auth(user, pwd)().body.as[String] should be(user + "\n" + pwd)
       }
     }
   }

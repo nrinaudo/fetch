@@ -6,7 +6,7 @@ import java.nio.charset.Charset
 /** Represents the body of an HTTP request.
   * @author Nicolas Rinaudo
   */
-trait RequestEntity {
+trait RequestEntity extends (OutputStream => Unit) {
   // - Entity length ---------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Exact length, in bytes, of the entity.
@@ -81,6 +81,12 @@ trait RequestEntity {
     * Implementations should not close the specified stream.
     */
   def write(out: OutputStream): Unit
+
+  def apply(out: OutputStream) {
+    val stream = encoding.encode(out)
+    try {write(stream)}
+    finally {stream.close()}
+  }
 }
 
 object RequestEntity {

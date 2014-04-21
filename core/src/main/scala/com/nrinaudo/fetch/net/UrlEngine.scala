@@ -1,10 +1,14 @@
-package com.nrinaudo.fetch
+package com.nrinaudo.fetch.net
 
-import java.net.{ProtocolException, HttpURLConnection}
+import java.net.{URL, ProtocolException, HttpURLConnection}
 import javax.net.ssl.HttpsURLConnection
+import com.nrinaudo.fetch._
+import com.nrinaudo.fetch.Response
+import com.nrinaudo.fetch.Status
 import scala.collection.JavaConverters._
+import com.nrinaudo.fetch.Request.Engine
 
-object HttpClient {
+object UrlEngine {
   /** Default chunk size (in bytes) when chunked transfer encoding is used. */
   val DefaultChunkSize = 4096
 
@@ -16,10 +20,11 @@ object HttpClient {
 }
 
 /**
+ * `java.net` connector for fetch.
  * @author Nicolas Rinaudo
  */
-case class HttpClient(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedirect: Boolean = false,
-                      chunkSize: Int = HttpClient.DefaultChunkSize) {
+case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedirect: Boolean = false,
+                      chunkSize: Int = UrlEngine.DefaultChunkSize) extends Engine {
   /** Configures the specified connection to this client's preferences. */
   private def configure(con: HttpURLConnection) {
     con.setConnectTimeout(connectTimeout)
@@ -37,37 +42,31 @@ case class HttpClient(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedi
         con match {
           case https: HttpsURLConnection => https.getClass.getDeclaredFields.find {_.getName == "delegate"}.foreach {d =>
             d.setAccessible(true)
-            HttpClient.methodField.set(d.get(con), method)
+            UrlEngine.methodField.set(d.get(con), method)
           }
-          case _ => HttpClient.methodField.set(con, method)
+          case _ => UrlEngine.methodField.set(con, method)
         }
     }
   }
 
-  private def process(con: HttpURLConnection, request: Request) = {
+  private def process(con: HttpURLConnection, method: String, body: Option[RequestEntity], headers: Headers) = {
     // Generic configuration.
     configure(con)
-    setMethod(con, request.method)
+    setMethod(con, method)
 
     // Entity body configuration.
-    request.body.foreach {body =>
+    body.foreach {b =>
       con.setDoOutput(true)
-      body.contentLength map con.setFixedLengthStreamingMode getOrElse con.setChunkedStreamingMode(chunkSize)
-      con.setRequestProperty("Content-Type",     body.mimeType.toString)
-      con.setRequestProperty("Content-Encoding", if(body.encoding == Encoding.Identity) null else body.encoding.name)
+      b.contentLength map con.setFixedLengthStreamingMode getOrElse con.setChunkedStreamingMode(chunkSize)
     }
 
     // Headers.
-    request.headers.foreach {case (name, value) => con.setRequestProperty(name, value.mkString(", "))}
+    headers.foreach {case (name, value) => con.setRequestProperty(name, value.mkString(", "))}
 
     con.connect()
 
     // Writes the request body if necessary.
-    request.body.foreach {body =>
-      val out = body.encoding.encode(con.getOutputStream)
-      try {body.write(out)}
-      finally {out.close()}
-    }
+    body.foreach {b => b(con.getOutputStream)}
 
     val status = Status(con.getResponseCode)
     new Response(status,
@@ -77,8 +76,9 @@ case class HttpClient(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedi
     )
   }
 
-  def apply(req: Request): Response[ResponseEntity] = req.url.openConnection() match {
-    case con: HttpURLConnection => process(con, req)
-    case _                      => throw new AssertionError("An URL opened a non-URL HTTP connection.")
-  }
+  def apply(url: URL, method: String, body: Option[RequestEntity], headers: Headers): Response[ResponseEntity] =
+    url.openConnection() match {
+      case con: HttpURLConnection => process(con, method, body, headers)
+      case _                      => throw new AssertionError("An URL opened a non-URL HTTP connection.")
+    }
 }

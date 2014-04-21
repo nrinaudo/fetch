@@ -1,15 +1,44 @@
 package com.nrinaudo.fetch
 
 import org.apache.commons.codec.binary.Base64
-import scala.Some
+import com.nrinaudo.fetch.Request.Engine
+import java.net.URL
+
+object Request {
+  type Engine = (URL, String, Option[RequestEntity], Headers) => Response[ResponseEntity]
+
+  def apply(url: URL)(implicit engine: Engine): Request = Request(engine, url)
+}
 
 /**
  * @author Nicolas Rinaudo
  */
-case class Request(url:     java.net.URL,
-                   method:  String                = "GET",
-                   body:    Option[RequestEntity] = None,
-                   headers: Headers               = Map()) {
+case class Request(engine:  Engine,
+                   url:     URL,
+                   method:  String  = "GET",
+                   headers: Headers = Map()) extends (Option[RequestEntity] => Response[ResponseEntity]) {
+  // - Execution -------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  def apply(body: Option[RequestEntity]): Response[ResponseEntity] = {
+    var h = headers
+
+    // Sets body specific HTTP headers.
+    body foreach {b =>
+      h = h + ("Content-Type" -> List(b.mimeType.toString))
+      if(b.encoding == Encoding.Identity) h = h - "Content-Encoding"
+      else                                h = h + ("Content-Encoding" -> List(b.encoding.name))
+    }
+
+    engine(url, method, body, h)
+  }
+
+
+  def apply(): Response[ResponseEntity] = apply(None)
+
+  def apply(body: RequestEntity): Response[ResponseEntity] = apply(Some(body))
+
+
+
   // - HTTP methods ----------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def method(method: String): Request = copy(method = method)
@@ -38,23 +67,17 @@ case class Request(url:     java.net.URL,
 
 
 
-  // - Entity body manipulation ----------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
-  def body(entity: RequestEntity) = copy(body = Some(entity))
-
-
-
   // - Generic headers -------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def header(name: String, value: String) = copy(headers = headers + (name -> List(value)))
+  def header(name: String, value: String): Request = copy(headers = headers + (name -> List(value)))
 
-  def header(name: String, value: List[String]) = copy(headers = headers + (name -> value))
+  def header(name: String, value: List[String]): Request = copy(headers = headers + (name -> value))
 
 
 
   // - Authentication --------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def auth(user: String, pwd: String) =
+  def auth(user: String, pwd: String): Request =
     header("Authorization", "Basic " + Base64.encodeBase64String((user + ':' + pwd).getBytes))
 }
 

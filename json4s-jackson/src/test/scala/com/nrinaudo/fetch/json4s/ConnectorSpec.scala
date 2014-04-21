@@ -12,6 +12,7 @@ import unfiltered.request.{Path, Seg}
 import com.nrinaudo.fetch._
 import org.json4s.JsonAST.JString
 import com.nrinaudo.fetch.Request
+import com.nrinaudo.fetch.net.UrlEngine
 
 class ReaderResponse(val reader: Reader) extends ResponseWriter {
   override def respond(res: HttpResponse[Any]): Unit = {
@@ -53,7 +54,7 @@ class ConnectorSpec extends FunSpec with ShouldMatchers with GeneratorDrivenProp
   describe("The json4s-jackson connector") {
     it("should serialize / deserialize as expected") {
       forAll(json) {json =>
-        HttpClient()(Request(server.url + "echo").body(json)).body.as[JValue] should be(json)
+        Request(UrlEngine(), server.url + "echo")(json).body.as[JValue] should be(json)
       }
     }
   }
