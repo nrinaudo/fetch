@@ -42,13 +42,13 @@ object TestPlan extends Plan {
 
 
   override def intent: Intent = Decoder {
-    /** Returns an empty response with the requested status. */
+    // Returns an empty response with the requested status.
     case Path(Seg("status" :: status :: Nil)) => SStatus(status.toInt)
 
-    /** Returns a response whose body is the requested HTTP method. */
+    // Returns a response whose body is the requested HTTP method.
     case req @ Path(Seg("method" :: Nil)) => ResponseString(req.method)
 
-    /** Returns the request entity body, applying the requested content-encodings if necessary.
+     /* Returns the request entity body, applying the requested content-encodings if necessary.
       * Note that due to a bug in the current version of Unfiltered (fixed in github, not yet released), we
       * can't easily extract the request's charset and will be assuming UTF-8.
       */
@@ -61,10 +61,14 @@ object TestPlan extends Plan {
 
       new ReaderResponse(new InputStreamReader(in, "UTF-8"))
 
-    /** Expects to find basic auth credentials. If found, returns them, otherwise fails. */
+    // Expects to find basic auth credentials. If found, returns them, otherwise fails.
     case req @ Path(Seg("auth" :: Nil))       => req match {
       case BasicAuth(user, pwd) => new ResponseString(user + "\n" + pwd)
       case _                    => Unauthorized ~> WWWAuthenticate("""Basic realm="/"""")
     }
+
+    // Returns the value(s) of the specified request header, separated by line breaks if the header has more than one
+    // value
+    case req @ Path(Seg("header" :: header :: Nil)) => ResponseString(req.headers(header).mkString("\n"))
   }
 }

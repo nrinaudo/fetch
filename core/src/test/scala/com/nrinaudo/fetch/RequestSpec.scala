@@ -6,6 +6,10 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary._
 import com.nrinaudo.fetch.net.UrlEngine
+import com.nrinaudo.fetch.Request._
+import java.nio.charset.Charset
+import scala.collection.JavaConverters._
+import java.util.Locale
 
 object RequestSpec {
   def httpMethod = Gen.oneOf("GET", "POST", "PUT", "DELETE", "OPTIONS", "TRACE", "PATCH", "LINK", "UNLINK")
@@ -22,6 +26,16 @@ object RequestSpec {
   } yield (user, pwd)
 
   def encoding = Gen.oneOf(Encoding.Gzip, Encoding.Deflate, Encoding.Identity)
+
+  lazy val charsets = Charset.availableCharsets().values().asScala.toList
+  def charset = Gen.oneOf(charsets)
+
+  def language = Gen.oneOf(Locale.getAvailableLocales)
+
+  def conneg[T](gen: Gen[T]) = for {
+    value <- gen
+    q     <- arbitrary[Float]
+  } yield Conneg(value, math.abs(q / Float.MaxValue))
 }
 
 class RequestSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers with GeneratorDrivenPropertyChecks {
@@ -59,7 +73,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers wit
     }
 
     it("should extract the correct HTTP status codes") {
-      forAll(Gen.choose(200, 599)) {code =>
+      forAll(Gen.choose(200, 599)) { code =>
         request("status/" + code)().status should be(Status(code))
       }
     }
@@ -70,6 +84,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers wit
     // -----------------------------------------------------------------------------------------------------------------
     it("should correctly read and write entity bodies, regardless of the request and response encoding") {
       forAll(entity, encoding, encoding) { (entity, reqEncoding, resEncoding) =>
+
         val response = request("body").acceptEncoding(resEncoding).PUT(entity.encoding(reqEncoding))
 
         if(resEncoding == Encoding.Identity) response.headers.get("Content-Encoding") should be(None)
@@ -79,6 +94,29 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers wit
       }
     }
 
+
+
+    // - Header helpers ------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
+    it("should use the specified Accept header, discarding parameters if any is present") {
+      forAll(MimeTypeSpec.mimeType) { mime =>
+        request("header/Accept").accept(mime).GET().body.as[String] should be(mime.main + "/" + mime.sub)
+      }
+    }
+
+    it("should use the specified Accept-Charset header") {
+      forAll(charset) { charset =>
+        request("header/Accept-Charset").acceptCharset(charset).GET().body.as[String] should be(charset.name())
+      }
+    }
+
+    it("should use the specified Accept-Language header") {
+      forAll(language) { language =>
+        request("header/Accept-Language").acceptLanguage(language).GET().body.as[String] should be {
+          language.getLanguage + (if(language.getCountry.isEmpty) "" else "-" + language.getCountry)
+        }
+      }
+    }
 
 
     // - BasicAuth -----------------------------------------------------------------------------------------------------

@@ -15,6 +15,12 @@ object MimeTypeSpec {
 
   def params = for(list <- Gen.listOf(param)) yield
     list.foldLeft(Map[String, String]()) {case (map, (name, value)) => map + (name -> value)}
+
+  def mimeType = for {
+    main   <- main
+    sub    <- sub
+    params <- params
+  } yield MimeType(main, sub, params)
 }
 
 class MimeTypeSpec extends FunSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {

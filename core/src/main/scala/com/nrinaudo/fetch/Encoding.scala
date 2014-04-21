@@ -28,5 +28,7 @@ trait Encoding {
   def name: String
   def encode(out: OutputStream): OutputStream
   def decode(in: InputStream): InputStream
+
+  override def toString: String = name
 }
 

@@ -5,6 +5,7 @@ import java.nio.charset.Charset
 import scala.language.implicitConversions
 import java.net.URL
 import com.nrinaudo.fetch.ResponseEntity.EntityParser
+import java.util.Locale
 
 /**
  * @author Nicolas Rinaudo
@@ -54,13 +55,23 @@ package object fetch {
 
   // - Implicit conversions --------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  implicit def stringToEntity(str: String)     = RequestEntity(str)
-  implicit def readerToEntity(reader: Reader)  = RequestEntity(reader)
-  implicit def streamToEntity(in: InputStream) = RequestEntity(in)
-  implicit def fileToEntity(file: File)        = RequestEntity(file)
-  implicit def stringToURL(str: String)        = new URL(str)
-  implicit def urlToURL(url: Url)              = new URL(url.toString)
+  // Request entities.
+  implicit def stringToEntity(str: String)          = RequestEntity(str)
+  implicit def readerToEntity(reader: Reader)       = RequestEntity(reader)
+  implicit def streamToEntity(in: InputStream)      = RequestEntity(in)
+  implicit def fileToEntity(file: File)             = RequestEntity(file)
 
+  // URLs.
+  implicit def stringToURL(str: String)             = new URL(str)
+  implicit def urlToURL(url: Url)                   = new URL(url.toString)
+
+  // Content negotiation headers.
+  implicit def mimeToConneg(mime: MimeType)         = Request.Conneg(mime)
+  implicit def encodingToConneg(encoding: Encoding) = Request.Conneg(encoding)
+  implicit def charsetToConneg(charset: Charset)    = Request.Conneg(charset)
+  implicit def localeToConneg(locale: Locale)       = Request.Conneg(locale)
+
+  // Response entities.
   implicit val TextEntityParser: EntityParser[String] = (entity: ResponseEntity) => {
     val writer = new StringWriter()
     entity.withReader(writeChars(_, writer))
