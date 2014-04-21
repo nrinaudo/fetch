@@ -3,6 +3,8 @@ package com.nrinaudo.fetch
 import org.apache.commons.codec.binary.Base64
 import com.nrinaudo.fetch.Request.Engine
 import java.net.URL
+import java.io.IOException
+import com.nrinaudo.fetch.Encoding.Encodings
 
 object Request {
   type Engine = (URL, String, Option[RequestEntity], Headers) => Response[ResponseEntity]
@@ -10,26 +12,49 @@ object Request {
   def apply(url: URL)(implicit engine: Engine): Request = Request(engine, url)
 }
 
-/**
- * @author Nicolas Rinaudo
- */
-case class Request(engine:  Engine,
-                   url:     URL,
-                   method:  String  = "GET",
-                   headers: Headers = Map()) extends (Option[RequestEntity] => Response[ResponseEntity]) {
+/** Represents an HTTP(S) request.
+  *
+  * @param engine    engine used to execute the request.
+  * @param url       URL to connect to.
+  * @param method    HTTP method to execute.
+  * @param headers   HTTP headers to send.
+  * @param encodings supported response encodings.
+  */
+case class Request(engine:    Engine,
+                   url:       URL,
+                   method:    String    = "GET",
+                   headers:   Headers   = Map(),
+                   encodings: Encodings = Encoding.DefaultEncodings)
+  extends (Option[RequestEntity] => Response[ResponseEntity]) {
   // - Execution -------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
+  /** Decodes the specified response according to whatever is specified in the `Content-Encoding` header and the list
+    * of encodings we actually support.
+    *
+    * Unsupported encodings result in IOExceptions.
+    */
+  private def decode(response: Response[ResponseEntity]): Response[ResponseEntity] =
+    response.headers.get("Content-Encoding") map {e =>
+      e.reverse.foldRight(response) {(encoding, res) =>
+        encodings get encoding map {encoding => res.map(_.decode(encoding))} getOrElse {
+          throw new IOException("Unsupported content encoding: " + encoding)
+        }
+      }
+    } getOrElse response
+
+
   def apply(body: Option[RequestEntity]): Response[ResponseEntity] = {
     var h = headers
 
-    // Sets body specific HTTP headers.
+    // Sets body specific HTTP headers (or unsets them if necessary).
     body foreach {b =>
       h = h + ("Content-Type" -> List(b.mimeType.toString))
       if(b.encoding == Encoding.Identity) h = h - "Content-Encoding"
       else                                h = h + ("Content-Encoding" -> List(b.encoding.name))
     }
 
-    engine(url, method, body, h)
+    // Executes the query and decodes the response.
+    decode(engine(url, method, body, h))
   }
 
 
@@ -64,6 +89,17 @@ case class Request(engine:  Engine,
   def LINK: Request = method("LINK")
 
   def UNLINK: Request = method("UNLINK")
+
+
+  // - Content encoding ------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  def acceptEncoding(encoding: Encoding): Request =
+    copy(encodings = encodings + (encoding.name -> encoding),
+      headers = headers + ("Accept-Encoding" -> List(encoding.name)))
+
+  def acceptGzip: Request = acceptEncoding(Encoding.Gzip)
+
+  def acceptDeflate: Request = acceptEncoding(Encoding.Deflate)
 
 
 

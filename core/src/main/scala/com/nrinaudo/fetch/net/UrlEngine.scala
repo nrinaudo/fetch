@@ -66,7 +66,7 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
     con.connect()
 
     // Writes the request body if necessary.
-    body.foreach {b => b(con.getOutputStream)}
+    body.foreach {_(con.getOutputStream)}
 
     val status = Status(con.getResponseCode)
     new Response(status,

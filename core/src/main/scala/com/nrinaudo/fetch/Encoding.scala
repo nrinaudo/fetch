@@ -8,6 +8,11 @@ object Encoding {
   val Gzip = apply("gzip", (out) => new GZIPOutputStream(out), (in) => new GZIPInputStream(in))
   val Deflate = apply("deflate", (out) => new DeflaterOutputStream(out), (in) => new InflaterInputStream(in))
 
+  type Encodings = Map[String, Encoding]
+
+  val DefaultEncodings: Encodings = Map(Identity.name -> Identity) + (Gzip.name -> Gzip) +
+                                    (Deflate.name -> Deflate)
+
   private class EncodingImpl(override val name: String, e: (OutputStream) => OutputStream,
                              d: (InputStream) => InputStream) extends Encoding {
     override def decode(in: InputStream): InputStream = d(in)

@@ -14,6 +14,8 @@ object ResponseEntity {
  * @param stream stream from which to read the content of the entity.
  */
 class ResponseEntity(val mime: Option[MimeType], private val stream: InputStream) {
+  def decode(encoding: Encoding): ResponseEntity = new ResponseEntity(mime, encoding.decode(stream))
+
   def as[T : EntityParser] =
     try {implicitly[EntityParser[T]].apply(this)}
     finally {stream.close()}
