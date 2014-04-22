@@ -68,7 +68,10 @@ object TestPlan extends Plan {
     }
 
     // Returns the value(s) of the specified request header, separated by line breaks if the header has more than one
-    // value
-    case req @ Path(Seg("header" :: header :: Nil)) => ResponseString(req.headers(header).mkString("\n"))
+    // value.
+    // Note that there appears to be an unfiltered (jetty?) issue that fails to parse multiple header values defined
+    // as a comma separated list.
+    case req @ Path(Seg("header" :: header :: Nil)) =>
+      ResponseString(req.headers(header).flatMap(_.split(",").map(_.trim)).mkString("\n"))
   }
 }
