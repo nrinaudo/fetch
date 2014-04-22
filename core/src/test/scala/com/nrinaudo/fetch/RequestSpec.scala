@@ -159,10 +159,10 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers wit
     // -----------------------------------------------------------------------------------------------------------------
     def checkConneg[T](response: Response[ResponseEntity], values: List[Conneg[T]])(f: T => String) =
       response.body.as[String].split("\n").zip(values).foreach {
-        case (connegValue(param, q), value) =>
-          param should be(f(value.value))
-          if(q == null) value.q should be(1)
-          else (math.round(value.q * 1000) / 1000f) should be(q.toFloat)
+        case (connegValue(param, q), header) =>
+          param should be(f(header.value))
+          if(q == null) header.q should be(1)
+          else          (math.round(header.q * 1000) / 1000f) should be(q.toFloat)
       }
 
 
