@@ -1,7 +1,6 @@
 package com.nrinaudo.fetch
 
-import org.scalatest.{BeforeAndAfterAll, FunSpec}
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{Matchers, BeforeAndAfterAll, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary._
@@ -70,8 +69,8 @@ object RequestSpec {
   // Note that this is not entirely correct: according to the RFC, password are allowed to contain a ':'. This is not
   // properly handled in version 0.7.1 of unfiltered, however (the issue is fixed in github, but not yet released).
   def authCredentials = for {
-    user <- nonEmpty(arbitrary[String]).suchThat {!_.contains(':')}
-    pwd <- nonEmpty(arbitrary[String]).suchThat {!_.contains(':')}
+    user <- arbitrary[String].suchThat {str => !(str.isEmpty || str.contains(':'))}
+    pwd  <- arbitrary[String].suchThat {str => !(str.isEmpty || str.contains(':'))}
   } yield (user, pwd)
 
 
@@ -98,7 +97,7 @@ object RequestSpec {
   val connegValue = "([^;]+)(?:;q=(.*))?".r
 }
 
-class RequestSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
   import RequestSpec._
 
 
@@ -111,11 +110,11 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers wit
 
   def request(path: String) = Request(server.url + path)
 
-  override def beforeAll(conf: Map[String, Any]) {
+  override def beforeAll() {
     server.start()
   }
 
-  override def afterAll(conf: Map[String, Any]) {
+  override def afterAll() {
     server.stop()
   }
 

@@ -42,6 +42,8 @@ object TestPlan extends Plan {
 
 
   override def intent: Intent = Decoder {
+    case Path(Seg("empty" :: Nil)) => NotFound
+
     // Returns an empty response with the requested status.
     case Path(Seg("status" :: status :: Nil)) => SStatus(status.toInt)
 

@@ -1,4 +1,3 @@
-import SonatypeKeys._
 
 sonatypeSettings
 
@@ -6,9 +5,9 @@ name := "fetch"
 
 libraryDependencies += "commons-codec"   % "commons-codec"     % "1.5"
 
-libraryDependencies += "org.scalatest"  %% "scalatest"         % "1.9.1"  % "test"
+libraryDependencies += "org.scalatest"  %% "scalatest"         % "2.1.3"  % "test"
 
-libraryDependencies += "org.scalacheck" %% "scalacheck"        % "1.10.1" % "test"
+libraryDependencies += "org.scalacheck" %% "scalacheck"        % "1.11.3" % "test"
 
 libraryDependencies += "net.databinder" %% "unfiltered-filter" % "0.7.1"  % "test"
 

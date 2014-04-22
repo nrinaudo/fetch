@@ -1,7 +1,6 @@
 package com.nrinaudo.fetch
 
-import org.scalatest.FunSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.Gen
 
@@ -23,7 +22,7 @@ object MimeTypeSpec {
   } yield MimeType(main, sub, params)
 }
 
-class MimeTypeSpec extends FunSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class MimeTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
   import MimeTypeSpec._
 
   describe("A MIME type") {

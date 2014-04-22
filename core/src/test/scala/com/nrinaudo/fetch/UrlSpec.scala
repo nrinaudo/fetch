@@ -1,7 +1,6 @@
 package com.nrinaudo.fetch
 
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.FunSpec
+import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.Gen
 
@@ -53,7 +52,7 @@ object UrlSpec {
 /**
  * @author Nicolas Rinaudo
  */
-class UrlSpec extends FunSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class UrlSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
   import ProtocolSpec._
   import UrlSpec._
 

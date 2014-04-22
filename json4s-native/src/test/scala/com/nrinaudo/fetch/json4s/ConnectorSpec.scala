@@ -1,7 +1,6 @@
 package com.nrinaudo.fetch.json4s
 
-import org.scalatest.{BeforeAndAfterAll, FunSpec}
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{Matchers, BeforeAndAfterAll, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.Arbitrary
 import org.json4s.JsonAST._
@@ -29,7 +28,7 @@ class ReaderResponse(val reader: Reader) extends ResponseWriter {
   }
 }
 
-class ConnectorSpec extends FunSpec with ShouldMatchers with GeneratorDrivenPropertyChecks with BeforeAndAfterAll {
+class ConnectorSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks with BeforeAndAfterAll {
   implicit val formats = org.json4s.DefaultFormats
 
   val server = unfiltered.jetty.Http.anylocal.plan(Planify {
@@ -38,11 +37,11 @@ class ConnectorSpec extends FunSpec with ShouldMatchers with GeneratorDrivenProp
     }
   })
 
-  override def beforeAll(conf: Map[String, Any]) {
+  override def beforeAll() {
     server.start()
   }
 
-  override def afterAll(conf: Map[String, Any]) {
+  override def afterAll() {
     server.stop()
   }
 

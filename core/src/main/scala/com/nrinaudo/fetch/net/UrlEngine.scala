@@ -7,6 +7,7 @@ import com.nrinaudo.fetch.Response
 import com.nrinaudo.fetch.Status
 import scala.collection.JavaConverters._
 import com.nrinaudo.fetch.Request.Engine
+import java.io.InputStream
 
 object UrlEngine {
   /** Default chunk size (in bytes) when chunked transfer encoding is used. */
@@ -49,6 +50,16 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
     }
   }
 
+  /** Best effort attempt at finding a workable stream. If all else fails, use an empty stream. */
+  private def responseStream(status: Status, con: HttpURLConnection) = {
+    val stream = if(status.isError) con.getErrorStream else con.getInputStream
+
+    if(stream == null) new InputStream {
+      override def read(): Int = -1
+    }
+    else stream
+  }
+
   private def process(con: HttpURLConnection, method: String, body: Option[RequestEntity], headers: Headers) = {
     // Generic configuration.
     configure(con)
@@ -71,9 +82,7 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
     val status = Status(con.getResponseCode)
     new Response(status,
       con.getHeaderFields.asScala.mapValues(_.asScala.toList).toMap,
-      new ResponseEntity(Option(con.getContentType).map {MimeType(_)},
-      if(status.isError) con.getErrorStream else con.getInputStream)
-    )
+      new ResponseEntity(Option(con.getContentType).map {MimeType(_)}, responseStream(status, con)))
   }
 
   def apply(url: URL, method: String, body: Option[RequestEntity], headers: Headers): Response[ResponseEntity] =
