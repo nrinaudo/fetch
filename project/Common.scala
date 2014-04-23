@@ -28,8 +28,9 @@ object Common extends Build {
   Seq(organization       := "com.nrinaudo",
       version            := "0.2.0",
       scalaVersion       := "2.11.0",
-      crossScalaVersions := Seq("2.11.0", "2.10.3"),
+      crossScalaVersions := Seq("2.11.0", "2.10.4"),
       scalacOptions      ++= Seq("-unchecked", "-deprecation"),
+      incOptions         := incOptions.value.withNameHashing(true),
       pomExtra           := pom)
 
 }
