@@ -11,9 +11,10 @@ import unfiltered.Cycle
 import unfiltered.response.ResponseFilter.Filtering
 import unfiltered.response.ResponseString
 
-/**
- * @author Nicolas Rinaudo
- */
+/** Web server used for unit tests.
+  *
+  * @author Nicolas Rinaudo
+  */
 object TestPlan extends Plan {
   class ReaderResponse(val reader: Reader) extends ResponseWriter {
     override def respond(res: HttpResponse[Any]): Unit = {

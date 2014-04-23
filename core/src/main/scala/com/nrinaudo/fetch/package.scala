@@ -66,10 +66,10 @@ package object fetch {
   implicit def urlToURL(url: Url)                   = new URL(url.toString)
 
   // Content negotiation headers.
-  implicit def mimeToConneg(mime: MimeType)         = Request.Conneg(mime)
-  implicit def encodingToConneg(encoding: Encoding) = Request.Conneg(encoding)
-  implicit def charsetToConneg(charset: Charset)    = Request.Conneg(charset)
-  implicit def localeToConneg(locale: Locale)       = Request.Conneg(locale)
+  implicit def mimeToConneg(mime: MimeType)         = Conneg(mime)
+  implicit def encodingToConneg(encoding: Encoding) = Conneg(encoding)
+  implicit def charsetToConneg(charset: Charset)    = Conneg(charset)
+  implicit def localeToConneg(locale: Locale)       = Conneg(locale)
 
   // Response entities.
   implicit val TextEntityParser: EntityParser[String] = (entity: ResponseEntity) => {

@@ -7,7 +7,6 @@ import java.io.IOException
 import com.nrinaudo.fetch.Encoding.Encodings
 import java.nio.charset.Charset
 import java.util.Locale
-import java.text.DecimalFormat
 
 object Request {
   type Engine = (URL, String, Option[RequestEntity], Headers) => Response[ResponseEntity]
@@ -15,21 +14,7 @@ object Request {
   def apply(url: URL)(implicit engine: Engine): Request = Request(engine, url)
 
   // TODO: have the version number be dynamic, somehow.
-  val UserAgent = "Fetch/0.1"
-
-  private val qFormat = new DecimalFormat("0.###")
-
-  /** Represents a content negotiation header. */
-  case class Conneg[T](value: T, q: Float = 1) {
-    require(q >= 0 && q <= 1, "q must be between 0 and 1, inclusive.")
-
-    override def toString: String =
-      if(q == 1) value.toString
-      else       value + ";q=" + qFormat.format(q)
-
-    def map[S](f: T => S): Conneg[S] = Conneg(f(value), q)
-    def flatMap[S](f: T => Conneg[S]): Conneg[S] = f(value).copy(q = q)
-  }
+  val UserAgent = "Fetch/0.2"
 }
 
 /** Represents an HTTP(S) request.
@@ -120,8 +105,6 @@ case class Request(engine:    Engine,
 
   // - Content negotiation ---------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  import Request.Conneg
-
   private def conneg[T](name: String, values: Conneg[T]*) = {
     header(name, values.map(_.toString) :_*)
   }
