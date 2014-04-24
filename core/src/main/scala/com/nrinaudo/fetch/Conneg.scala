@@ -4,6 +4,7 @@ import java.text.DecimalFormat
 import scala.util.Try
 import java.nio.charset.Charset
 import java.util.Locale
+import Headers._
 
 object Conneg {
   implicit val ConnegEncoding: HeaderFormat[Conneg[Encoding]] = new ConnegFormat[Encoding]
