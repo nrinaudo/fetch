@@ -1,7 +1,7 @@
 package com.nrinaudo.fetch
 
 import java.net.URLEncoder
-
+import scala.util.Try
 
 object Url {
   import java.net.URL
@@ -26,7 +26,7 @@ object Url {
     Url(proto, url.getHost, url.getPort, splitPath(url.getPath), splitQuery(url.getQuery), Option(url.getRef))
   }
 
-  def apply(url: String): Url = apply(new URL(url))
+  def unapply(url: String): Option[Url] = Try {Url(new URL(url))}.toOption
 }
 
 /**

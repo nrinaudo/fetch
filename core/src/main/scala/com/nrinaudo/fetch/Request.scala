@@ -3,10 +3,10 @@ package com.nrinaudo.fetch
 import org.apache.commons.codec.binary.Base64
 import com.nrinaudo.fetch.Request.Engine
 import java.net.URL
-import java.io.IOException
-import com.nrinaudo.fetch.Encoding.Encodings
+import java.util.{Locale, Date}
+import Headers._
+import Conneg._
 import java.nio.charset.Charset
-import java.util.Locale
 
 object Request {
   type Engine = (URL, String, Option[RequestEntity], Headers) => Response[ResponseEntity]
@@ -23,14 +23,11 @@ object Request {
   * @param url       URL to connect to.
   * @param method    HTTP method to execute.
   * @param headers   HTTP headers to send.
-  * @param encodings supported response encodings.
   */
 case class Request(engine:    Engine,
                    url:       URL,
-                   method:    String    = "GET",
-                   headers:   Headers   = Map(),
-                   encodings: Encodings = Encoding.DefaultEncodings)
-  extends (Option[RequestEntity] => Response[ResponseEntity]) {
+                   method:    String  = "GET",
+                   headers:   Headers = new Headers()) extends (Option[RequestEntity] => Response[ResponseEntity]) {
   // - Execution -------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Decodes the specified response according to whatever is specified in the `Content-Encoding` header and the list
@@ -39,30 +36,21 @@ case class Request(engine:    Engine,
     * Unsupported encodings result in IOExceptions.
     */
   private def decode(response: Response[ResponseEntity]): Response[ResponseEntity] =
-    response.headers.get("Content-Encoding") map {e =>
-      e.reverse.foldRight(response) {(encoding, res) =>
-        encodings get encoding map {encoding => res.map(_.decode(encoding))} getOrElse {
-          throw new IOException("Unsupported content encoding: " + encoding)
-        }
-      }
+    response.headers.get[Seq[Encoding]]("Content-Encoding") map { values =>
+      values.reverse.foldLeft(response) { (res, encoding) => res.map(_.decode(encoding))}
     } getOrElse response
-
 
   def apply(body: Option[RequestEntity]): Response[ResponseEntity] = {
     var h = headers
 
     // Sets body specific HTTP headers (or unsets them if necessary).
     body foreach {b =>
-      h = h + ("Content-Type" -> List(b.mimeType.toString))
-      if(b.encoding == Encoding.Identity) h = h - "Content-Encoding"
-      else                                h = h + ("Content-Encoding" -> List(b.encoding.name))
+      h = h.set("Content-Type", b.mimeType)
+      if(b.encoding == Encoding.Identity) h = h.remove("Content-Encoding")
+      else                                h = h.set("Content-Encoding", b.encoding)
     }
 
-    // Sets default headers.
-    def setDefault(name: String, value: String) =
-      if(!headers.contains(name)) h = h + (name -> List(value))
-
-    setDefault("User-Agent", Request.UserAgent)
+    h = h.setIfEmpty("User-Agent", Request.UserAgent)
 
     // Executes the query and decodes the response.
     decode(engine(url, method, body, h))
@@ -105,52 +93,41 @@ case class Request(engine:    Engine,
 
   // - Content negotiation ---------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  private def conneg[T](name: String, values: Conneg[T]*) = {
-    header(name, values.map(_.toString) :_*)
-  }
-
-  def acceptEncoding(encoding: Conneg[Encoding]*): Request =
-    conneg("Accept-Encoding", encoding :_*).copy(encodings =
-      encoding.foldLeft(encodings) {(map, e) =>
-        map + (e.value.name -> e.value)
-      })
+  def acceptEncoding(encoding: Conneg[Encoding]*): Request = header("Accept-Encoding", encoding)
 
   def acceptGzip: Request = acceptEncoding(Encoding.Gzip)
 
   def acceptDeflate: Request = acceptEncoding(Encoding.Deflate)
 
+  def accept(mimeTypes: Conneg[MimeType]*): Request = header("Accept", mimeTypes map {mime =>
+    mime.map {_.copy(params = Map())}
+  })
 
-  def accept(mimeTypes: Conneg[MimeType]*): Request = conneg("Accept", mimeTypes map {mime =>
-    mime.map {_.copy(params = Map()).toString}
-  } :_*)
+  def acceptCharset(charsets: Conneg[Charset]*): Request = header("Accept-Charset", charsets)
 
-  def acceptCharset(charsets: Conneg[Charset]*): Request = conneg("Accept-Charset", charsets map {c =>
-    c.map(_.name())
-  } :_*)
-
-  def acceptLanguage(languages: Conneg[Locale]*): Request = conneg("Accept-Language", languages map {l =>
-    l.map {language =>
-      var value = language.getLanguage
-      if(!language.getCountry.isEmpty) value += "-" + language.getCountry
-      value
-    }
-  } :_*)
+  def acceptLanguage(languages: Conneg[Locale]*): Request = header("Accept-Language", languages)
 
 
 
   // - Generic headers -------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def header(name: String, value: String*): Request = copy(headers = headers + (name -> value.toList))
+  def header[T : HeaderFormat](name: String, value: T): Request = copy(headers = headers.set(name, value))
 
-  def header(name: String): Option[List[String]] = headers.get(name)
+  def header[T : HeaderFormat](name: String): Option[T] = headers.get[T](name)
 
 
 
   // - Misc. helpers ---------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
+  def range(ranges: ByteRange*): Request =
+    if(ranges.isEmpty) this
+    else               header("Range", ranges)
+
+  def date(date: Date = new Date()): Request = copy(headers = headers.set("Date", date))
+
   def userAgent(name: String): Request = header("User-Agent", name)
 
+  // TODO: do we want to wrap user & pwd in an Authorization case class?
   def auth(user: String, pwd: String): Request =
     header("Authorization", "Basic " + Base64.encodeBase64String((user + ':' + pwd).getBytes))
 }
-

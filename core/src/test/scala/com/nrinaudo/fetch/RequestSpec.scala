@@ -5,7 +5,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary._
 import com.nrinaudo.fetch.net.UrlEngine
-import scala.Some
+import java.util.Date
+import Headers._
 
 object RequestSpec {
   private val connegValue = "([^;]+)(?:;q=(.*))?".r
@@ -19,10 +20,13 @@ object RequestSpec {
     user <- arbitrary[String].suchThat {str => !(str.isEmpty || str.contains(':'))}
     pwd  <- arbitrary[String].suchThat {str => !(str.isEmpty || str.contains(':'))}
   } yield (user, pwd)
+
+  def simpleDate = for(time <- Gen.choose(0, 253402300799000l)) yield new Date((time / 1000l) * 1000)
 }
 
 class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
   import RequestSpec._
+  import ByteRangeSpec._
   import RequestEntitySpec._
   import ConnegSpec._
 
@@ -77,8 +81,8 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
       forAll(entity, encoding, encoding) { (entity, reqEncoding, resEncoding) =>
         val response = request("body").acceptEncoding(resEncoding).PUT(entity.entity.encoding(reqEncoding))
 
-        if(resEncoding == Encoding.Identity) response.headers.get("Content-Encoding") should be(None)
-        else                                 response.headers.get("Content-Encoding") should be(Some(List(resEncoding.name)))
+        if(resEncoding == Encoding.Identity) response.headers.get[String]("Content-Encoding") should be(None)
+        else                                 response.headers.get[String]("Content-Encoding") should be(Some(resEncoding.name))
 
         response.body.as[String] should be(entity.content)
       }
@@ -89,7 +93,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     // - Header helpers ------------------------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
     def checkConneg[T](response: Response[ResponseEntity], values: List[Conneg[T]])(f: T => String) =
-      response.body.as[String].split("\n").zip(values).foreach {
+      response.body.as[String].split(",").zip(values).foreach {
         case (connegValue(param, q), header) =>
           param should be(f(header.value))
           if(q == null) header.q should be(1)
@@ -128,21 +132,39 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
 
 
 
-    // - User agent ----------------------------------------------------------------------------------------------------
+    // - Misc. helpers -------------------------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
-    it("should send the default User-Agent when not specified") {
+    it("should send the default User-Agent header when none is specified") {
       request("header/User-Agent").GET().body.as[String] should be(Request.UserAgent)
     }
 
-    it("should send the correct User-Agent when specified") {
+    it("should send the correct User-Agent header when specified") {
       forAll(Gen.identifier) { userAgent =>
         request("header/User-Agent").userAgent(userAgent).GET().body.as[String] should be(userAgent)
       }
     }
 
+    it("should not send a Date header when none is specified") {
+      request("header/Date").GET().status should be(Status.NotFound)
+    }
 
-    // - BasicAuth -----------------------------------------------------------------------------------------------------
-    // -----------------------------------------------------------------------------------------------------------------
+    it("should send the correct Date header when specified") {
+      forAll(simpleDate) { date =>
+        Headers.DateFormat.parse(request("header/Date").date(date).GET().body.as[String]) should be(date)
+      }
+    }
+
+    it("should not send a Range header when none is specified") {
+      request("header/Range").GET().status should be(Status.NotFound)
+      request("header/Range").range().GET().status should be(Status.NotFound)
+    }
+
+    it("should send the correct Range header when specified") {
+      forAll(Gen.listOf(byteRange).suchThat(!_.isEmpty)) { ranges =>
+        request("header/Range").range(ranges :_*).GET().body.as[String] should be("bytes=" + ranges.mkString(","))
+      }
+    }
+
     it("should send basic auth credentials properly") {
       forAll(authCredentials) {case (user, pwd) =>
         request("auth").auth(user, pwd)().body.as[String] should be(user + "\n" + pwd)

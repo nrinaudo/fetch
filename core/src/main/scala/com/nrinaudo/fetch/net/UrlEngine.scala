@@ -72,7 +72,7 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
     }
 
     // Headers.
-    headers.foreach {case (name, value) => con.setRequestProperty(name, value.mkString(", "))}
+    headers.values.foreach {case (name, value) => con.setRequestProperty(name, value)}
 
     con.connect()
 
@@ -81,8 +81,8 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
 
     val status = Status(con.getResponseCode)
     new Response(status,
-      con.getHeaderFields.asScala.mapValues(_.asScala.toList).toMap,
-      new ResponseEntity(Option(con.getContentType).map {MimeType(_)}, responseStream(status, con)))
+      new Headers(con.getHeaderFields.asScala.mapValues(_.asScala.mkString(", ")).toMap),
+      new ResponseEntity(Option(con.getContentType) flatMap MimeType.unapply, responseStream(status, con)))
   }
 
   def apply(url: URL, method: String, body: Option[RequestEntity], headers: Headers): Response[ResponseEntity] =

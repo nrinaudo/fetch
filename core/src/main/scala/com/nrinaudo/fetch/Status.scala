@@ -1,5 +1,9 @@
 package com.nrinaudo.fetch
 
+object Status {
+  object NotFound extends Status(404)
+}
+
 /**
  * Represents HTTP statuses.
  * @author Nicolas Rinaudo

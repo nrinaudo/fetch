@@ -17,8 +17,6 @@ package object fetch {
   val         DefaultCharset = Charset.forName("UTF-8")
   /** Size of the buffer used when processing streams. */
   private val BufferSize     = 4096
-  /** Represents a request or response's HTTP headers. */
-  type Headers = Map[String, List[String]]
 
 
 
