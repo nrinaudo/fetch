@@ -22,8 +22,8 @@ object ByteRangeSpec {
   def byteRange = for {
     (from, to) <- boundaries
     opt        <- Gen.oneOf(0, 1, 2)
-    // Possibly not the cleanest generator I've ever written, but it does the job and will not be embarked in any
-    // live code.
+  // Possibly not the cleanest generator I've ever written, but it does the job and will not be embarked in any
+  // live code.
   } yield ByteRange(if(opt == 1) None else Some(from), if(opt ==2 ) None else Some(to))
 }
 
@@ -43,29 +43,26 @@ class ByteRangeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
     }
 
     it("should refuse negative values for its lower boundary") {
-      forAll(negBoundary, Gen.option(boundary)) {
-        (from, to) =>
-          intercept[IllegalArgumentException] {
-            ByteRange(Some(from), to)
-          }
+      forAll(negBoundary, Gen.option(boundary)) { (from, to) =>
+        intercept[IllegalArgumentException] {
+          ByteRange(Some(from), to)
+        }
       }
     }
 
     it("should refuse negative values for its upper boundary") {
-      forAll(Gen.option(boundary), negBoundary) {
-        (from, to) =>
-          intercept[IllegalArgumentException] {
-            ByteRange(from, Some(to))
-          }
+      forAll(Gen.option(boundary), negBoundary) { (from, to) =>
+        intercept[IllegalArgumentException] {
+          ByteRange(from, Some(to))
+        }
       }
     }
 
     it("should refuse instances where the upper boundary is smaller than the lower one") {
-      forAll(boundary, boundary) {
-        (from, to) =>
-          intercept[IllegalArgumentException] {
-            ByteRange(Some(math.max(from, to)), Some(math.min(from, to)))
-          }
+      forAll(boundaries.suchThat {b => b._1 != b._2}) { case (from, to) =>
+        intercept[IllegalArgumentException] {
+          ByteRange(Some(math.max(from, to)), Some(math.min(from, to)))
+        }
       }
     }
 
@@ -74,13 +71,13 @@ class ByteRangeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
     // -----------------------------------------------------------------------------------------------------------------
     it("should serialize as -[to] when no lower boundary is present") {
       forAll(boundary) { to =>
-          ByteRange(None, Some(to)).toString should be("-" + to)
+        ByteRange(None, Some(to)).toString should be("-" + to)
       }
     }
 
     it("should serialize as [from]- when no upper boundary is present") {
       forAll(boundary) { from =>
-          ByteRange(Some(from), None).toString should be(from + "-")
+        ByteRange(Some(from), None).toString should be(from + "-")
       }
     }
 
