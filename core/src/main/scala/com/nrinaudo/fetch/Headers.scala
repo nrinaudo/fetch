@@ -79,7 +79,9 @@ object Headers {
   }
 
   implicit val ByteRangesFormat = new HeaderFormat[Seq[ByteRange]] {
-    override def parse(value: String): Seq[ByteRange] = ???
+    override def parse(value: String): Seq[ByteRange] =
+      if(value.startsWith("bytes=")) value.substring(6).split(',').map(r => ByteRangeFormat.parse(r.trim))
+      else                           throw new IllegalArgumentException("Illegal byte range list: " + value)
     override def format(value: Seq[ByteRange]): String = {
       val builder = new StringBuilder("bytes=")
       var first   = true
