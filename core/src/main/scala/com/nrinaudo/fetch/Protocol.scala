@@ -1,8 +1,24 @@
 package com.nrinaudo.fetch
 
+import java.net.URL
+
+/** Known protocols. */
 object Protocol {
-  val Http = Protocol("http", Some(80))
-  val Https = Protocol("https", Some(443))
+  object Http extends Protocol("http", Some(80))
+  object Https extends Protocol("https", Some(443))
+
+  def unapply(str: String): Option[Protocol] = str match {
+    case Http.name  => Some(Http)
+    case Https.name => Some(Https)
+    case _          => Some(Protocol(str, None))
+  }
 }
 
-case class Protocol(value: String, defaultPort: Option[Int])
+/** Represents a valid URL protocol.
+  *
+  * See the [[Protocol$ companion object]] for standard instances.
+  *
+  * @param name        name of the protocol as used in URL strings.
+  * @param defaultPort default port associated with this protocol, if any.
+  */
+case class Protocol(name: String, defaultPort: Option[Int])

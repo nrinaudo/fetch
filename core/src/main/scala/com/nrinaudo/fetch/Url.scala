@@ -8,25 +8,31 @@ object Url {
 
   type Query = Map[String, List[String]]
 
+
+
+  // - URL-based construction ------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  def unapply(url: URL): Option[Url] = Some(apply(url))
+  def apply(url: URL): Url = {
+    val Protocol(protocol) = url.getProtocol
+    Url(protocol, url.getHost, url.getPort, splitPath(url.getPath), splitQuery(url.getQuery), Option(url.getRef))
+  }
+
   private def splitPath(path: String) = path.split("/").toList.filter(!_.isEmpty)
 
   private def splitQuery(query: String): Query =
     if(query == null) Map()
-    else              query.split("&").toList.foldLeft(Map[String, List[String]]()) {case (map, entry) =>
+    else              query.split("&").toList.foldLeft(Map[String, List[String]]()) { case (map, entry) =>
       val(name, values) = entry.splitAt(entry.indexOf('='))
       map + (name -> values.substring(1).split(',').toList)
     }
 
-  def apply(url: URL): Url = {
-    val proto = url.getProtocol match {
-      case "http"  => Protocol.Http
-      case "https" => Protocol.Https
-      case v       => new Protocol(v, None)
-    }
-    Url(proto, url.getHost, url.getPort, splitPath(url.getPath), splitQuery(url.getQuery), Option(url.getRef))
-  }
 
-  def unapply(url: String): Option[Url] = Try {Url(new URL(url))}.toOption
+
+  // - String-based construction ---------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  def unapply(url: String): Option[Url] = Try {apply(url)}.toOption
+  def apply(url: String) = Url(new URL(url))
 }
 
 /**
@@ -58,7 +64,7 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
     val builder = new StringBuilder
 
     // Protocol and host.
-    builder.append(protocol.value).append("://").append(host)
+    builder.append(protocol.name).append("://").append(host)
 
     // Appends the port if different from the default one.
     if(protocol.defaultPort.filter(_ == port).isEmpty) builder.append(':').append(port)

@@ -59,7 +59,7 @@ class UrlSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
   describe("An Url") {
     it("should ignore default ports") {
       forAll(protocol, host) {(protocol, host) =>
-        Url(protocol, host, protocol.defaultPort.get).toString should be(protocol.value + "://" + host + "/")
+        Url(protocol, host, protocol.defaultPort.get).toString should be(protocol.name + "://" + host + "/")
       }
     }
 
