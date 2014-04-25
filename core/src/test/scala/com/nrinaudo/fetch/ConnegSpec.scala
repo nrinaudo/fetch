@@ -12,7 +12,10 @@ object ConnegSpec {
 
   def charset: Gen[Charset] = Gen.oneOf(charsets)
 
-  def language: Gen[Locale] = Gen.oneOf(Locale.getAvailableLocales.filter(_.getVariant.isEmpty))
+  def language: Gen[Locale] = Gen.oneOf(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN, Locale.ITALIAN, Locale.JAPANESE,
+    Locale.KOREAN, Locale.CHINESE, Locale.SIMPLIFIED_CHINESE, Locale.TRADITIONAL_CHINESE, Locale.FRANCE, Locale.GERMANY,
+    Locale.ITALY, Locale.JAPAN, Locale.KOREA, Locale.CHINA, Locale.PRC, Locale.TAIWAN, Locale.UK, Locale.US,
+    Locale.CANADA, Locale.CANADA_FRENCH)
 
 
   def conneg[T](gen: Gen[T]): Gen[Conneg[T]] = for {
