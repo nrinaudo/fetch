@@ -2,16 +2,21 @@ package com.nrinaudo.fetch
 
 import org.apache.commons.codec.binary.Base64
 import com.nrinaudo.fetch.Request.Engine
-import java.net.URL
 import java.util.{Locale, Date}
 import Headers._
 import Conneg._
 import java.nio.charset.Charset
 
 object Request {
-  type Engine = (URL, String, Option[RequestEntity], Headers) => Response[ResponseEntity]
+  /** Type for underlying HTTP engines.
+    *
+    * Fetch comes with a default, `java.net.URLConnection` based [[com.nrinaudo.fetch.net.UrlEngine implementation]],
+    * but it might not be applicable to all use-cases. Defining your own engine allows you to use another underlying
+    * library, such as [[http://hc.apache.org/httpclient-3.x/ Apache HTTP client ]].
+    */
+  type Engine = (Url, Method, Option[RequestEntity], Headers) => Response[ResponseEntity]
 
-  def apply(url: URL)(implicit engine: Engine): Request = Request(engine, url)
+  def apply(url: Url)(implicit engine: Engine): Request = Request(engine, url)
 
   // TODO: have the version number be dynamic, somehow.
   val UserAgent = "Fetch/0.2"
@@ -24,10 +29,10 @@ object Request {
   * @param method    HTTP method to execute.
   * @param headers   HTTP headers to send.
   */
-case class Request(engine:    Engine,
-                   url:       URL,
-                   method:    String  = "GET",
-                   headers:   Headers = new Headers()) extends (Option[RequestEntity] => Response[ResponseEntity]) {
+case class Request(engine:  Engine,
+                   url:     Url,
+                   method:  Method  = Method.GET,
+                   headers: Headers = new Headers()) extends (Option[RequestEntity] => Response[ResponseEntity]) {
   // - Execution -------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Decodes the specified response according to whatever is specified in the `Content-Encoding` header and the list
@@ -50,7 +55,10 @@ case class Request(engine:    Engine,
       else                                h = h.set("Content-Encoding", b.encoding)
     }
 
-    h = h.setIfEmpty("User-Agent", Request.UserAgent)
+    // I'm not entirely happy with forcing a default Accept header - it's perfectly legal for it to be empty. The
+    // standard URLConnection forces a somewhat messed up default, however (image/gif, what were they thinking?),
+    // and */* is curl's default behaviour - if it's good enough for curl, it's good enough for me.
+    h = h.setIfEmpty("User-Agent", Request.UserAgent).setIfEmpty("Accept", "*/*")
 
     // Executes the query and decodes the response.
     decode(engine(url, method, body, h))
@@ -65,55 +73,94 @@ case class Request(engine:    Engine,
 
   // - HTTP methods ----------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def method(method: String): Request = copy(method = method)
+  def method(method: Method): Request = copy(method = method)
 
-  def GET: Request = method("GET")
+  def GET: Request = method(Method.GET)
 
-  def POST: Request = method("POST")
+  def POST: Request = method(Method.POST)
 
-  def PUT: Request = method("PUT")
+  def PUT: Request = method(Method.PUT)
 
-  def DELETE: Request = method("DELETE")
+  def DELETE: Request = method(Method.DELETE)
 
-  def HEAD: Request = method("HEAD")
+  def HEAD: Request = method(Method.HEAD)
 
-  def OPTIONS: Request = method("OPTIONS")
+  def OPTIONS: Request = method(Method.OPTIONS)
 
-  def TRACE: Request = method("TRACE")
+  def TRACE: Request = method(Method.TRACE)
 
-  def CONNECT: Request = method("CONNECT")
+  def CONNECT: Request = method(Method.CONNECT)
 
-  def PATCH: Request = method("PATCH")
+  def PATCH: Request = method(Method.PATCH)
 
-  def LINK: Request = method("LINK")
+  def LINK: Request = method(Method.LINK)
 
-  def UNLINK: Request = method("UNLINK")
+  def UNLINK: Request = method(Method.UNLINK)
 
 
 
   // - Content negotiation ---------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def acceptEncoding(encoding: Conneg[Encoding]*): Request = header("Accept-Encoding", encoding)
+  /** Notifies the remote server about transfer encoding preferences.
+    *
+    * This maps to the [[http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3 Accept-Encoding]] header.
+    * 
+    * @param  encodings list of encodings to declare.
+    */
+  def acceptEncoding(encodings: Conneg[Encoding]*): Request = header("Accept-Encoding", encodings)
 
+  /** Notifies the remote server that we expect GZIPed responses. */
   def acceptGzip: Request = acceptEncoding(Encoding.Gzip)
 
+  /** Notifies the remote server that we expect deflated responses. */
   def acceptDeflate: Request = acceptEncoding(Encoding.Deflate)
 
+  /** Notifies the remote server about response content type preferences.
+    *
+    * Note that should any of the MIME types contain a `charset` parameter, it will be removed. Charset preferences
+    * are expressed through [[Request.acceptCharset]].
+    *
+    * This maps to the [[http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1 Accept]] header.
+    *
+    * @param mimeTypes list of MIME types to declare.
+    */
   def accept(mimeTypes: Conneg[MimeType]*): Request = header("Accept", mimeTypes map {mime =>
     mime.map {_.copy(params = Map())}
   })
 
+  /** Notifies the remote server about response charset preferences.
+    *
+    * This maps to the [[http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.2 Accept-Charset]] header.
+   *
+   * @param charsets list of charsets to declare.
+   */
   def acceptCharset(charsets: Conneg[Charset]*): Request = header("Accept-Charset", charsets)
 
+  /** Notifies the remote server about response language preferences.
+    *
+    * This maps to the [[http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4 Accept-Language]] header.
+    *
+    * @param languages list of languages to declare.
+    */
   def acceptLanguage(languages: Conneg[Locale]*): Request = header("Accept-Language", languages)
 
 
 
   // - Generic headers -------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def header[T : HeaderFormat](name: String, value: T): Request = copy(headers = headers.set(name, value))
+  /** Sets the value of the specified header.
+    *
+    * This method expects an appropriate implicit [[HeaderFormat]] to be in scope. Standard formats are declared
+    * in `com.nrinaudo.fetch.Headers`.
+    */
+  def header[T: HeaderFormat](name: String, value: T): Request = copy(headers = headers.set(name, value))
 
-  def header[T : HeaderFormat](name: String): Option[T] = headers.get[T](name)
+  /** Returns the value of the requested header.
+    *
+    * This method expects an appropriate implicit [[HeaderFormat]] to be in scope. Standard formats are declared
+    * in `com.nrinaudo.fetch.Headers`.
+    */
+  def header[T: HeaderFormat](name: String): Option[T] = headers.get[T](name)
 
 
 

@@ -4,9 +4,12 @@ import java.io._
 import java.nio.charset.Charset
 
 /** Represents the body of an HTTP request.
+  *
+  * See [[RequestEntity!]] for various creation helpers.
+  *
   * @author Nicolas Rinaudo
   */
-trait RequestEntity extends (OutputStream => Unit) {
+trait RequestEntity {
   // - Entity length ---------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Exact length, in bytes, of the entity.
@@ -77,6 +80,10 @@ trait RequestEntity extends (OutputStream => Unit) {
   // - Submission ------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Writes this entity to the specified output stream.
+    *
+    * Note that this method should not be called directly, as it ignores modifiers such that content encoding.
+    * When you absolutely need to write the entity (such as when, say, implementing a non-defaul
+    * [[com.nrinaudo.fetch.Request.Engine Engine]]), you should call [[RequestEntity!.apply]] instead.
     *
     * Implementations should not close the specified stream.
     */

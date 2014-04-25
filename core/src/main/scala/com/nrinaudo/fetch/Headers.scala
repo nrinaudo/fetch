@@ -92,8 +92,12 @@ class Headers(val values: Map[String, String] = Map()) {
   // -------------------------------------------------------------------------------------------------------------------
   def get[T: HeaderFormat](name: String): Option[T] = values.get(name).map(implicitly[HeaderFormat[T]].parse)
 
-  def set[T: HeaderFormat](name: String, value: T): Headers =
-    new Headers(values + (name -> implicitly[HeaderFormat[T]].format(value)))
+  def set[T: HeaderFormat](name: String, value: T): Headers = {
+    val formatted = implicitly[HeaderFormat[T]].format(value)
+
+    if(formatted.isEmpty) this
+    else                  new Headers(values + (name -> formatted))
+  }
 
   def setIfEmpty[T: HeaderFormat](name: String, value: T): Headers =
     if(contains(name)) this

@@ -9,7 +9,7 @@ object ByteRangeSpec {
   /** Generates valid byte range boundaries. */
   def boundary = Gen.choose(0, 1000)
 
-  /** Generates invalid vyte range boundaries. */
+  /** Generates invalid byte range boundaries. */
   def negBoundary = Gen.choose(-1000, -1)
 
   /** Generate valid byte range boundaries. */

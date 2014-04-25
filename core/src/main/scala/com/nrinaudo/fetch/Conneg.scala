@@ -6,16 +6,17 @@ import java.nio.charset.Charset
 import java.util.Locale
 import Headers._
 
+/** Collection of implicit header formats for known content negotiation headers. */
 object Conneg {
   implicit val ConnegEncoding: HeaderFormat[Conneg[Encoding]] = new ConnegFormat[Encoding]
   implicit val ConnegMimeType: HeaderFormat[Conneg[MimeType]] = new ConnegFormat[MimeType]
   implicit val ConnegCharset: HeaderFormat[Conneg[Charset]]   = new ConnegFormat[Charset]
-  implicit val ConnegLocale: HeaderFormat[Conneg[Locale]]   = new ConnegFormat[Locale]
+  implicit val ConnegLocale: HeaderFormat[Conneg[Locale]]     = new ConnegFormat[Locale]
 }
 
-/** Represents an acceptable value for content negotiation headers (`Accept-*`).
+/** Represents an acceptable value for content negotiation headers (`Accept*`).
   *
-  * @param  value value of the header (its `toString` method will be used when setting HTTP headers).
+  * @param  value value of the header (see the companion object for header formats).
   * @param  q     weight of the value, as a float between 0 and 1 inclusive. Bigger weights tell remote servers that
   *               the corresponding value is more desirable than values associated with lower weights.
   */

@@ -60,10 +60,10 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
     else stream
   }
 
-  private def process(con: HttpURLConnection, method: String, body: Option[RequestEntity], headers: Headers) = {
+  private def process(con: HttpURLConnection, method: Method, body: Option[RequestEntity], headers: Headers) = {
     // Generic configuration.
     configure(con)
-    setMethod(con, method)
+    setMethod(con, method.name)
 
     // Entity body configuration.
     body.foreach {b =>
@@ -73,7 +73,6 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
 
     // Headers.
     headers.values.foreach {case (name, value) => con.setRequestProperty(name, value)}
-
     con.connect()
 
     // Writes the request body if necessary.
@@ -85,8 +84,8 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
       new ResponseEntity(Option(con.getContentType) flatMap MimeType.unapply, responseStream(status, con)))
   }
 
-  def apply(url: URL, method: String, body: Option[RequestEntity], headers: Headers): Response[ResponseEntity] =
-    url.openConnection() match {
+  def apply(url: Url, method: Method, body: Option[RequestEntity], headers: Headers): Response[ResponseEntity] =
+    new URL(url.toString).openConnection() match {
       case con: HttpURLConnection => process(con, method, body, headers)
       case _                      => throw new AssertionError("An URL opened a non-URL HTTP connection.")
     }

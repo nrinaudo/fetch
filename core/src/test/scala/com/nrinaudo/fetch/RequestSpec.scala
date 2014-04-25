@@ -12,7 +12,8 @@ object RequestSpec {
   private val connegValue = "([^;]+)(?:;q=(.*))?".r
 
   /** Generates random, legal HTTP methods. */
-  def httpMethod = Gen.oneOf("GET", "POST", "PUT", "DELETE", "OPTIONS", "TRACE", "PATCH", "LINK", "UNLINK")
+  def httpMethod = Gen.oneOf(Method.GET, Method.POST, Method.PUT, Method.DELETE, Method.OPTIONS, Method.TRACE,
+    Method.PATCH, Method.LINK, Method.UNLINK)
 
   // Note that this is not entirely correct: according to the RFC, password are allowed to contain a ':'. This is not
   // properly handled in version 0.7.1 of unfiltered, however (the issue is fixed in github, but not yet released).
@@ -29,6 +30,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
   import ByteRangeSpec._
   import RequestEntitySpec._
   import ConnegSpec._
+  import EncodingSpec._
 
 
 
@@ -57,7 +59,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     // -----------------------------------------------------------------------------------------------------------------
     it("should use the specified HTTP method") {
       forAll(httpMethod) { method =>
-        request("method").method(method).apply().body.as[String] should be(method)
+        request("method").method(method).apply().body.as[String] should be(method.name)
       }
     }
 
@@ -100,7 +102,6 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
           else          (math.round(header.q * 1000) / 1000f) should be(q.toFloat)
       }
 
-
     it("should use the specified Accept header(s), discarding parameters if any is present") {
       forAll(connegs(MimeTypeSpec.mimeType)) { mimeTypes =>
         checkConneg(request("header/Accept").accept(mimeTypes :_*).GET(), mimeTypes) { mimeType =>
@@ -109,10 +110,20 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
       }
     }
 
+    it("should send the default Accept header (*/*) when none is specified") {
+      request("header/Accept").GET().body.as[String] should be("*/*")
+      request("header/Accept").accept().GET().body.as[String] should be("*/*")
+    }
+
     it("should use the specified Accept-Charset header") {
       forAll(connegs(charset)) { charsets =>
         checkConneg(request("header/Accept-Charset").acceptCharset(charsets :_*).GET(), charsets)(_.name())
       }
+    }
+
+    it("should not send an Accept-Charset header when none is specified") {
+      request("header/Accept-Charset").GET().status should be(Status.NotFound)
+      request("header/Accept-Charset").acceptCharset().GET().status should be(Status.NotFound)
     }
 
     it("should use the specified Accept-Language header") {
@@ -123,17 +134,22 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
       }
     }
 
+    it("should not send an Accept-Language header when none is specified") {
+      request("header/Accept-Language").GET().status should be(Status.NotFound)
+      request("header/Accept-Language").acceptLanguage().GET().status should be(Status.NotFound)
+    }
+
     it("should use the specified Accept-Encoding header") {
       forAll(connegs(encoding)) { encodings =>
         checkConneg(request("header/Accept-Encoding").acceptEncoding(encodings :_*).GET(), encodings)(_.name)
       }
     }
 
+    it("should not send an Accept-Encoding header when none is specified") {
+      request("header/Accept-Encoding").GET().status should be(Status.NotFound)
+      request("header/Accept-Encoding").acceptEncoding().GET().status should be(Status.NotFound)
+    }
 
-
-
-    // - Misc. helpers -------------------------------------------------------------------------------------------------
-    // -----------------------------------------------------------------------------------------------------------------
     it("should send the default User-Agent header when none is specified") {
       request("header/User-Agent").GET().body.as[String] should be(Request.UserAgent)
     }

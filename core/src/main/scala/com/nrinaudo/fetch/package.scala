@@ -60,8 +60,8 @@ package object fetch {
   implicit def fileToEntity(file: File)             = RequestEntity(file)
 
   // URLs.
-  implicit def stringToURL(str: String)             = new URL(str)
-  implicit def urlToURL(url: Url)                   = new URL(url.toString)
+  implicit def stringToURL(str: String)             = Url.unapply(str).getOrElse {throw new IllegalArgumentException(str)}
+  implicit def urlToURL(url: URL)                   = Url(url)
 
   // Content negotiation headers.
   implicit def mimeToConneg(mime: MimeType)         = Conneg(mime)
