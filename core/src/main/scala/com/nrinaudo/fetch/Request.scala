@@ -117,8 +117,7 @@ case class Request(engine:  Engine,
 
   /** Notifies the remote server about response content type preferences.
     *
-    * Note that should any of the MIME types contain a `charset` parameter, it will be removed. Charset preferences
-    * are expressed through [[Request.acceptCharset]].
+    * Note that MIME type parameters are removed here. This is not RFC compliant and is an acknowledged issue.
     *
     * This maps to the [[http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1 Accept]] header.
     *

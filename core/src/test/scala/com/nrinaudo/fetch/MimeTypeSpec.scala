@@ -12,8 +12,10 @@ object MimeTypeSpec {
     value <- Gen.identifier
   } yield (name, value)
 
-  def params = for(list <- Gen.listOf(param)) yield
-    list.foldLeft(Map[String, String]()) {case (map, (name, value)) => map + (name -> value)}
+  def params = for {
+    n    <- Gen.choose(0, 10)
+    list <- Gen.listOfN(n, param)
+  } yield list.foldLeft(Map[String, String]()) {case (map, (name, value)) => map + (name -> value)}
 
   def mimeType = for {
     main   <- main

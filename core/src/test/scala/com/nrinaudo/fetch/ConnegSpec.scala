@@ -3,7 +3,6 @@ package com.nrinaudo.fetch
 import org.scalacheck.Gen
 import java.nio.charset.Charset
 import java.util.Locale
-import org.scalacheck.Arbitrary._
 import scala.collection.JavaConverters._
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
@@ -13,13 +12,13 @@ object ConnegSpec {
 
   def charset: Gen[Charset] = Gen.oneOf(charsets)
 
-  def language: Gen[Locale] = Gen.oneOf(Locale.getAvailableLocales)
+  def language: Gen[Locale] = Gen.oneOf(Locale.getAvailableLocales.filter(_.getVariant.isEmpty))
 
 
   def conneg[T](gen: Gen[T]): Gen[Conneg[T]] = for {
     value <- gen
-    q     <- arbitrary[Float]
-  } yield Conneg(value, math.abs(q / Float.MaxValue))
+    q     <- Gen.choose(0, 1000)
+  } yield Conneg(value, q / 1000f)
 
   def connegs[T](gen: Gen[T]): Gen[List[Conneg[T]]] = for {
     l    <- Gen.choose(1, 10)
@@ -28,16 +27,54 @@ object ConnegSpec {
 }
 
 class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  describe("A content negotiation header") {
-    it("should refuse illegal q values") {
+  import ConnegSpec._
+  import MimeTypeSpec._
+  import EncodingSpec._
+
+  describe("Content negotiation headers") {
+    it("should refuse illegal value of q") {
       forAll(Gen.oneOf(Gen.choose(1.1f, 100f), Gen.choose(-100f, -0.1f))) {q =>
         intercept[IllegalArgumentException] {Conneg("value", q)}
       }
     }
 
-    it("should accept legal q values") {
+    it("should accept legal values of q") {
       forAll(Gen.choose(0f, 1f)) {q =>
         Conneg("value", q)
+      }
+    }
+
+    it("should not serialize q when it's equal to 1") {
+      Conneg.ConnegCharset.format(Conneg(Charset.forName("UTF-8"), 1)) should be("UTF-8")
+    }
+
+    it("should assume an absent q defaults to 1.0") {
+      Conneg.ConnegCharset.parse("UTF-8") should be(Conneg(Charset.forName("UTF-8"), 1.0f))
+    }
+
+    it("should correctly serialize and parse languages") {
+      forAll(connegs(language)) { headers =>
+        HeadersSpec.cycle(Headers.seqFormat(Conneg.ConnegLanguage), headers) should be(headers)
+      }
+    }
+
+    it("should correctly serialize and parse charsets") {
+      forAll(connegs(charset)) { headers =>
+        HeadersSpec.cycle(Headers.seqFormat(Conneg.ConnegCharset), headers) should be(headers)
+      }
+    }
+
+    it("should correctly serialize and parse MIME types") {
+      forAll(connegs(mimeType)) { headers =>
+      // TODO: we're not perfectly RFC compliant when it comes to parsing Accept: parameters break the parser.
+        val fixed = headers.map(_.map(_.copy(params = Map())))
+        HeadersSpec.cycle(Headers.seqFormat(Conneg.ConnegMimeType), fixed) should be(fixed)
+      }
+    }
+
+    it("should correctly serialize and parse content encodings") {
+      forAll(connegs(encoding)) { headers =>
+        HeadersSpec.cycle(Headers.seqFormat(Conneg.ConnegEncoding), headers) should be(headers)
       }
     }
   }

@@ -21,8 +21,6 @@ object RequestSpec {
     user <- arbitrary[String].suchThat {str => !(str.isEmpty || str.contains(':'))}
     pwd  <- arbitrary[String].suchThat {str => !(str.isEmpty || str.contains(':'))}
   } yield (user, pwd)
-
-  def simpleDate = for(time <- Gen.choose(0, 253402300799000l)) yield new Date((time / 1000l) * 1000)
 }
 
 class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
@@ -31,6 +29,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
   import RequestEntitySpec._
   import ConnegSpec._
   import EncodingSpec._
+  import HeadersSpec._
 
 
 
@@ -165,7 +164,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     }
 
     it("should send the correct Date header when specified") {
-      forAll(simpleDate) { date =>
+      forAll(date) { date =>
         Headers.DateFormat.parse(request("header/Date").date(date).GET().body.as[String]) should be(date)
       }
     }

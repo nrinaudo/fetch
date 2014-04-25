@@ -1,5 +1,7 @@
 package com.nrinaudo.fetch
 
+import com.nrinaudo.fetch.Method.GET
+
 object Method {
   object GET extends Method("GET")
   object POST extends Method("POST")

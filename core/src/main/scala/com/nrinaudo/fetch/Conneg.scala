@@ -11,7 +11,7 @@ object Conneg {
   implicit val ConnegEncoding: HeaderFormat[Conneg[Encoding]] = new ConnegFormat[Encoding]
   implicit val ConnegMimeType: HeaderFormat[Conneg[MimeType]] = new ConnegFormat[MimeType]
   implicit val ConnegCharset: HeaderFormat[Conneg[Charset]]   = new ConnegFormat[Charset]
-  implicit val ConnegLocale: HeaderFormat[Conneg[Locale]]     = new ConnegFormat[Locale]
+  implicit val ConnegLanguage: HeaderFormat[Conneg[Locale]]     = new ConnegFormat[Locale]
 }
 
 /** Represents an acceptable value for content negotiation headers (`Accept*`).
@@ -34,7 +34,9 @@ private object ConnegFormat {
   val ConnegPattern = """([^;]+)(?:;\s*q\s*=\s*([0-9.]+))?""".r
 
   object qPattern {
-    def unapply(str: String): Option[Float] = Try {str.toFloat}.toOption.filter {q => q >= 0 && q <= 1}
+    def unapply(str: String): Option[Float] =
+      if(str == null) Some(1.0f)
+      else Try {str.toFloat}.toOption.filter {q => q >= 0 && q <= 1}
   }
 }
 

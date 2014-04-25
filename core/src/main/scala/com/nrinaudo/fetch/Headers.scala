@@ -26,10 +26,18 @@ object Headers {
 
     override def parse(str: String): Date = HttpDateFormat.synchronized {HttpDateFormat.parse(str)}
     override def format(date: Date): String = HttpDateFormat.synchronized {HttpDateFormat.format(date)}
+
   }
 
+  private val LanguagePattern = """([^-]+)(?:-([^-]+))?""".r
   implicit val LanguageFormat = new HeaderFormat[Locale] {
-    override def parse(value: String): Locale = ???
+    override def parse(value: String): Locale = value match {
+      case LanguagePattern(lang, country) =>
+        if(country == null) new Locale(lang)
+        else                new Locale(lang, country)
+
+      case _ => throw new IllegalArgumentException("Illegal language definition: " + value)
+    }
 
     override def format(value: Locale): String = {
       var v = value.getLanguage
