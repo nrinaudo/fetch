@@ -32,7 +32,7 @@ object Url {
   // - String-based construction ---------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def unapply(url: String): Option[Url] = Try {apply(url)}.toOption
-  def apply(url: String) = Url(new URL(url))
+  def apply(url: String): Url = Url(new URL(url))
 }
 
 /**
