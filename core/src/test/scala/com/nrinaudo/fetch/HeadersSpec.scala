@@ -17,6 +17,7 @@ class HeadersSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChec
   import ConnegSpec._
   import MimeTypeSpec._
   import EncodingSpec._
+  import ByteRangeSpec._
 
   def validate[T](format: HeaderFormat[T], value: T) = cycle(format, value) should be(value)
 
@@ -57,12 +58,22 @@ class HeadersSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChec
   }
 
   describe("The content encoding formatter") {
-    it("should correctly serialize and parse encoings") {
+    it("should correctly serialize and parse encodings") {
       forAll(encoding) { encoding => validate(Headers.EncodingFormat, encoding)}
     }
 
     it("should correctly serialize and parse lists of encodings") {
       forAll(nonEmptyListOf(encoding)) { encodings => validate(Headers.seqFormat(Headers.EncodingFormat), encodings)}
+    }
+  }
+
+  describe("The byte range encoding formatter") {
+    it("should correctly serialize and parse byte ranges") {
+      forAll(byteRange) { range => validate(Headers.ByteRangeFormat, range)}
+    }
+
+    it("should correctly serialize and parse lists of byte ranges") {
+      forAll(nonEmptyListOf(byteRange)) { ranges => validate(Headers.ByteRangesFormat, ranges)}
     }
   }
 }

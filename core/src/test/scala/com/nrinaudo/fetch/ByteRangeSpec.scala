@@ -31,8 +31,6 @@ object ByteRangeSpec {
 class ByteRangeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
   import ByteRangeSpec._
 
-
-
   describe("A byte range") {
     // - Failure cases -------------------------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
