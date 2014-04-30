@@ -6,6 +6,7 @@ import java.util.{Locale, Date}
 import Headers._
 import Conneg._
 import java.nio.charset.Charset
+import scala.concurrent.{ExecutionContext, Future}
 
 object Request {
   /** Type for underlying HTTP engines.
@@ -14,7 +15,7 @@ object Request {
     * but it might not be applicable to all use-cases. Defining your own engine allows you to use another underlying
     * library, such as [[http://hc.apache.org/httpclient-3.x/ Apache HTTP client ]].
     */
-  type Engine = (Url, Method, Option[RequestEntity], Headers) => Response[ResponseEntity]
+  type Engine = (Url, Method, Option[RequestEntity], Headers) => Future[Response[ResponseEntity]]
 
   def apply(url: Url)(implicit engine: Engine): Request = Request(engine, url)
 
@@ -32,7 +33,7 @@ object Request {
 case class Request(engine:  Engine,
                    url:     Url,
                    method:  Method  = Method.GET,
-                   headers: Headers = new Headers()) extends (Option[RequestEntity] => Response[ResponseEntity]) {
+                   headers: Headers = new Headers()) {
   // - Execution -------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Decodes the specified response according to whatever is specified in the `Content-Encoding` header and the list
@@ -45,7 +46,7 @@ case class Request(engine:  Engine,
       values.reverse.foldLeft(response) { (res, encoding) => res.map(_.decode(encoding))}
     } getOrElse response
 
-  def apply(body: Option[RequestEntity]): Response[ResponseEntity] = {
+  def apply(body: Option[RequestEntity])(implicit context: ExecutionContext): Future[Response[ResponseEntity]] = {
     var h = headers
 
     // Sets body specific HTTP headers (or unsets them if necessary).
@@ -61,13 +62,13 @@ case class Request(engine:  Engine,
     h = h.setIfEmpty("User-Agent", Request.UserAgent).setIfEmpty("Accept", "*/*")
 
     // Executes the query and decodes the response.
-    decode(engine(url, method, body, h))
+    engine(url, method, body, h) map decode
   }
 
 
-  def apply(): Response[ResponseEntity] = apply(None)
+  def apply()(implicit context: ExecutionContext): Future[Response[ResponseEntity]] = apply(None)
 
-  def apply(body: RequestEntity): Response[ResponseEntity] = apply(Some(body))
+  def apply(body: RequestEntity)(implicit context: ExecutionContext): Future[Response[ResponseEntity]] = apply(Some(body))
 
 
 
@@ -150,14 +151,14 @@ case class Request(engine:  Engine,
   /** Sets the value of the specified header.
     *
     * This method expects an appropriate implicit [[HeaderFormat]] to be in scope. Standard formats are declared
-    * in `com.nrinaudo.fetch.Headers`.
+    * in [[Headers$ Headers]].
     */
   def header[T: HeaderFormat](name: String, value: T): Request = copy(headers = headers.set(name, value))
 
   /** Returns the value of the requested header.
     *
     * This method expects an appropriate implicit [[HeaderFormat]] to be in scope. Standard formats are declared
-    * in `com.nrinaudo.fetch.Headers`.
+    * in [[Headers$ Headers]].
     */
   def header[T: HeaderFormat](name: String): Option[T] = headers.get[T](name)
 

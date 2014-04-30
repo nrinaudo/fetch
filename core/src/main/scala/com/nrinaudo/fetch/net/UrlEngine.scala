@@ -8,6 +8,7 @@ import com.nrinaudo.fetch.Status
 import scala.collection.JavaConverters._
 import com.nrinaudo.fetch.Request.Engine
 import java.io.InputStream
+import scala.concurrent._
 
 object UrlEngine {
   /** Default chunk size (in bytes) when chunked transfer encoding is used. */
@@ -25,7 +26,7 @@ object UrlEngine {
  * @author Nicolas Rinaudo
  */
 case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedirect: Boolean = false,
-                      chunkSize: Int = UrlEngine.DefaultChunkSize) extends Engine {
+                      chunkSize: Int = UrlEngine.DefaultChunkSize)(implicit val context: ExecutionContext) extends Engine {
   /** Configures the specified connection to this client's preferences. */
   private def configure(con: HttpURLConnection) {
     con.setConnectTimeout(connectTimeout)
@@ -84,9 +85,9 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
       new ResponseEntity(Option(con.getContentType) flatMap MimeType.unapply, responseStream(status, con)))
   }
 
-  def apply(url: Url, method: Method, body: Option[RequestEntity], headers: Headers): Response[ResponseEntity] =
+  def apply(url: Url, method: Method, body: Option[RequestEntity], headers: Headers): Future[Response[ResponseEntity]] =
     new URL(url.toString).openConnection() match {
-      case con: HttpURLConnection => process(con, method, body, headers)
-      case _                      => throw new AssertionError("An URL opened a non-URL HTTP connection.")
+      case con: HttpURLConnection => Future {process(con, method, body, headers)}
+      case _                      => Future.failed {new AssertionError("An URL opened a non-URL HTTP connection.")}
     }
 }

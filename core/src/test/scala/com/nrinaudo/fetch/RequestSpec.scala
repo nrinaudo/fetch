@@ -5,8 +5,9 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary._
 import com.nrinaudo.fetch.net.UrlEngine
-import java.util.Date
 import Headers._
+import scala.concurrent.{Future, Await, ExecutionContext}
+import scala.concurrent.duration._
 
 object RequestSpec {
   private val connegValue = "([^;]+)(?:;q=(.*))?".r
@@ -30,6 +31,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
   import ConnegSpec._
   import EncodingSpec._
   import HeadersSpec._
+  import scala.concurrent.ExecutionContext.Implicits.global
 
 
 
@@ -39,7 +41,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
 
   implicit val engine = UrlEngine()
 
-  def request(path: String) = Request(server.url + path)
+  def request(path: String)(implicit context: ExecutionContext) = Request(server.url + path)
 
   override def beforeAll() {
     server.start()
@@ -48,6 +50,8 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
   override def afterAll() {
     server.stop()
   }
+
+  def await(res: Future[Response[ResponseEntity]]): Response[ResponseEntity] = Await.result(res, 10 second)
 
 
 
@@ -58,19 +62,19 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     // -----------------------------------------------------------------------------------------------------------------
     it("should use the specified HTTP method") {
       forAll(httpMethod) { method =>
-        request("method").method(method).apply().body.as[String] should be(method.name)
+        await(request("method").method(method).apply()).body.as[String] should be(method.name)
       }
     }
 
     it("should extract the correct HTTP status codes") {
       forAll(Gen.choose(200, 599)) { code =>
-        request("status/" + code)().status should be(Status(code))
+        await(request("status/" + code).apply()).status should be(Status(code))
       }
     }
 
     it("should correctly send custom HTTP headers when present") {
       forAll(Gen.identifier, Gen.identifier) { (name, value) =>
-        request("header/" + name).header(name, value).GET().body.as[String] should be(value)
+        await(request("header/" + name).header(name, value).GET.apply()).body.as[String] should be(value)
       }
     }
 
@@ -80,7 +84,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     // -----------------------------------------------------------------------------------------------------------------
     it("should correctly read and write entity bodies, regardless of the request and response encoding") {
       forAll(entity, encoding, encoding) { (entity, reqEncoding, resEncoding) =>
-        val response = request("body").acceptEncoding(resEncoding).PUT(entity.entity.encoding(reqEncoding))
+        val response = await(request("body").acceptEncoding(resEncoding).PUT(entity.entity.encoding(reqEncoding)))
 
         if(resEncoding == Encoding.Identity) response.headers.get[String]("Content-Encoding") should be(None)
         else                                 response.headers.get[String]("Content-Encoding") should be(Some(resEncoding.name))
@@ -103,86 +107,86 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
 
     it("should use the specified Accept header(s), discarding parameters if any is present") {
       forAll(connegs(MimeTypeSpec.mimeType)) { mimeTypes =>
-        checkConneg(request("header/Accept").accept(mimeTypes :_*).GET(), mimeTypes) { mimeType =>
+        checkConneg(await(request("header/Accept").accept(mimeTypes :_*).GET.apply()), mimeTypes) { mimeType =>
           mimeType.main + "/" + mimeType.sub
         }
       }
     }
 
     it("should send the default Accept header (*/*) when none is specified") {
-      request("header/Accept").GET().body.as[String] should be("*/*")
-      request("header/Accept").accept().GET().body.as[String] should be("*/*")
+      await(request("header/Accept").GET.apply()).body.as[String] should be("*/*")
+      await(request("header/Accept").accept().GET.apply()).body.as[String] should be("*/*")
     }
 
     it("should use the specified Accept-Charset header") {
       forAll(connegs(charset)) { charsets =>
-        checkConneg(request("header/Accept-Charset").acceptCharset(charsets :_*).GET(), charsets)(_.name())
+        checkConneg(await(request("header/Accept-Charset").acceptCharset(charsets :_*).GET.apply()), charsets)(_.name())
       }
     }
 
     it("should not send an Accept-Charset header when none is specified") {
-      request("header/Accept-Charset").GET().status should be(Status.NotFound)
-      request("header/Accept-Charset").acceptCharset().GET().status should be(Status.NotFound)
+      await(request("header/Accept-Charset").GET.apply()).status should be(Status.NotFound)
+            await(request("header/Accept-Charset").acceptCharset().GET.apply()).status should be(Status.NotFound)
     }
 
     it("should use the specified Accept-Language header") {
       forAll(connegs(language)) { languages =>
-        checkConneg(request("header/Accept-Language").acceptLanguage(languages :_*).GET(), languages) { lang =>
+        checkConneg(await(request("header/Accept-Language").acceptLanguage(languages :_*).GET.apply()), languages) { lang =>
           lang.getLanguage + (if(lang.getCountry.isEmpty) "" else "-" + lang.getCountry)
         }
       }
     }
 
     it("should not send an Accept-Language header when none is specified") {
-      request("header/Accept-Language").GET().status should be(Status.NotFound)
-      request("header/Accept-Language").acceptLanguage().GET().status should be(Status.NotFound)
+      await(request("header/Accept-Language").GET.apply()).status should be(Status.NotFound)
+      await(request("header/Accept-Language").acceptLanguage().GET.apply()).status should be(Status.NotFound)
     }
 
     it("should use the specified Accept-Encoding header") {
       forAll(connegs(encoding)) { encodings =>
-        checkConneg(request("header/Accept-Encoding").acceptEncoding(encodings :_*).GET(), encodings)(_.name)
+        checkConneg(await(request("header/Accept-Encoding").acceptEncoding(encodings :_*).GET.apply()), encodings)(_.name)
       }
     }
 
     it("should not send an Accept-Encoding header when none is specified") {
-      request("header/Accept-Encoding").GET().status should be(Status.NotFound)
-      request("header/Accept-Encoding").acceptEncoding().GET().status should be(Status.NotFound)
+      await(request("header/Accept-Encoding").GET.apply()).status should be(Status.NotFound)
+      await(request("header/Accept-Encoding").acceptEncoding().GET.apply()).status should be(Status.NotFound)
     }
 
     it("should send the default User-Agent header when none is specified") {
-      request("header/User-Agent").GET().body.as[String] should be(Request.UserAgent)
+      await(request("header/User-Agent").GET.apply()).body.as[String] should be(Request.UserAgent)
     }
 
     it("should send the correct User-Agent header when specified") {
       forAll(Gen.identifier) { userAgent =>
-        request("header/User-Agent").userAgent(userAgent).GET().body.as[String] should be(userAgent)
+        await(request("header/User-Agent").userAgent(userAgent).GET.apply()).body.as[String] should be(userAgent)
       }
     }
 
     it("should not send a Date header when none is specified") {
-      request("header/Date").GET().status should be(Status.NotFound)
+      await(request("header/Date").GET.apply()).status should be(Status.NotFound)
     }
 
     it("should send the correct Date header when specified") {
       forAll(date) { date =>
-        Headers.DateFormat.parse(request("header/Date").date(date).GET().body.as[String]) should be(date)
+        Headers.DateFormat.parse(await(request("header/Date").date(date).GET.apply()).body.as[String]) should be(date)
       }
     }
 
     it("should not send a Range header when none is specified") {
-      request("header/Range").GET().status should be(Status.NotFound)
-      request("header/Range").range().GET().status should be(Status.NotFound)
+      await(request("header/Range").GET.apply()).status should be(Status.NotFound)
+      await(request("header/Range").range().GET.apply()).status should be(Status.NotFound)
     }
 
     it("should send the correct Range header when specified") {
       forAll(Gen.listOf(byteRange).suchThat(!_.isEmpty)) { ranges =>
-        request("header/Range").range(ranges :_*).GET().body.as[String] should be("bytes=" + ranges.mkString(","))
+        await(request("header/Range").range(ranges :_*).GET.apply()).body.as[String] should be("bytes=" + ranges.mkString(","))
       }
     }
 
     it("should send basic auth credentials properly") {
       forAll(authCredentials) {case (user, pwd) =>
-        request("auth").auth(user, pwd)().body.as[String] should be(user + "\n" + pwd)
+        await(request("auth").auth(user, pwd).apply()).body.as[String] should be(user + "\n" + pwd)
       }
     }
   }
