@@ -31,6 +31,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
   import ConnegSpec._
   import EncodingSpec._
   import HeadersSpec._
+  import ETagSpec._
   import scala.concurrent.ExecutionContext.Implicits.global
 
 
@@ -126,7 +127,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
 
     it("should not send an Accept-Charset header when none is specified") {
       await(request("header/Accept-Charset").GET.apply()).status should be(Status.NotFound)
-            await(request("header/Accept-Charset").acceptCharset().GET.apply()).status should be(Status.NotFound)
+      await(request("header/Accept-Charset").acceptCharset().GET.apply()).status should be(Status.NotFound)
     }
 
     it("should use the specified Accept-Language header") {
@@ -173,6 +174,26 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
       }
     }
 
+    it("should not send a If-Modified-Since header when none is specified") {
+      await(request("header/If-Modified-Since").GET.apply()).status should be(Status.NotFound)
+    }
+
+    it("should send the correct If-Modified-Since header when specified") {
+      forAll(date) { date =>
+        Headers.DateFormat.parse(await(request("header/If-Modified-Since").ifModifiedSince(date).GET.apply()).body.as[String]) should be(date)
+      }
+    }
+
+    it("should not send a If-Unmodified-Since header when none is specified") {
+      await(request("header/If-Unmodified-Since").GET.apply()).status should be(Status.NotFound)
+    }
+
+    it("should send the correct If-Unmodified-Since header when specified") {
+      forAll(date) { date =>
+        Headers.DateFormat.parse(await(request("header/If-Unmodified-Since").ifUnmodifiedSince(date).GET.apply()).body.as[String]) should be(date)
+      }
+    }
+
     it("should not send a Range header when none is specified") {
       await(request("header/Range").GET.apply()).status should be(Status.NotFound)
       await(request("header/Range").range().GET.apply()).status should be(Status.NotFound)
@@ -184,17 +205,46 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
       }
     }
 
+    it("should send the correct If-Match header when specified") {
+      forAll(Gen.listOf(etag).suchThat(!_.isEmpty)) { tags =>
+        await(request("header/If-Match").ifMatch(tags :_*).GET.apply()).body.as[String] should be(tags.mkString(","))
+      }
+    }
+
+    it("should not send an If-Match header when none is specified") {
+      await(request("header/If-Match").GET.apply()).status should be(Status.NotFound)
+      await(request("header/If-Match").ifMatch().GET.apply()).status should be(Status.NotFound)
+    }
+
+    it("should send the correct If-None-Match header when specified") {
+      forAll(Gen.listOf(etag).suchThat(!_.isEmpty)) { tags =>
+        await(request("header/If-None-Match").ifNoneMatch(tags :_*).GET.apply()).body.as[String] should be(tags.mkString(","))
+      }
+    }
+
+    it("should not send an If-None-Match header when none is specified") {
+      await(request("header/If-None-Match").GET.apply()).status should be(Status.NotFound)
+      await(request("header/If-None-Match").ifNoneMatch().GET.apply()).status should be(Status.NotFound)
+    }
+
+    it("should send the correct If-Range header when specified") {
+      forAll(etag) { tag =>
+        ETag(await(request("header/If-Range").ifRange(tag).GET.apply()).body.as[String]) should be(tag)
+      }
+
+      forAll(date) { date =>
+        Headers.DateFormat.parse(await(request("header/If-Range").ifRange(date).GET.apply()).body.as[String]) should be(date)
+      }
+    }
+
+    it("should not send an If-Range header when none is specified") {
+      await(request("header/If-Range").GET.apply()).status should be(Status.NotFound)
+    }
+
     it("should send basic auth credentials properly") {
       forAll(authCredentials) {case (user, pwd) =>
         await(request("auth").auth(user, pwd).apply()).body.as[String] should be(user + "\n" + pwd)
       }
     }
-
-    // TODO: tests for ifModifiedSince
-    // TODO: tests for ifUnmodifiedSince
-    // TODO: tests for ifNoneMatch
-    // TODO: tests for ifMatch
-    // TODO: tests for ifRange(ETag)
-    // TODO: tests for ifRange(Date)
   }
 }

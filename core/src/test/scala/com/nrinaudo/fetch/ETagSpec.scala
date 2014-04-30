@@ -2,12 +2,12 @@ package com.nrinaudo.fetch
 
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.Arbitrary
+import org.scalacheck.{Gen, Arbitrary}
 
 object ETagSpec {
   def etag = for {
     weak  <- Arbitrary.arbitrary[Boolean]
-    value <- Arbitrary.arbitrary[String].suchThat(!_.isEmpty)
+    value <- Gen.identifier.suchThat(!_.isEmpty)
   } yield
     if(weak) WeakTag(value)
     else     StrongTag(value)
