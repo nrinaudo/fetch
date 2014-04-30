@@ -36,7 +36,7 @@ private object ConnegFormat {
   object qPattern {
     def unapply(str: String): Option[Float] =
       if(str == null) Some(1.0f)
-      else Try {str.toFloat}.toOption.filter {q => q >= 0 && q <= 1}
+      else            Try {str.toFloat}.toOption.filter {q => q >= 0 && q <= 1}
   }
 }
 

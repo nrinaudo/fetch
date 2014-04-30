@@ -71,8 +71,7 @@ class UrlSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
 
     it("should serialize to itself") {
       forAll(url) {url =>
-        val Url(parsed) = url.toString
-        parsed should be(url)
+        Url(url.toString) should be(url)
       }
     }
   }

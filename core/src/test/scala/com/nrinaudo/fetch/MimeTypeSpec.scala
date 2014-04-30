@@ -30,9 +30,7 @@ class MimeTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChe
   describe("A MIME type") {
     it("should serialize to itself") {
       forAll(mimeType) { mime =>
-        val MimeType(parsed) = mime.toString
-
-        parsed should be(mime)
+        MimeType(mime.toString) should be(mime)
       }
     }
   }

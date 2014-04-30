@@ -36,7 +36,7 @@ object Headers {
         if(country == null) new Locale(lang)
         else                new Locale(lang, country)
 
-      case _ => throw new IllegalArgumentException("Illegal language definition: " + value)
+        case _ => throw new IllegalArgumentException("Illegal language definition: " + value)
     }
 
     override def format(value: Locale): String = {
@@ -59,9 +59,7 @@ object Headers {
   }
 
   implicit val MimeTypeFormat = new HeaderFormat[MimeType] {
-    override def parse(str: String): MimeType = MimeType.unapply(str).getOrElse {
-      throw new IllegalArgumentException("Not a valid MIME type: " + str)
-    }
+    override def parse(str: String): MimeType = MimeType(str)
     override def format(t: MimeType): String = t.toString
   }
 
@@ -70,10 +68,13 @@ object Headers {
     override def format(t: String): String = t
   }
 
+  implicit val ETagFormat = new HeaderFormat[ETag] {
+    override def format(value: ETag): String = value.toString
+    override def parse(value: String): ETag = ETag(value)
+  }
+
   implicit val ByteRangeFormat = new HeaderFormat[ByteRange] {
-    override def parse(value: String): ByteRange = ByteRange.unapply(value).getOrElse {
-      throw new IllegalArgumentException("Not a valid byte range: " + value)
-    }
+    override def parse(value: String): ByteRange = ByteRange(value)
 
     override def format(value: ByteRange): String = value.toString
   }

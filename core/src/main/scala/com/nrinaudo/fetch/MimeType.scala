@@ -35,6 +35,10 @@ object MimeType {
     case MimePattern(main, sub, ps) => Some(MimeType(main, sub, params(ps)))
     case _                          => None
   }
+
+  def apply(str: String): MimeType = unapply(str) getOrElse {
+    throw new IllegalArgumentException("Illegal MIME Type: " + str)
+  }
 }
 
 case class MimeType(main: String, sub: String, params: Map[String, String] = Map()) {

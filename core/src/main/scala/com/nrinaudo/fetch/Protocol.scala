@@ -12,6 +12,10 @@ object Protocol {
     case Https.name => Some(Https)
     case _          => Some(Protocol(str, None))
   }
+
+  def apply(str: String): Protocol = unapply(str) getOrElse {
+    throw new IllegalArgumentException("Illegal protocol: " + str)
+  }
 }
 
 /** Represents a valid URL protocol.

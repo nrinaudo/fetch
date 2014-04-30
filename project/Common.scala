@@ -29,7 +29,7 @@ object Common extends Build {
       version            := "0.2.0",
       scalaVersion       := "2.11.0",
       crossScalaVersions := Seq("2.11.0", "2.10.4"),
-      scalacOptions      ++= Seq("-unchecked", "-deprecation"),
+      scalacOptions      ++= Seq("-unchecked", "-deprecation", "-feature"),
       incOptions         := incOptions.value.withNameHashing(true),
       pomExtra           := pom)
 

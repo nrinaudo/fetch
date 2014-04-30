@@ -9,6 +9,10 @@ object ByteRange {
     case Extractor(left, right) => Try {ByteRange(Option(left).map {_.toInt}, Option(right).map {_.toInt})}.toOption
     case _                      => None
   }
+
+  def apply(str: String): ByteRange = unapply(str) getOrElse {
+    throw new IllegalArgumentException("Illegal byte range: " + str)
+  }
 }
 
 /** Represents an acceptable value for the `Range` HTTP header. */

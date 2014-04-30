@@ -90,8 +90,7 @@ class ByteRangeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
     // -----------------------------------------------------------------------------------------------------------------
     it("should parse valid instances correctly") {
       forAll(byteRange) { range =>
-        val ByteRange(parsed) = range.toString
-        parsed should be(range)
+        ByteRange(range.toString) should be(range)
       }
     }
   }

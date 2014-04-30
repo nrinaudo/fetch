@@ -51,7 +51,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     server.stop()
   }
 
-  def await(res: Future[Response[ResponseEntity]]): Response[ResponseEntity] = Await.result(res, 10 second)
+  def await(res: Future[Response[ResponseEntity]]): Response[ResponseEntity] = Await.result(res, 10.second)
 
 
 
@@ -189,5 +189,12 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
         await(request("auth").auth(user, pwd).apply()).body.as[String] should be(user + "\n" + pwd)
       }
     }
+
+    // TODO: tests for ifModifiedSince
+    // TODO: tests for ifUnmodifiedSince
+    // TODO: tests for ifNoneMatch
+    // TODO: tests for ifMatch
+    // TODO: tests for ifRange(ETag)
+    // TODO: tests for ifRange(Date)
   }
 }

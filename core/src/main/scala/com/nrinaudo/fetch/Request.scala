@@ -164,6 +164,22 @@ case class Request(engine:  Engine,
 
 
 
+  // - Cache headers ---------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  def ifModifiedSince(date: Date): Request = header("If-Modified-Since", date)
+
+  def ifUnmodifiedSince(date: Date): Request = header("If-Unmodified-Since", date)
+
+  def ifNoneMatch(tags: ETag*): Request = header("If-None-Match", tags)
+
+  def ifMatch(tags: ETag*): Request = header("If-Match", tags)
+
+  def ifRange(tag: ETag): Request = header("If-Range", tag)
+
+  def ifRange(date: Date): Request = header("If-Range", date)
+
+
+
   // - Misc. helpers ---------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def range(ranges: ByteRange*): Request =
