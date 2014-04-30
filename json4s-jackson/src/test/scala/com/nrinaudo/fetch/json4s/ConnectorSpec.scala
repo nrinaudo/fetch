@@ -12,6 +12,9 @@ import com.nrinaudo.fetch._
 import org.json4s.JsonAST.JString
 import com.nrinaudo.fetch.Request
 import com.nrinaudo.fetch.net.UrlEngine
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
 
 class ReaderResponse(val reader: Reader) extends ResponseWriter {
   override def respond(res: HttpResponse[Any]): Unit = {
@@ -36,6 +39,8 @@ class ConnectorSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
     }
   })
 
+  def await(res: Future[Response[ResponseEntity]]): Response[ResponseEntity] = Await.result(res, 10.second)
+
   override def beforeAll() {
     server.start()
   }
@@ -53,7 +58,7 @@ class ConnectorSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
   describe("The json4s-jackson connector") {
     it("should serialize / deserialize as expected") {
       forAll(json) {json =>
-        Request(UrlEngine(), server.url + "echo")(json).body.as[JValue] should be(json)
+        await(Request(UrlEngine(), server.url + "echo")(json)).body.as[JValue] should be(json)
       }
     }
   }
