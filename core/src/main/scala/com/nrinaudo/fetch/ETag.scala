@@ -14,6 +14,7 @@ object ETag {
 
 sealed trait ETag {
   def value: String
+  require(!value.isEmpty)
 }
 
 case class StrongTag(value: String) extends ETag {
