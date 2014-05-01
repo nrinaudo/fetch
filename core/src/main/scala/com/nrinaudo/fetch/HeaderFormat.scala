@@ -21,10 +21,10 @@ object HeaderFormat {
     override def write(value: T): String = writer.write(value)
   }
 
-  implicit def format[T](implicit reader: HeaderReader[T], writer: HeaderWriter[T]): HeaderFormat[T] =
+  def format[T](implicit reader: HeaderReader[T], writer: HeaderWriter[T]): HeaderFormat[T] =
     new Aggregated(reader, writer)
 
-  implicit def seqFormat[T: HeaderFormat]: HeaderFormat[Seq[T]] =
+  def seqFormat[T: HeaderFormat]: HeaderFormat[Seq[T]] =
     new Aggregated(seqReader(implicitly[HeaderReader[T]]), seqWriter(implicitly[HeaderWriter[T]]))
 
   implicit def seqWriter[T: HeaderWriter]: HeaderWriter[Seq[T]] = new HeaderWriter[Seq[T]] {
