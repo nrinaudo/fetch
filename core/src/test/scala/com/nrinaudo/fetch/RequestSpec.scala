@@ -5,7 +5,7 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary._
 import com.nrinaudo.fetch.net.UrlEngine
-import Headers._
+import HeaderFormat._
 import scala.concurrent.{Future, Await, ExecutionContext}
 import scala.concurrent.duration._
 
@@ -87,8 +87,8 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
       forAll(entity, encoding, encoding) { (entity, reqEncoding, resEncoding) =>
         val response = await(request("body").acceptEncoding(resEncoding).PUT(entity.entity.encoding(reqEncoding)))
 
-        if(resEncoding == Encoding.Identity) response.headers.get[String]("Content-Encoding") should be(None)
-        else                                 response.headers.get[String]("Content-Encoding") should be(Some(resEncoding.name))
+        if(resEncoding == Encoding.Identity) response.headers.getOpt[String]("Content-Encoding") should be(None)
+        else                                 response.headers.getOpt[String]("Content-Encoding") should be(Some(resEncoding.name))
 
         response.body.as[String] should be(entity.content)
       }
@@ -170,7 +170,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
 
     it("should send the correct Date header when specified") {
       forAll(date) { date =>
-        Headers.DateFormat.parse(await(request("header/Date").date(date).GET.apply()).body.as[String]) should be(date)
+        DateFormat.read(await(request("header/Date").date(date).GET.apply()).body.as[String]) should be(Some(date))
       }
     }
 
@@ -180,7 +180,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
 
     it("should send the correct If-Modified-Since header when specified") {
       forAll(date) { date =>
-        Headers.DateFormat.parse(await(request("header/If-Modified-Since").ifModifiedSince(date).GET.apply()).body.as[String]) should be(date)
+        DateFormat.read(await(request("header/If-Modified-Since").ifModifiedSince(date).GET.apply()).body.as[String]) should be(Some(date))
       }
     }
 
@@ -190,7 +190,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
 
     it("should send the correct If-Unmodified-Since header when specified") {
       forAll(date) { date =>
-        Headers.DateFormat.parse(await(request("header/If-Unmodified-Since").ifUnmodifiedSince(date).GET.apply()).body.as[String]) should be(date)
+        DateFormat.read(await(request("header/If-Unmodified-Since").ifUnmodifiedSince(date).GET.apply()).body.as[String]) should be(Some(date))
       }
     }
 
@@ -233,7 +233,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
       }
 
       forAll(date) { date =>
-        Headers.DateFormat.parse(await(request("header/If-Range").ifRange(date).GET.apply()).body.as[String]) should be(date)
+        DateFormat.read(await(request("header/If-Range").ifRange(date).GET.apply()).body.as[String]) should be(Some(date))
       }
     }
 

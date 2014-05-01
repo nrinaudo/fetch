@@ -1,7 +1,5 @@
 package com.nrinaudo.fetch
 
-import java.net.URL
-
 /** Known protocols. */
 object Protocol {
   object Http extends Protocol("http", Some(80))

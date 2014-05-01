@@ -33,6 +33,7 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
   import ConnegSpec._
   import MimeTypeSpec._
   import EncodingSpec._
+  import HeaderFormatSpec._
 
   describe("Content negotiation headers") {
     it("should refuse illegal value of q") {
@@ -48,22 +49,22 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     }
 
     it("should not serialize q when it's equal to 1") {
-      Conneg.ConnegCharset.format(Conneg(Charset.forName("UTF-8"), 1)) should be("UTF-8")
+      Conneg.ConnegCharset.write(Conneg(Charset.forName("UTF-8"), 1)) should be("UTF-8")
     }
 
     it("should assume an absent q defaults to 1.0") {
-      Conneg.ConnegCharset.parse("UTF-8") should be(Conneg(Charset.forName("UTF-8"), 1.0f))
+      Conneg.ConnegCharset.read("UTF-8") should be(Some(Conneg(Charset.forName("UTF-8"), 1.0f)))
     }
 
     it("should correctly serialize and parse languages") {
       forAll(connegs(language)) { headers =>
-        HeadersSpec.cycle(Headers.seqFormat(Conneg.ConnegLanguage), headers) should be(headers)
+        cycle(HeaderFormat.seqFormat(Conneg.ConnegLanguage), headers) should be(Some(headers))
       }
     }
 
     it("should correctly serialize and parse charsets") {
       forAll(connegs(charset)) { headers =>
-        HeadersSpec.cycle(Headers.seqFormat(Conneg.ConnegCharset), headers) should be(headers)
+        cycle(HeaderFormat.seqFormat(Conneg.ConnegCharset), headers) should be(Some(headers))
       }
     }
 
@@ -71,13 +72,13 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
       forAll(connegs(mimeType)) { headers =>
       // TODO: we're not perfectly RFC compliant when it comes to parsing Accept: parameters break the parser.
         val fixed = headers.map(_.map(_.copy(params = Map())))
-        HeadersSpec.cycle(Headers.seqFormat(Conneg.ConnegMimeType), fixed) should be(fixed)
+        cycle(HeaderFormat.seqFormat(Conneg.ConnegMimeType), fixed) should be(Some(fixed))
       }
     }
 
     it("should correctly serialize and parse content encodings") {
       forAll(connegs(encoding)) { headers =>
-        HeadersSpec.cycle(Headers.seqFormat(Conneg.ConnegEncoding), headers) should be(headers)
+        cycle(HeaderFormat.seqFormat(Conneg.ConnegEncoding), headers) should be(Some(headers))
       }
     }
   }

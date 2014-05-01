@@ -4,14 +4,13 @@ import java.text.DecimalFormat
 import scala.util.Try
 import java.nio.charset.Charset
 import java.util.Locale
-import Headers._
 
 /** Collection of implicit header formats for known content negotiation headers. */
 object Conneg {
   implicit val ConnegEncoding: HeaderFormat[Conneg[Encoding]] = new ConnegFormat[Encoding]
   implicit val ConnegMimeType: HeaderFormat[Conneg[MimeType]] = new ConnegFormat[MimeType]
   implicit val ConnegCharset: HeaderFormat[Conneg[Charset]]   = new ConnegFormat[Charset]
-  implicit val ConnegLanguage: HeaderFormat[Conneg[Locale]]     = new ConnegFormat[Locale]
+  implicit val ConnegLanguage: HeaderFormat[Conneg[Locale]]   = new ConnegFormat[Locale]
 }
 
 /** Represents an acceptable value for content negotiation headers (`Accept*`).
@@ -43,13 +42,13 @@ private object ConnegFormat {
 private class ConnegFormat[T: HeaderFormat] extends HeaderFormat[Conneg[T]] {
   import ConnegFormat._
 
-  override def parse(value: String): Conneg[T] = value match {
-    case ConnegPattern(data, qPattern(q)) => Conneg(implicitly[HeaderFormat[T]].parse(data), q)
-    case _                                => throw new IllegalArgumentException("Illegal conneg value: " + value)
+  override def read(value: String): Option[Conneg[T]] = value match {
+    case ConnegPattern(data, qPattern(q)) => implicitly[HeaderFormat[T]].read(data).map(Conneg(_, q))
+    case _                                => None
   }
 
-  override def format(value: Conneg[T]): String = {
-    val raw = implicitly[HeaderFormat[T]].format(value.value)
+  override def write(value: Conneg[T]): String = {
+    val raw = implicitly[HeaderFormat[T]].write(value.value)
     if(value.q == 1)  raw
     else              raw + ";q=" + qFormat.format(value.q)
   }

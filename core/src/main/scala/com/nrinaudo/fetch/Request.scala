@@ -3,8 +3,7 @@ package com.nrinaudo.fetch
 import org.apache.commons.codec.binary.Base64
 import com.nrinaudo.fetch.Request.Engine
 import java.util.{Locale, Date}
-import Headers._
-import Conneg._
+import HeaderFormat._
 import java.nio.charset.Charset
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -150,17 +149,11 @@ case class Request(engine:  Engine,
   // -------------------------------------------------------------------------------------------------------------------
   /** Sets the value of the specified header.
     *
-    * This method expects an appropriate implicit [[HeaderFormat]] to be in scope. Standard formats are declared
+    * This method expects an appropriate implicit [[HeaderWriter]] to be in scope. Standard formats are declared
     * in [[Headers$ Headers]].
     */
-  def header[T: HeaderFormat](name: String, value: T): Request = copy(headers = headers.set(name, value))
+  def header[T: HeaderWriter](name: String, value: T): Request = copy(headers = headers.set(name, value))
 
-  /** Returns the value of the requested header.
-    *
-    * This method expects an appropriate implicit [[HeaderFormat]] to be in scope. Standard formats are declared
-    * in [[Headers$ Headers]].
-    */
-  def header[T: HeaderFormat](name: String): Option[T] = headers.get[T](name)
 
 
 
