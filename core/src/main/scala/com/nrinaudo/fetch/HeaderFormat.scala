@@ -51,7 +51,6 @@ object HeaderFormat {
 
     override def read(str: String): Option[Date] = HttpDateFormat.synchronized {Try {HttpDateFormat.parse(str)}.toOption}
     override def write(date: Date): String = HttpDateFormat.synchronized {HttpDateFormat.format(date)}
-
   }
 
   private val LanguagePattern = """([^-]+)(?:-([^-]+))?""".r
@@ -105,16 +104,7 @@ object HeaderFormat {
     override def read(value: String): Option[Seq[ByteRange]] =
       if(value.startsWith("bytes=")) reader.read(value.substring(6))
       else                           None
-    override def write(value: Seq[ByteRange]): String = {
-      val builder = new StringBuilder("bytes=")
-      var first   = true
 
-      value.foreach { range =>
-        if(first) first = false
-        else      builder.append(',')
-        builder.append(ByteRangeFormat.write(range))
-      }
-      builder.result()
-    }
+    override def write(value: Seq[ByteRange]): String = value.map(ByteRangeFormat.write).mkString("bytes=", ",", "")
   }
 }
