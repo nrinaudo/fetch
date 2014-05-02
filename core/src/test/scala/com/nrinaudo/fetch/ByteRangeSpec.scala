@@ -25,6 +25,8 @@ object ByteRangeSpec {
   // Possibly not the cleanest generator I've ever written, but it does the job and will not be embarked in any
   // live code.
   } yield ByteRange(if(opt == 1) None else Some(from), if(opt ==2 ) None else Some(to))
+
+  def byteRanges = HeadersSpec.headers(byteRange)
 }
 
 /** Tests the [[ByteRange]] class. */

@@ -23,10 +23,7 @@ object ConnegSpec {
     q     <- Gen.choose(0, 1000)
   } yield Conneg(value, q / 1000f)
 
-  def connegs[T](gen: Gen[T]): Gen[List[Conneg[T]]] = for {
-    l    <- Gen.choose(1, 10)
-    list <- Gen.listOfN(l, conneg(gen))
-  } yield list
+  def connegs[T](gen: Gen[T]): Gen[List[Conneg[T]]] = HeadersSpec.headers(conneg(gen))
 }
 
 class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {

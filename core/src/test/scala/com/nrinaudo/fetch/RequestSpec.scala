@@ -200,13 +200,13 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     }
 
     it("should send the correct Range header when specified") {
-      forAll(Gen.listOf(byteRange).suchThat(!_.isEmpty)) { ranges =>
+      forAll(byteRanges) { ranges =>
         await(request("header/Range").range(ranges :_*).GET.apply()).body.as[String] should be("bytes=" + ranges.mkString(","))
       }
     }
 
     it("should send the correct If-Match header when specified") {
-      forAll(Gen.listOf(etag).suchThat(!_.isEmpty)) { tags =>
+      forAll(etags) { tags =>
         await(request("header/If-Match").ifMatch(tags :_*).GET.apply()).body.as[String] should be(tags.mkString(","))
       }
     }
@@ -217,7 +217,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     }
 
     it("should send the correct If-None-Match header when specified") {
-      forAll(Gen.listOf(etag).suchThat(!_.isEmpty)) { tags =>
+      forAll(etags) { tags =>
         await(request("header/If-None-Match").ifNoneMatch(tags :_*).GET.apply()).body.as[String] should be(tags.mkString(","))
       }
     }

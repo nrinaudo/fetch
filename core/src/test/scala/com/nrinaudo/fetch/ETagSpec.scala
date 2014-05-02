@@ -12,6 +12,7 @@ object ETagSpec {
     if(weak) WeakTag(value)
     else     StrongTag(value)
 
+  def etags = HeadersSpec.headers(etag)
 }
 
 class ETagSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {

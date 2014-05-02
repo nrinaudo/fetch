@@ -1,8 +1,5 @@
 package com.nrinaudo.fetch
 
-import java.util.{TimeZone, Locale, Date}
-import java.text.SimpleDateFormat
-import java.nio.charset.Charset
 import scala.util.Try
 
 /** Represents the headers associated with an HTTP request or response. */
