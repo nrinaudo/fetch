@@ -41,7 +41,7 @@ case class Request(engine:  Engine,
     * Unsupported encodings result in IOExceptions.
     */
   private def decode(response: Response[ResponseEntity]): Response[ResponseEntity] =
-    response.headers.get[Seq[Encoding]]("Content-Encoding") map { values =>
+    response.contentEncoding map { values =>
       values.reverse.foldLeft(response) { (res, encoding) => res.map(_.decode(encoding))}
     } getOrElse response
 

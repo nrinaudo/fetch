@@ -4,7 +4,7 @@ import java.util.{TimeZone, Locale, Date}
 import java.text.SimpleDateFormat
 import scala.util.Try
 import java.nio.charset.Charset
-
+import scala.concurrent.duration.Duration
 
 // - Reader ------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
@@ -118,6 +118,12 @@ object HeaderFormat {
   implicit object IntFormat extends HeaderFormat[Int] {
     override def read(str: String): Option[Int] = Try {str.toInt}.toOption
     override def write(t: Int): String          = t.toString
+  }
+
+  implicit object MethodFormat extends HeaderFormat[Method] {
+    override def read(value: String): Option[Method] = Method.unapply(value)
+
+    override def write(value: Method): String = value.name
   }
 
   implicit object ETagFormat extends HeaderFormat[ETag] {

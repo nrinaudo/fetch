@@ -2,7 +2,7 @@ package com.nrinaudo.fetch
 
 import unfiltered.filter.Plan
 import unfiltered.filter.Plan.Intent
-import unfiltered.request.{Decodes, BasicAuth, Seg, Path}
+import unfiltered.request._
 import unfiltered.response.{Status => SStatus, _}
 import java.util.zip.DeflaterOutputStream
 import java.io._
@@ -10,6 +10,7 @@ import unfiltered.kit.Prepend
 import unfiltered.Cycle
 import unfiltered.response.ResponseFilter.Filtering
 import unfiltered.response.ResponseString
+import scala.io.Source
 
 /** Web server used for unit tests.
   *
@@ -28,6 +29,13 @@ object TestPlan extends Plan {
         writer.write(c)
       }
       reader.close()
+    }
+  }
+
+  class HeaderResponse(name: String, value: String) extends Responder[Any] {
+    override def respond(res: HttpResponse[Any]): Unit = {
+      res.header(name, value)
+      res.status(200)
     }
   }
 
@@ -73,8 +81,13 @@ object TestPlan extends Plan {
     // Returns the value(s) of the specified request header, separated by line breaks if the header has more than one
     // value.
     case req @ Path(Seg("header" :: header :: Nil)) =>
-      val value = req.headers(header)
-      if(value.hasNext) ResponseString(value.map(_.trim).mkString("\n"))
-      else              NotFound
+      req match {
+        case GET(_) =>
+          val value = req.headers(header)
+          if(value.hasNext) ResponseString(value.map(_.trim).mkString("\n"))
+          else              NotFound
+
+        case POST(_) => new HeaderResponse(header, Source.fromInputStream(req.inputStream, "UTF-8").mkString)
+      }
   }
 }
