@@ -29,7 +29,7 @@ case class Response[A](status: Status, headers: Headers, body: A) {
   def age: Option[Int] = headers.getOpt[Int]("Age")
   def wwwAuthenticate: Option[String] = headers.getOpt[String]("WWW-Authenticate")
 
-  // TODO: implement Accept-RangesWhat partial content range types this server supports	Accept-Ranges: bytes	Permanent
+  // TODO: implement Accept-Ranges
   // TODO: implement Cache-Control
   // TODO: implement Connection
   // TODO: implement Content-Length
