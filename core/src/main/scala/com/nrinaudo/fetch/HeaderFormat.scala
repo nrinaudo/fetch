@@ -5,14 +5,38 @@ import java.text.SimpleDateFormat
 import scala.util.Try
 import java.nio.charset.Charset
 
+
+// - Reader ------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+object HeaderReader {
+  def apply[T](f: String => Option[T]) = new HeaderReader[T] {
+    override def read(value: String): Option[T] = f(value)
+  }
+}
+
 trait HeaderReader[T] {
+  /** Returns `Some[T]` if the specified value is a legal instance of `T`, `None` otherwise. */
   def read(value: String): Option[T]
+}
+
+
+
+// - Writer ------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+object HeaderWriter {
+  def apply[T](f: T => String) = new HeaderWriter[T] {
+    override def write(value: T): String = f(value)
+  }
 }
 
 trait HeaderWriter[T] {
   def write(value: T): String
 }
 
+
+
+// - Format ------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 trait HeaderFormat[T] extends HeaderReader[T] with HeaderWriter[T]
 
 object HeaderFormat {
@@ -21,7 +45,10 @@ object HeaderFormat {
     override def write(value: T): String = writer.write(value)
   }
 
-  def format[T](implicit reader: HeaderReader[T], writer: HeaderWriter[T]): HeaderFormat[T] =
+  def apply[T](reader: String => Option[T], writer: T => String): HeaderFormat[T] =
+    apply(HeaderReader(reader), HeaderWriter(writer))
+
+  def apply[T](implicit reader: HeaderReader[T], writer: HeaderWriter[T]): HeaderFormat[T] =
     new Aggregated(reader, writer)
 
   def seqFormat[T: HeaderFormat]: HeaderFormat[Seq[T]] =
@@ -70,32 +97,37 @@ object HeaderFormat {
 
   implicit object CharsetFormat extends HeaderFormat[Charset] {
     override def read(value: String): Option[Charset] = Try {Charset.forName(value)}.toOption
-    override def write(value: Charset): String = value.name()
+    override def write(value: Charset): String        = value.name()
   }
 
   implicit object EncodingFormat extends HeaderFormat[Encoding] {
     override def read(value: String): Option[Encoding] = Encoding.DefaultEncodings.get(value)
-    override def write(value: Encoding): String = value.name
+    override def write(value: Encoding): String        = value.name
   }
 
   implicit object MimeTypeFormat extends HeaderFormat[MimeType] {
     override def read(str: String): Option[MimeType] = MimeType.unapply(str)
-    override def write(t: MimeType): String = t.toString
+    override def write(t: MimeType): String          = t.toString
   }
 
   implicit object StringFormat extends HeaderFormat[String] {
     override def read(str: String): Option[String] = Some(str)
-    override def write(t: String): String = t
+    override def write(t: String): String          = t
+  }
+
+  implicit object IntFormat extends HeaderFormat[Int] {
+    override def read(str: String): Option[Int] = Try {str.toInt}.toOption
+    override def write(t: Int): String          = t.toString
   }
 
   implicit object ETagFormat extends HeaderFormat[ETag] {
     override def read(value: String): Option[ETag] = ETag.unapply(value)
-    override def write(value: ETag): String = value.toString
+    override def write(value: ETag): String        = value.toString
   }
 
   implicit object ByteRangeFormat extends HeaderFormat[ByteRange] {
     override def read(value: String): Option[ByteRange] = ByteRange.unapply(value)
-    override def write(value: ByteRange): String = value.toString
+    override def write(value: ByteRange): String        = value.toString
   }
 
   implicit object ByteRangesFormat extends HeaderFormat[Seq[ByteRange]] {

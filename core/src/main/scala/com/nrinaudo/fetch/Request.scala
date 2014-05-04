@@ -179,9 +179,11 @@ case class Request(engine:  Engine,
     if(ranges.isEmpty) this
     else               header("Range", ranges)
 
-  def date(date: Date = new Date()): Request = copy(headers = headers.set("Date", date))
+  def date(date: Date = new Date()): Request = header("Date", date)
 
   def userAgent(name: String): Request = header("User-Agent", name)
+
+  def maxForwards(value: Int): Request = header("Max-Forwards", value)
 
   // TODO: do we want to wrap user & pwd in an Authorization case class?
   def auth(user: String, pwd: String): Request =

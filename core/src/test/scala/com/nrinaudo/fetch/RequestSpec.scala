@@ -174,6 +174,16 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
       }
     }
 
+    it("should not send a Max-Forwards header when none is specified") {
+      await(request("header/MaxForwards").GET.apply()).status should be(Status.NotFound)
+    }
+
+    it("should send the correct Max-Forwards header when specified") {
+      forAll(arbitrary[Int].suchThat(_ >= 0)) { value =>
+        await(request("header/Max-Forwards").maxForwards(value).GET.apply()).body.as[Int] should be(value)
+      }
+    }
+
     it("should not send a If-Modified-Since header when none is specified") {
       await(request("header/If-Modified-Since").GET.apply()).status should be(Status.NotFound)
     }

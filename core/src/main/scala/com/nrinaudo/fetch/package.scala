@@ -75,4 +75,6 @@ package object fetch {
     entity.withReader(writeChars(_, writer))
     writer.toString
   }
+
+  implicit val IntEntityParser: EntityParser[Int] = TextEntityParser.andThen {_.toInt}
 }
