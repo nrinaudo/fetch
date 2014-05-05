@@ -6,6 +6,7 @@ import java.util.Locale
 import scala.collection.JavaConverters._
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import scala.util.Success
 
 object ConnegSpec {
   private lazy val charsets = Charset.availableCharsets().values().asScala.toList
@@ -50,18 +51,18 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     }
 
     it("should assume an absent q defaults to 1.0") {
-      Conneg.ConnegCharset.read("UTF-8") should be(Some(Conneg(Charset.forName("UTF-8"), 1.0f)))
+      Conneg.ConnegCharset.read("UTF-8") should be(Success(Conneg(Charset.forName("UTF-8"), 1.0f)))
     }
 
     it("should correctly serialize and parse languages") {
       forAll(connegs(language)) { headers =>
-        cycle(HeaderFormat.seqFormat(Conneg.ConnegLanguage), headers) should be(Some(headers))
+        cycle(HeaderFormat.seqFormat(Conneg.ConnegLanguage), headers) should be(Success(headers))
       }
     }
 
     it("should correctly serialize and parse charsets") {
       forAll(connegs(charset)) { headers =>
-        cycle(HeaderFormat.seqFormat(Conneg.ConnegCharset), headers) should be(Some(headers))
+        cycle(HeaderFormat.seqFormat(Conneg.ConnegCharset), headers) should be(Success(headers))
       }
     }
 
@@ -69,13 +70,13 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
       forAll(connegs(mimeType)) { headers =>
       // TODO: we're not perfectly RFC compliant when it comes to parsing Accept: parameters break the parser.
         val fixed = headers.map(_.map(_.copy(params = Map())))
-        cycle(HeaderFormat.seqFormat(Conneg.ConnegMimeType), fixed) should be(Some(fixed))
+        cycle(HeaderFormat.seqFormat(Conneg.ConnegMimeType), fixed) should be(Success(fixed))
       }
     }
 
     it("should correctly serialize and parse content encodings") {
       forAll(connegs(encoding)) { headers =>
-        cycle(HeaderFormat.seqFormat(Conneg.ConnegEncoding), headers) should be(Some(headers))
+        cycle(HeaderFormat.seqFormat(Conneg.ConnegEncoding), headers) should be(Success(headers))
       }
     }
   }

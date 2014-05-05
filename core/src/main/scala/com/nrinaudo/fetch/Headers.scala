@@ -1,6 +1,6 @@
 package com.nrinaudo.fetch
 
-import scala.util.Try
+import scala.util.{Failure, Try}
 
 /** Represents the headers associated with an HTTP request or response. */
 class Headers(val values: Map[String, String] = Map()) {
@@ -8,15 +8,15 @@ class Headers(val values: Map[String, String] = Map()) {
   // -------------------------------------------------------------------------------------------------------------------
   def apply[T: HeaderReader](name: String): T = {
     val raw = values(name)
-    implicitly[HeaderReader[T]].read(raw) getOrElse {throw new IllegalArgumentException(raw)}
+    implicitly[HeaderReader[T]].read(raw).get
   }
 
   def getOpt[T: HeaderReader](name: String): Option[T] = for {
     raw    <- values.get(name)
-    parsed <- implicitly[HeaderReader[T]].read(raw)
+    parsed <- implicitly[HeaderReader[T]].read(raw).toOption
   } yield parsed
 
-  def get[T: HeaderReader](name: String): Try[T] = Try {apply(name)}
+  def get[T: HeaderReader](name: String): Option[Try[T]] = values.get(name) map {implicitly[HeaderReader[T]].read}
 
   def set[T: HeaderWriter](name: String, value: T): Headers = {
     val formatted = implicitly[HeaderWriter[T]].write(value)

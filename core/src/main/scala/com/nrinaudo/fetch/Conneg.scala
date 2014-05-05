@@ -1,7 +1,7 @@
 package com.nrinaudo.fetch
 
 import java.text.DecimalFormat
-import scala.util.Try
+import scala.util.{Failure, Try}
 import java.nio.charset.Charset
 import java.util.Locale
 
@@ -42,9 +42,9 @@ private object ConnegFormat {
 private class ConnegFormat[T: HeaderFormat] extends HeaderFormat[Conneg[T]] {
   import ConnegFormat._
 
-  override def read(value: String): Option[Conneg[T]] = value match {
+  override def read(value: String): Try[Conneg[T]] = value match {
     case ConnegPattern(data, qPattern(q)) => implicitly[HeaderFormat[T]].read(data).map(Conneg(_, q))
-    case _                                => None
+    case _                                => Failure(new IllegalArgumentException("Illegal content negotiation header: " + value))
   }
 
   override def write(value: Conneg[T]): String = {

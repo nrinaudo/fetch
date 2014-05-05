@@ -4,7 +4,7 @@ import org.scalacheck.Gen._
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import com.nrinaudo.fetch.HeaderFormat._
-import scala.Some
+import scala.util.Success
 
 object HeaderFormatSpec {
   def cycle[T](format: HeaderFormat[T], value: T) = format.read(format.write(value))
@@ -18,7 +18,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
   import EncodingSpec._
   import ByteRangeSpec._
 
-  def validate[T](format: HeaderFormat[T], value: T) = cycle(format, value) should be(Some(value))
+  def validate[T](format: HeaderFormat[T], value: T) = cycle(format, value) should be(Success(value))
 
   describe("The date formatter") {
     it("should correctly serialize and parse dates") {

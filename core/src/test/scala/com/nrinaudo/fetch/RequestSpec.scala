@@ -8,6 +8,7 @@ import com.nrinaudo.fetch.net.UrlEngine
 import HeaderFormat._
 import scala.concurrent.{Future, Await, ExecutionContext}
 import scala.concurrent.duration._
+import scala.util.Success
 
 object RequestSpec {
   private val connegValue = "([^;]+)(?:;q=(.*))?".r
@@ -170,7 +171,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
 
     it("should send the correct Date header when specified") {
       forAll(date) { date =>
-        DateFormat.read(await(request("header/Date").date(date).GET.apply()).body.as[String]) should be(Some(date))
+        DateFormat.read(await(request("header/Date").date(date).GET.apply()).body.as[String]) should be(Success(date))
       }
     }
 
@@ -190,7 +191,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
 
     it("should send the correct If-Modified-Since header when specified") {
       forAll(date) { date =>
-        DateFormat.read(await(request("header/If-Modified-Since").ifModifiedSince(date).GET.apply()).body.as[String]) should be(Some(date))
+        DateFormat.read(await(request("header/If-Modified-Since").ifModifiedSince(date).GET.apply()).body.as[String]) should be(Success(date))
       }
     }
 
@@ -200,7 +201,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
 
     it("should send the correct If-Unmodified-Since header when specified") {
       forAll(date) { date =>
-        DateFormat.read(await(request("header/If-Unmodified-Since").ifUnmodifiedSince(date).GET.apply()).body.as[String]) should be(Some(date))
+        DateFormat.read(await(request("header/If-Unmodified-Since").ifUnmodifiedSince(date).GET.apply()).body.as[String]) should be(Success(date))
       }
     }
 
@@ -243,7 +244,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
       }
 
       forAll(date) { date =>
-        DateFormat.read(await(request("header/If-Range").ifRange(date).GET.apply()).body.as[String]) should be(Some(date))
+        DateFormat.read(await(request("header/If-Range").ifRange(date).GET.apply()).body.as[String]) should be(Success(date))
       }
     }
 
