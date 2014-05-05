@@ -9,13 +9,10 @@ import HeaderFormat._
 import scala.concurrent.{Future, Await, ExecutionContext}
 import scala.concurrent.duration._
 import scala.util.Success
+import unfiltered.jetty.Server
 
 object RequestSpec {
   private val connegValue = "([^;]+)(?:;q=(.*))?".r
-
-  /** Generates random, legal HTTP methods. */
-  def httpMethod = Gen.oneOf(Method.GET, Method.POST, Method.PUT, Method.DELETE, Method.OPTIONS, Method.TRACE,
-    Method.PATCH, Method.LINK, Method.UNLINK)
 
   // Note that this is not entirely correct: according to the RFC, password are allowed to contain a ':'. This is not
   // properly handled in version 0.7.1 of unfiltered, however (the issue is fixed in github, but not yet released).
@@ -23,6 +20,8 @@ object RequestSpec {
     user <- arbitrary[String].suchThat {str => !(str.isEmpty || str.contains(':'))}
     pwd  <- arbitrary[String].suchThat {str => !(str.isEmpty || str.contains(':'))}
   } yield (user, pwd)
+
+  def await(res: Future[Response[ResponseEntity]]): Response[ResponseEntity] = Await.result(res, 10.second)
 }
 
 class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
@@ -33,27 +32,24 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
   import EncodingSpec._
   import HeadersSpec._
   import ETagSpec._
+  import MethodSpec._
   import scala.concurrent.ExecutionContext.Implicits.global
+  import TestPlan._
 
 
 
   // - Test HTTP server ------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  val server = unfiltered.jetty.Http.anylocal.plan(TestPlan)
-
+  implicit val server: Server = TestPlan.create
   implicit val engine = UrlEngine()
 
-  def request(path: String)(implicit context: ExecutionContext) = Request(server.url + path)
-
   override def beforeAll() {
-    server.start()
+    TestPlan.start
   }
 
   override def afterAll() {
-    server.stop()
+    TestPlan.stop
   }
-
-  def await(res: Future[Response[ResponseEntity]]): Response[ResponseEntity] = Await.result(res, 10.second)
 
 
 

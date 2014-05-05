@@ -11,13 +11,15 @@ import unfiltered.Cycle
 import unfiltered.response.ResponseFilter.Filtering
 import unfiltered.response.ResponseString
 import scala.io.Source
+import unfiltered.jetty.Server
+import scala.concurrent.ExecutionContext
+import com.nrinaudo.fetch.Request.Engine
 
-/** Web server used for unit tests.
-  *
-  * @author Nicolas Rinaudo
-  */
+/** Web server used for unit tests. */
 object TestPlan extends Plan {
-  class ReaderResponse(val reader: Reader) extends ResponseWriter {
+  // - Helper classes --------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  private class ReaderResponse(val reader: Reader) extends ResponseWriter {
     override def respond(res: HttpResponse[Any]): Unit = {
       res.header("Content-Type", "text/plain;charset=\"" + res.charset.name() + "\"")
       super.respond(res)
@@ -32,8 +34,9 @@ object TestPlan extends Plan {
     }
   }
 
-  class HeaderResponse(name: String, value: String) extends Responder[Any] {
+  private class HeaderResponse(name: String, value: String) extends Responder[Any] {
     override def respond(res: HttpResponse[Any]): Unit = {
+      println(res.underlying.getClass)
       res.header(name, value)
       res.status(200)
     }
@@ -50,6 +53,18 @@ object TestPlan extends Plan {
   }
 
 
+
+  // - Startup / shutdown ----------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  def create: Server = unfiltered.jetty.Http.anylocal.plan(TestPlan)
+  def start(implicit server: Server) = server.start()
+  def stop(implicit server: Server) = server.stop()
+  def request(path: String)(implicit context: ExecutionContext, server: Server, engine: Engine) = Request(server.url + path)
+
+
+
+  // - Actual plan -----------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
   override def intent: Intent = Decoder {
     case Path(Seg("empty" :: Nil)) => NotFound
 
