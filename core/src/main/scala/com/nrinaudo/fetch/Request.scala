@@ -1,11 +1,11 @@
 package com.nrinaudo.fetch
 
 import org.apache.commons.codec.binary.Base64
-import com.nrinaudo.fetch.Request.Engine
 import java.util.{Locale, Date}
 import HeaderFormat._
 import java.nio.charset.Charset
 import scala.concurrent.{ExecutionContext, Future}
+import Request._
 
 object Request {
   /** Type for underlying HTTP engines.
@@ -32,7 +32,7 @@ object Request {
 case class Request(engine:  Engine,
                    url:     Url,
                    method:  Method  = Method.GET,
-                   headers: Headers = new Headers()) {
+                   headers: Headers = new Headers(Map[String, String]())) {
   // - Execution -------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Decodes the specified response according to whatever is specified in the `Content-Encoding` header and the list
@@ -41,9 +41,9 @@ case class Request(engine:  Engine,
     * Unsupported encodings result in IOExceptions.
     */
   private def decode(response: Response[ResponseEntity]): Response[ResponseEntity] =
-    response.contentEncoding map { values =>
-      values.reverse.foldLeft(response) { (res, encoding) => res.map(_.decode(encoding))}
-    } getOrElse response
+    response.contentEncoding.fold(response) { values =>
+      values.reverse.foldLeft(response) { (res, encoding) => res.map(_.decode(encoding)) }
+    }
 
   def apply(body: Option[RequestEntity])(implicit context: ExecutionContext): Future[Response[ResponseEntity]] = {
     var h = headers
@@ -150,7 +150,7 @@ case class Request(engine:  Engine,
   /** Sets the value of the specified header.
     *
     * This method expects an appropriate implicit [[HeaderWriter]] to be in scope. Standard formats are declared
-    * in [[Headers$ Headers]].
+    * in [[Header$ Header]].
     */
   def header[T: HeaderWriter](name: String, value: T): Request = copy(headers = headers.set(name, value))
 

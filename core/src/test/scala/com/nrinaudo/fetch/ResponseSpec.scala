@@ -7,7 +7,7 @@ import com.nrinaudo.fetch.net.UrlEngine
 import org.scalacheck.Gen
 
 class ResponseSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
-  import HeadersSpec._
+  import HeaderSpec._
   import TestPlan._
   import HeaderFormat._
   import ETagSpec._
@@ -38,31 +38,31 @@ class ResponseSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gen
   describe("A Response") {
     it("should have the expected Date header") {
       forAll(date) { date =>
-        await(request("header/Date").POST.apply(DateFormat.write(date))).date should be(Some(date))
+        await(request("header/Date").POST.apply(DateFormat.write(date).get)).date should be(Some(date))
       }
     }
 
     it("should have the expected Last-Modified header") {
       forAll(date) { date =>
-        await(request("header/Last-Modified").POST.apply(DateFormat.write(date))).lastModified should be(Some(date))
+        await(request("header/Last-Modified").POST.apply(DateFormat.write(date).get)).lastModified should be(Some(date))
       }
     }
 
     it("should have the expected Expires header") {
       forAll(date) { date =>
-        await(request("header/Expires").POST.apply(DateFormat.write(date))).expires should be(Some(date))
+        await(request("header/Expires").POST.apply(DateFormat.write(date).get)).expires should be(Some(date))
       }
     }
 
     it("should have the expected Content-Language header") {
       forAll(language) { lang =>
-        await(request("header/Content-Language").POST.apply(LanguageFormat.write(lang))).contentLanguage should be(Some(List(lang)))
+        await(request("header/Content-Language").POST.apply(LanguageFormat.write(lang).get)).contentLanguage should be(Some(List(lang)))
       }
     }
 
     it("should have the expected ETag header") {
       forAll(etag) { etag =>
-        await(request("header/ETag").POST.apply(ETagFormat.write(etag))).etag should be(Some(etag))
+        await(request("header/ETag").POST.apply(ETagFormat.write(etag).get)).etag should be(Some(etag))
       }
     }
 

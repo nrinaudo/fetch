@@ -36,7 +36,6 @@ object TestPlan extends Plan {
 
   private class HeaderResponse(name: String, value: String) extends Responder[Any] {
     override def respond(res: HttpResponse[Any]): Unit = {
-      println(res.underlying.getClass)
       res.header(name, value)
       res.status(200)
     }

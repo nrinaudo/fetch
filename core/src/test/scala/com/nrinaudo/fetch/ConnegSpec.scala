@@ -24,7 +24,7 @@ object ConnegSpec {
     q     <- Gen.choose(0, 1000)
   } yield Conneg(value, q / 1000f)
 
-  def connegs[T](gen: Gen[T]): Gen[List[Conneg[T]]] = HeadersSpec.headers(conneg(gen))
+  def connegs[T](gen: Gen[T]): Gen[List[Conneg[T]]] = HeaderSpec.headers(conneg(gen))
 }
 
 class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
@@ -47,7 +47,7 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     }
 
     it("should not serialize q when it's equal to 1") {
-      Conneg.ConnegCharset.write(Conneg(Charset.forName("UTF-8"), 1)) should be("UTF-8")
+      Conneg.ConnegCharset.write(Conneg(Charset.forName("UTF-8"), 1)) should be(Some("UTF-8"))
     }
 
     it("should assume an absent q defaults to 1.0") {

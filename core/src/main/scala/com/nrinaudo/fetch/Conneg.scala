@@ -47,10 +47,10 @@ private class ConnegFormat[T: HeaderFormat] extends HeaderFormat[Conneg[T]] {
     case _                                => Failure(new IllegalArgumentException("Illegal content negotiation header: " + value))
   }
 
-  override def write(value: Conneg[T]): String = {
+  override def write(value: Conneg[T]): Option[String] = {
     val raw = implicitly[HeaderFormat[T]].write(value.value)
     if(value.q == 1)  raw
-    else              raw + ";q=" + qFormat.format(value.q)
+    else              raw map(_ + ";q=" + qFormat.format(value.q))
   }
 }
 

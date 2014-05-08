@@ -69,7 +69,7 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
     // Entity body configuration.
     body.foreach {b =>
       con.setDoOutput(true)
-      b.contentLength map con.setFixedLengthStreamingMode getOrElse con.setChunkedStreamingMode(chunkSize)
+      b.contentLength.fold(con.setChunkedStreamingMode(chunkSize))(con.setFixedLengthStreamingMode)
     }
 
     // Headers.

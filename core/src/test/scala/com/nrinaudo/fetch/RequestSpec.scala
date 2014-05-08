@@ -30,7 +30,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
   import RequestEntitySpec._
   import ConnegSpec._
   import EncodingSpec._
-  import HeadersSpec._
+  import HeaderSpec._
   import ETagSpec._
   import MethodSpec._
   import scala.concurrent.ExecutionContext.Implicits.global

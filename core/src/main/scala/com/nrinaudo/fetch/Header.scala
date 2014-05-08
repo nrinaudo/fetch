@@ -13,24 +13,19 @@ object HeaderReader {
   }
 }
 
-trait HeaderReader[T] {
-  /** Returns `Some[T]` if the specified value is a legal instance of `T`, `None` otherwise. */
-  def read(value: String): Try[T]
-}
+trait HeaderReader[T] extends ValueReader[String, T]
 
 
 
 // - Writer ------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 object HeaderWriter {
-  def apply[T](f: T => String) = new HeaderWriter[T] {
-    override def write(value: T): String = f(value)
+  def apply[T](f: T => Option[String]) = new HeaderWriter[T] {
+    override def write(value: T): Option[String] = f(value)
   }
 }
 
-trait HeaderWriter[T] {
-  def write(value: T): String
-}
+trait HeaderWriter[T] extends ValueWriter[T, String]
 
 
 
@@ -41,10 +36,10 @@ trait HeaderFormat[T] extends HeaderReader[T] with HeaderWriter[T]
 object HeaderFormat {
   private class Aggregated[T](reader: HeaderReader[T], writer: HeaderWriter[T]) extends HeaderFormat[T] {
     override def read(value: String): Try[T] = reader.read(value)
-    override def write(value: T): String = writer.write(value)
+    override def write(value: T): Option[String] = writer.write(value)
   }
 
-  def apply[T](reader: String => Try[T], writer: T => String): HeaderFormat[T] =
+  def apply[T](reader: String => Try[T], writer: T => Option[String]): HeaderFormat[T] =
     apply(HeaderReader(reader), HeaderWriter(writer))
 
   def apply[T](implicit reader: HeaderReader[T], writer: HeaderWriter[T]): HeaderFormat[T] =
@@ -54,7 +49,14 @@ object HeaderFormat {
     new Aggregated(seqReader(implicitly[HeaderReader[T]]), seqWriter(implicitly[HeaderWriter[T]]))
 
   implicit def seqWriter[T: HeaderWriter]: HeaderWriter[Seq[T]] = new HeaderWriter[Seq[T]] {
-    override def write(value: Seq[T]): String = value.map(implicitly[HeaderWriter[T]].write).mkString(",")
+    override def write(value: Seq[T]): Option[String] = {
+      value.map(implicitly[HeaderWriter[T]].write).collect {
+        case Some(v) => v
+      } match {
+        case Nil  => None
+        case list => Some(list.mkString(","))
+      }
+    }
   }
 
   implicit def seqReader[T: HeaderReader]: HeaderReader[Seq[T]] = new HeaderReader[Seq[T]] {
@@ -76,8 +78,8 @@ object HeaderFormat {
       format
     }
 
-    override def read(str: String): Try[Date] = HttpDateFormat.synchronized {Try {HttpDateFormat.parse(str)}}
-    override def write(date: Date): String = HttpDateFormat.synchronized {HttpDateFormat.format(date)}
+    override def read(str: String): Try[Date]      = HttpDateFormat.synchronized {Try {HttpDateFormat.parse(str)}}
+    override def write(date: Date): Option[String] = Some(HttpDateFormat.synchronized {HttpDateFormat.format(date)})
   }
 
   private val LanguagePattern = """([^-]+)(?:-([^-]+))?""".r
@@ -88,37 +90,41 @@ object HeaderFormat {
       case _                              => Failure(new IllegalArgumentException("Not a valid locale: " + value))
     }
 
-    override def write(value: Locale): String = {
+    override def write(value: Locale): Option[String] = {
       var v = value.getLanguage
+
       if(!value.getCountry.isEmpty) v += "-" + value.getCountry
-      v
+
+      Some(v)
     }
   }
 
   implicit object CharsetFormat extends HeaderFormat[Charset] {
-    override def read(value: String): Try[Charset] = Try {Charset.forName(value)}
-    override def write(value: Charset): String     = value.name()
+    override def read(value: String): Try[Charset]     = Try {Charset.forName(value)}
+    override def write(value: Charset): Option[String] = Some(value.name())
   }
 
   implicit object EncodingFormat extends HeaderFormat[Encoding] {
     override def read(value: String): Try[Encoding] =
       Encoding.DefaultEncodings.get(value) map {Success(_)} getOrElse Failure(new IllegalArgumentException("Unsupported encoding: " + value))
-    override def write(value: Encoding): String = value.name
+    override def write(value: Encoding): Option[String] = Some(value.name)
   }
 
   implicit object MimeTypeFormat extends HeaderFormat[MimeType] {
-    override def read(str: String): Try[MimeType] = Try {MimeType(str)}
-    override def write(t: MimeType): String       = t.toString
+    override def read(str: String): Try[MimeType]   = Try {MimeType(str)}
+    override def write(t: MimeType): Option[String] = Some(t.toString)
   }
 
   implicit object StringFormat extends HeaderFormat[String] {
-    override def read(str: String): Try[String] = Success(str)
-    override def write(t: String): String       = t
+    override def read(str: String): Try[String]   = Success(str)
+    override def write(t: String): Option[String] =
+      if(t.isEmpty) None
+      else          Some(t)
   }
 
   implicit object IntFormat extends HeaderFormat[Int] {
-    override def read(str: String): Try[Int] = Try {str.toInt}
-    override def write(t: Int): String       = t.toString
+    override def read(str: String): Try[Int]   = Try {str.toInt}
+    override def write(t: Int): Option[String] = Some(t.toString)
   }
 
   implicit object MethodFormat extends HeaderFormat[Method] {
@@ -126,26 +132,27 @@ object HeaderFormat {
       throw new IllegalArgumentException("Unsupported method: " + value)
     }
 
-    override def write(value: Method): String = value.name
+    override def write(value: Method): Option[String] = Some(value.name)
   }
 
   implicit object ETagFormat extends HeaderFormat[ETag] {
-    override def read(value: String): Try[ETag] = Try {ETag(value)}
-    override def write(value: ETag): String     = value.toString
+    override def read(value: String): Try[ETag]     = Try {ETag(value)}
+    override def write(value: ETag): Option[String] = Some(value.toString)
   }
 
   implicit object ByteRangeFormat extends HeaderFormat[ByteRange] {
-    override def read(value: String): Try[ByteRange] = Try {ByteRange(value)}
-    override def write(value: ByteRange): String     = value.toString
+    override def read(value: String): Try[ByteRange]     = Try {ByteRange(value)}
+    override def write(value: ByteRange): Option[String] = Some(value.toString)
   }
 
   implicit object ByteRangesFormat extends HeaderFormat[Seq[ByteRange]] {
     private val reader = seqReader[ByteRange]
+    private val writer = seqWriter[ByteRange]
 
     override def read(value: String): Try[Seq[ByteRange]] =
       if(value.startsWith("bytes=")) reader.read(value.substring(6))
       else                           Failure(new IllegalArgumentException("Illegal byte ranges: " + value))
 
-    override def write(value: Seq[ByteRange]): String = value.map(ByteRangeFormat.write).mkString("bytes=", ",", "")
+    override def write(value: Seq[ByteRange]): Option[String] = writer.write(value) map {"bytes=" + _ }
   }
 }

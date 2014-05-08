@@ -4,7 +4,7 @@ import org.scalacheck.Gen
 import Gen._
 import java.util.Date
 
-object HeadersSpec {
+object HeaderSpec {
   def date = for(time <- choose(0, 253402300799000l)) yield new Date((time / 1000l) * 1000)
 
   def headers[T](gen: Gen[T]) = for {

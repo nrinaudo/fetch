@@ -7,11 +7,11 @@ import com.nrinaudo.fetch.HeaderFormat._
 import scala.util.Success
 
 object HeaderFormatSpec {
-  def cycle[T](format: HeaderFormat[T], value: T) = format.read(format.write(value))
+  def cycle[T](format: HeaderFormat[T], value: T) = format.read(format.write(value).get)
 }
 
 class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  import HeadersSpec._
+  import HeaderSpec._
   import HeaderFormatSpec._
   import ConnegSpec._
   import MimeTypeSpec._
