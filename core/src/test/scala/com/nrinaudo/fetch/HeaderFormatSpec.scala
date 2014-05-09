@@ -32,7 +32,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
 
     it("should correctly serialize and parse lists of languages") {
-      forAll(nonEmptyListOf(language)) { langs => validate(seqFormat(LanguageFormat), langs)}
+      forAll(nonEmptyListOf(language)) { langs => validate(compositeFormat(LanguageFormat), langs)}
     }
   }
 
@@ -42,7 +42,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
 
     it("should correctly serialize and parse lists of charsets") {
-      forAll(nonEmptyListOf(charset)) { charsets => validate(seqFormat(CharsetFormat), charsets)}
+      forAll(nonEmptyListOf(charset)) { charsets => validate(compositeFormat(CharsetFormat), charsets)}
     }
   }
 
@@ -52,7 +52,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
 
     it("should correctly serialize and parse lists of MIME types") {
-      forAll(nonEmptyListOf(mimeType)) { mimes => validate(seqFormat(MimeTypeFormat), mimes)}
+      forAll(nonEmptyListOf(mimeType)) { mimes => validate(compositeFormat(MimeTypeFormat), mimes)}
     }
   }
 
@@ -62,7 +62,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
 
     it("should correctly serialize and parse lists of encodings") {
-      forAll(nonEmptyListOf(encoding)) { encodings => validate(seqFormat(EncodingFormat), encodings)}
+      forAll(nonEmptyListOf(encoding)) { encodings => validate(compositeFormat(EncodingFormat), encodings)}
     }
   }
 
