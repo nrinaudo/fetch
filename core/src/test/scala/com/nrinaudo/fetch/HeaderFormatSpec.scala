@@ -3,7 +3,7 @@ package com.nrinaudo.fetch
 import org.scalacheck.Gen._
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import com.nrinaudo.fetch.HeaderFormat._
+import com.nrinaudo.fetch.Headers._
 import scala.util.Success
 
 object HeaderFormatSpec {

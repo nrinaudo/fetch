@@ -2,7 +2,7 @@ package com.nrinaudo.fetch
 
 import org.apache.commons.codec.binary.Base64
 import java.util.{Locale, Date}
-import HeaderFormat._
+import Headers._
 import java.nio.charset.Charset
 import scala.concurrent.{ExecutionContext, Future}
 import Request._

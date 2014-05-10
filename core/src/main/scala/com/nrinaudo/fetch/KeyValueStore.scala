@@ -72,33 +72,37 @@ trait ValueFormat[S, T] extends ValueReader[S, T] with ValueWriter[T, S]
 // ---------------------------------------------------------------------------------------------------------------------
 object KeyValueStore {
   object StringFormats {
-    val IntFormat: ValueFormat[String, Int] = ValueFormat((s) => Try {s.toInt}, (i) => Some {i.toString})
-    val StringFormat: ValueFormat[String, String] = ValueFormat(Success(_), Some(_))
+    val Ints: ValueFormat[String, Int] = ValueFormat((s) => Try {s.toInt}, (i) => Some {i.toString})
+    val Strings: ValueFormat[String, String] = ValueFormat(Success(_), Some(_))
   }
 }
 
-class KeyValueStore[T](val values: Map[String, T] = Map()) {
-  def apply[S](name: String)(implicit reader: ValueReader[T, S]): S =
+trait KeyValueStore[S, T <: KeyValueStore[S, T]] {
+  this: T =>
+  val values: Map[String, S]
+  def build(values: Map[String, S]): T
+
+  def apply[U](name: String)(implicit reader: ValueReader[S, U]): U =
     reader.read(values(name)).get
 
-  def getOpt[S](name: String)(implicit reader: ValueReader[T, S]): Option[S] = for {
+  def getOpt[U](name: String)(implicit reader: ValueReader[S, U]): Option[U] = for {
     raw    <- values.get(name)
     parsed <- reader.read(raw).toOption
   } yield parsed
 
-  def get[S](name: String)(implicit reader: ValueReader[T, S]): Option[Try[S]] = values.get(name) map reader.read
+  def get[U](name: String)(implicit reader: ValueReader[S, U]): Option[Try[U]] = values.get(name) map reader.read
 
-  def set[S](name: String, value: S)(implicit writer: ValueWriter[S, T]): KeyValueStore[T] =
+  def set[U](name: String, value: U)(implicit writer: ValueWriter[U, S]): T =
     writer.write(value).fold(this)(set(name, _))
 
-  def set(name: String, value: T): KeyValueStore[T] = new KeyValueStore(values + (name -> value))
+  def set(name: String, value: S): T = build(values + (name -> value))
 
-  def setIfEmpty[S](name: String, value: S)(implicit writer: ValueWriter[S, T]): KeyValueStore[T] =
+  def setIfEmpty[U](name: String, value: U)(implicit writer: ValueWriter[U, S]): T =
       if(contains(name)) this
       else               set(name, value)
 
-  def remove(name: String): KeyValueStore[T] =
-      if(contains(name)) new KeyValueStore[T](values - name)
+  def remove(name: String): T =
+      if(contains(name)) build(values - name)
       else               this
 
   def contains(name: String): Boolean = values.contains(name)

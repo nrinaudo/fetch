@@ -2,12 +2,10 @@ package com.nrinaudo.fetch
 
 import java.net.URLEncoder
 import scala.util.Try
+import javax.management.Query
 
 object Url {
   import java.net.URL
-
-  type Query = Map[String, List[String]]
-
 
 
   // - URL-based construction ------------------------------------------------------------------------------------------
@@ -15,17 +13,10 @@ object Url {
   def unapply(url: URL): Option[Url] = Some(apply(url))
   def apply(url: URL): Url = {
     val Protocol(protocol) = url.getProtocol
-    Url(protocol, url.getHost, url.getPort, splitPath(url.getPath), splitQuery(url.getQuery), Option(url.getRef))
+    Url(protocol, url.getHost, url.getPort, splitPath(url.getPath), QueryParameters(url.getQuery), Option(url.getRef))
   }
 
   private def splitPath(path: String) = path.split("/").toList.filter(!_.isEmpty)
-
-  private def splitQuery(query: String): Query =
-    if(query == null) Map()
-    else              query.split("&").toList.foldLeft(Map[String, List[String]]()) { case (map, entry) =>
-      val(name, values) = entry.splitAt(entry.indexOf('='))
-      map + (name -> values.substring(1).split(',').toList)
-    }
 
 
 
@@ -39,7 +30,7 @@ object Url {
  * @author Nicolas Rinaudo
  */
 case class Url(protocol: Protocol, host: String, port: Int, path: List[String] = List(),
-               query: Url.Query = Map(), ref: Option[String] = None) {
+               query: QueryParameters = new QueryParameters(), ref: Option[String] = None) {
   // - Url building ----------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def protocol(value: Protocol): Url = copy(protocol = value)
@@ -48,7 +39,7 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
   def path(value: String): Url = copy(path = value.split("/").toList)
   def path(value: List[String]): Url = copy(path = value)
   def ref(value: Option[String]): Url = copy(ref = value)
-  def query(value: Url.Query): Url = copy(query = value)
+  def query(value: QueryParameters): Url = copy(query = value)
 
 
   // - Object methods --------------------------------------------------------------------------------------------------
@@ -72,10 +63,7 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
     // Path
     builder.append(path.map(URLEncoder.encode(_, "utf-8")).mkString("/", "/", ""))
 
-    val q = query.foldLeft(List[String]()) {case (list, (name, values)) =>
-      (name + "=" + values.map(URLEncoder.encode(_, "utf-8")).mkString(",")):: list
-    }
-    if(!q.isEmpty) q.sorted.addString(builder, "?", "&", "")
+    if(!query.values.isEmpty) builder.append("?").append(query.toString)
 
     ref.foreach {r => builder.append(URLEncoder.encode(r, "utf-8"))}
 

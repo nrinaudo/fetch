@@ -56,13 +56,13 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
 
     it("should correctly serialize and parse languages") {
       forAll(connegs(language)) { headers =>
-        cycle(HeaderFormat.compositeFormat(Conneg.ConnegLanguage), headers) should be(Success(headers))
+        cycle(Headers.compositeFormat(Conneg.ConnegLanguage), headers) should be(Success(headers))
       }
     }
 
     it("should correctly serialize and parse charsets") {
       forAll(connegs(charset)) { headers =>
-        cycle(HeaderFormat.compositeFormat(Conneg.ConnegCharset), headers) should be(Success(headers))
+        cycle(Headers.compositeFormat(Conneg.ConnegCharset), headers) should be(Success(headers))
       }
     }
 
@@ -70,13 +70,13 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
       forAll(connegs(mimeType)) { headers =>
       // TODO: we're not perfectly RFC compliant when it comes to parsing Accept: parameters break the parser.
         val fixed = headers.map(_.map(_.copy(params = Map())))
-        cycle(HeaderFormat.compositeFormat(Conneg.ConnegMimeType), fixed) should be(Success(fixed))
+        cycle(Headers.compositeFormat(Conneg.ConnegMimeType), fixed) should be(Success(fixed))
       }
     }
 
     it("should correctly serialize and parse content encodings") {
       forAll(connegs(encoding)) { headers =>
-        cycle(HeaderFormat.compositeFormat(Conneg.ConnegEncoding), headers) should be(Success(headers))
+        cycle(Headers.compositeFormat(Conneg.ConnegEncoding), headers) should be(Success(headers))
       }
     }
   }

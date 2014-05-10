@@ -32,7 +32,7 @@ object UrlSpec {
   /** Returns a query string. */
   def query = for {
     query <- Gen.listOf(param)
-  } yield query.foldLeft(Map[String, List[String]]()) {(map, param) => map + param}
+  } yield query.foldLeft(new QueryParameters()) {(map, param) => map.set(param._1, param._2)}
 
   def ref = Gen.oneOf(true, false) flatMap {b =>
     if(b) None

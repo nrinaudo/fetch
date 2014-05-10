@@ -4,7 +4,7 @@ import java.text.DecimalFormat
 import scala.util.{Failure, Try}
 import java.nio.charset.Charset
 import java.util.Locale
-import com.nrinaudo.fetch.HeaderFormat._
+import com.nrinaudo.fetch.Headers._
 
 /** Collection of implicit header formats for known content negotiation headers. */
 object Conneg {

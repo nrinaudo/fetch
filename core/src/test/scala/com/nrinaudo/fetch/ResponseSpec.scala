@@ -9,7 +9,7 @@ import org.scalacheck.Gen
 class ResponseSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
   import HeaderSpec._
   import TestPlan._
-  import HeaderFormat._
+  import Headers._
   import ETagSpec._
   import scala.concurrent.ExecutionContext.Implicits.global
   import RequestSpec._

@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 import scala.util.{Failure, Success, Try}
 import java.nio.charset.Charset
 
-object HeaderFormat {
+object Headers {
   type HeaderReader[T] = ValueReader[String, T]
   type HeaderWriter[T] = ValueWriter[T, String]
   type HeaderFormat[T] = ValueFormat[String, T]
@@ -23,13 +23,10 @@ object HeaderFormat {
     ValueReader((s: String) => Success(s.split(',').toSeq)).andThen(ValueReader.seq(implicitly[HeaderReader[T]]))
 
 
-  // - Generic specific default formats --------------------------------------------------------------------------------
+  // - Generic default formats -----------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  implicit val StringFormat: HeaderFormat[String] =
-    ValueFormat(KeyValueStore.StringFormats.StringFormat, KeyValueStore.StringFormats.StringFormat)
-
-  implicit val IntFormat: HeaderFormat[Int] =
-    ValueFormat(KeyValueStore.StringFormats.IntFormat, KeyValueStore.StringFormats.IntFormat)
+  implicit val StringFormat: HeaderFormat[String] = KeyValueStore.StringFormats.Strings
+  implicit val IntFormat: HeaderFormat[Int]       = KeyValueStore.StringFormats.Ints
 
 
   // - Header specific default formats ---------------------------------------------------------------------------------
@@ -107,4 +104,8 @@ object HeaderFormat {
 
     override def write(value: Seq[ByteRange]): Option[String] = writer.write(value) map {"bytes=" + _ }
   }
+}
+
+class Headers(override val values: Map[String, String] = Map()) extends KeyValueStore[String, Headers] {
+  override def build(values: Map[String, String]): Headers = new Headers(values)
 }

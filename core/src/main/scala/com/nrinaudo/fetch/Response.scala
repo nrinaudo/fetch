@@ -1,7 +1,7 @@
 package com.nrinaudo.fetch
 
 import java.util.{Locale, Date}
-import HeaderFormat._
+import Headers._
 
 /**
  * Represents an HTTP response.
