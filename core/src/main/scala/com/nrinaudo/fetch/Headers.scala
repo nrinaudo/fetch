@@ -6,33 +6,28 @@ import scala.util.{Failure, Success, Try}
 import java.nio.charset.Charset
 
 object Headers {
-  type HeaderReader[T] = ValueReader[String, T]
-  type HeaderWriter[T] = ValueWriter[T, String]
-  type HeaderFormat[T] = ValueFormat[String, T]
-
-
   // - Composite header formats ----------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def compositeFormat[T: HeaderFormat]: HeaderFormat[Seq[T]] =
-    ValueFormat(compositeReader(implicitly[HeaderReader[T]]), compositeWriter(implicitly[HeaderWriter[T]]))
+  def compositeFormat[T: ValueReader: ValueWriter]: ValueFormat[Seq[T]] =
+    ValueFormat(compositeReader[T], compositeWriter[T])
 
-  implicit def compositeWriter[T: HeaderWriter]: HeaderWriter[Seq[T]] =
-    ValueWriter.seq(implicitly[HeaderWriter[T]]).andThen {s => Some(s.mkString(","))}
+  implicit def compositeWriter[T: ValueWriter]: ValueWriter[Seq[T]] =
+    ValueWriter((values: Seq[T]) => ValueWriter.sequence(values) map {_.mkString(",")})
 
-  implicit def compositeReader[T: HeaderReader]: HeaderReader[Seq[T]] =
-    ValueReader((s: String) => Success(s.split(',').toSeq)).andThen(ValueReader.seq(implicitly[HeaderReader[T]]))
+  implicit def compositeReader[T: ValueReader]: ValueReader[Seq[T]] =
+    ValueReader((s: String) => ValueReader.sequence[T](s.split(',')))
 
 
   // - Generic default formats -----------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  implicit val StringFormat: HeaderFormat[String] = KeyValueStore.StringFormats.Strings
-  implicit val IntFormat: HeaderFormat[Int]       = KeyValueStore.StringFormats.Ints
+  implicit val StringFormat: ValueFormat[String] = ValueFormat.Strings
+  implicit val IntFormat: ValueFormat[Int]       = ValueFormat.Ints
 
 
   // - Header specific default formats ---------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Formats dates to the proper RFC compliant syntax. */
-  implicit object DateFormat extends HeaderFormat[Date] {
+  implicit object DateFormat extends ValueFormat[Date] {
     private val HttpDateFormat = {
       val format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US)
       format.setTimeZone(TimeZone.getTimeZone("GMT"))
@@ -44,7 +39,7 @@ object Headers {
   }
 
   private val LanguagePattern = """([^-]+)(?:-([^-]+))?""".r
-  implicit object LanguageFormat extends HeaderFormat[Locale] {
+  implicit object LanguageFormat extends ValueFormat[Locale] {
     override def read (value: String): Try[Locale] = value match {
       case LanguagePattern(lang, null)    => Success(new Locale(lang))
       case LanguagePattern(lang, country) => Success(new Locale(lang, country))
@@ -60,23 +55,23 @@ object Headers {
     }
   }
 
-  implicit object CharsetFormat extends HeaderFormat[Charset] {
+  implicit object CharsetFormat extends ValueFormat[Charset] {
     override def read(value: String): Try[Charset]     = Try {Charset.forName(value)}
     override def write(value: Charset): Option[String] = Some(value.name())
   }
 
-  implicit object EncodingFormat extends HeaderFormat[Encoding] {
+  implicit object EncodingFormat extends ValueFormat[Encoding] {
     override def read(value: String): Try[Encoding] =
       Encoding.DefaultEncodings.get(value) map {Success(_)} getOrElse Failure(new IllegalArgumentException("Unsupported encoding: " + value))
     override def write(value: Encoding): Option[String] = Some(value.name)
   }
 
-  implicit object MimeTypeFormat extends HeaderFormat[MimeType] {
+  implicit object MimeTypeFormat extends ValueFormat[MimeType] {
     override def read(str: String): Try[MimeType]   = Try {MimeType(str)}
     override def write(t: MimeType): Option[String] = Some(t.toString)
   }
 
-  implicit object MethodFormat extends HeaderFormat[Method] {
+  implicit object MethodFormat extends ValueFormat[Method] {
     override def read(value: String): Try[Method] = Method.unapply(value) map {Success(_)} getOrElse {
       throw new IllegalArgumentException("Unsupported method: " + value)
     }
@@ -84,17 +79,17 @@ object Headers {
     override def write(value: Method): Option[String] = Some(value.name)
   }
 
-  implicit object ETagFormat extends HeaderFormat[ETag] {
+  implicit object ETagFormat extends ValueFormat[ETag] {
     override def read(value: String): Try[ETag]     = Try {ETag(value)}
     override def write(value: ETag): Option[String] = Some(value.toString)
   }
 
-  implicit object ByteRangeFormat extends HeaderFormat[ByteRange] {
+  implicit object ByteRangeFormat extends ValueFormat[ByteRange] {
     override def read(value: String): Try[ByteRange]     = Try {ByteRange(value)}
     override def write(value: ByteRange): Option[String] = Some(value.toString)
   }
 
-  implicit object ByteRangesFormat extends HeaderFormat[Seq[ByteRange]] {
+  implicit object ByteRangesFormat extends ValueFormat[Seq[ByteRange]] {
     private val reader = compositeReader[ByteRange]
     private val writer = compositeWriter[ByteRange]
 
@@ -106,6 +101,29 @@ object Headers {
   }
 }
 
-class Headers(override val values: Map[String, String] = Map()) extends KeyValueStore[String, Headers] {
-  override def build(values: Map[String, String]): Headers = new Headers(values)
+class Headers(val values: Map[String, String] = Map()) {
+  def apply[T](name: String)(implicit reader: ValueReader[T]): T =
+    reader.read(values(name)).get
+
+  def getOpt[T](name: String)(implicit reader: ValueReader[T]): Option[T] = for {
+    raw    <- values.get(name)
+    parsed <- reader.read(raw).toOption
+  } yield parsed
+
+  def get[T](name: String)(implicit reader: ValueReader[T]): Option[Try[T]] = values.get(name) map reader.read
+
+  def set[T](name: String, value: T)(implicit writer: ValueWriter[T]): Headers =
+    writer.write(value).fold(this)(set(name, _))
+
+  def set(name: String, value: String): Headers = new Headers(values + (name -> value))
+
+  def setIfEmpty[T](name: String, value: T)(implicit writer: ValueWriter[T]): Headers =
+    if(contains(name)) this
+    else               set(name, value)
+
+  def remove(name: String): Headers =
+    if(contains(name)) new Headers(values - name)
+    else               this
+
+  def contains(name: String): Boolean = values.contains(name)
 }

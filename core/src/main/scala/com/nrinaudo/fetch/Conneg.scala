@@ -8,10 +8,10 @@ import com.nrinaudo.fetch.Headers._
 
 /** Collection of implicit header formats for known content negotiation headers. */
 object Conneg {
-  implicit val ConnegEncoding: HeaderFormat[Conneg[Encoding]] = new ConnegFormat[Encoding]
-  implicit val ConnegMimeType: HeaderFormat[Conneg[MimeType]] = new ConnegFormat[MimeType]
-  implicit val ConnegCharset: HeaderFormat[Conneg[Charset]]   = new ConnegFormat[Charset]
-  implicit val ConnegLanguage: HeaderFormat[Conneg[Locale]]   = new ConnegFormat[Locale]
+  implicit val ConnegEncoding: ValueFormat[Conneg[Encoding]] = new ConnegFormat[Encoding]
+  implicit val ConnegMimeType: ValueFormat[Conneg[MimeType]] = new ConnegFormat[MimeType]
+  implicit val ConnegCharset: ValueFormat[Conneg[Charset]]   = new ConnegFormat[Charset]
+  implicit val ConnegLanguage: ValueFormat[Conneg[Locale]]   = new ConnegFormat[Locale]
 }
 
 /** Represents an acceptable value for content negotiation headers (`Accept*`).
@@ -40,16 +40,16 @@ private object ConnegFormat {
   }
 }
 
-private class ConnegFormat[T: HeaderFormat] extends HeaderFormat[Conneg[T]] {
+private class ConnegFormat[T: ValueFormat] extends ValueFormat[Conneg[T]] {
   import ConnegFormat._
 
   override def read(value: String): Try[Conneg[T]] = value match {
-    case ConnegPattern(data, qPattern(q)) => implicitly[HeaderFormat[T]].read(data).map(Conneg(_, q))
+    case ConnegPattern(data, qPattern(q)) => implicitly[ValueFormat[T]].read(data).map(Conneg(_, q))
     case _                                => Failure(new IllegalArgumentException("Illegal content negotiation header: " + value))
   }
 
   override def write(value: Conneg[T]): Option[String] = {
-    val raw = implicitly[HeaderFormat[T]].write(value.value)
+    val raw = implicitly[ValueFormat[T]].write(value.value)
     if(value.q == 1)  raw
     else              raw map(_ + ";q=" + qFormat.format(value.q))
   }

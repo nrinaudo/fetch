@@ -3,6 +3,7 @@ package com.nrinaudo.fetch
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.Gen
+import QueryString._
 
 object UrlSpec {
   def domainSeg = for {
@@ -32,7 +33,7 @@ object UrlSpec {
   /** Returns a query string. */
   def query = for {
     query <- Gen.listOf(param)
-  } yield query.foldLeft(new QueryParameters()) {(map, param) => map.set(param._1, param._2)}
+  } yield query.foldLeft(new QueryString()) {(map, param) => map.set(param._1, param._2: _*)}
 
   def ref = Gen.oneOf(true, false) flatMap {b =>
     if(b) None

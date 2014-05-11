@@ -5,9 +5,11 @@ import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import com.nrinaudo.fetch.Headers._
 import scala.util.Success
+import java.util.Locale
+import java.nio.charset.Charset
 
 object HeaderFormatSpec {
-  def cycle[T](format: HeaderFormat[T], value: T) = format.read(format.write(value).get)
+  def cycle[T](format: ValueFormat[T], value: T) = format.read(format.write(value).get)
 }
 
 class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
@@ -18,7 +20,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
   import EncodingSpec._
   import ByteRangeSpec._
 
-  def validate[T](format: HeaderFormat[T], value: T) = cycle(format, value) should be(Success(value))
+  def validate[T](format: ValueFormat[T], value: T) = cycle(format, value) should be(Success(value))
 
   describe("The date formatter") {
     it("should correctly serialize and parse dates") {
@@ -32,7 +34,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
 
     it("should correctly serialize and parse lists of languages") {
-      forAll(nonEmptyListOf(language)) { langs => validate(compositeFormat(LanguageFormat), langs)}
+      forAll(nonEmptyListOf(language)) { langs => validate(compositeFormat[Locale], langs)}
     }
   }
 
@@ -42,7 +44,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
 
     it("should correctly serialize and parse lists of charsets") {
-      forAll(nonEmptyListOf(charset)) { charsets => validate(compositeFormat(CharsetFormat), charsets)}
+      forAll(nonEmptyListOf(charset)) { charsets => validate(compositeFormat[Charset], charsets)}
     }
   }
 
@@ -52,7 +54,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
 
     it("should correctly serialize and parse lists of MIME types") {
-      forAll(nonEmptyListOf(mimeType)) { mimes => validate(compositeFormat(MimeTypeFormat), mimes)}
+      forAll(nonEmptyListOf(mimeType)) { mimes => validate(compositeFormat[MimeType], mimes)}
     }
   }
 
@@ -62,7 +64,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
 
     it("should correctly serialize and parse lists of encodings") {
-      forAll(nonEmptyListOf(encoding)) { encodings => validate(compositeFormat(EncodingFormat), encodings)}
+      forAll(nonEmptyListOf(encoding)) { encodings => validate(compositeFormat[Encoding], encodings)}
     }
   }
 

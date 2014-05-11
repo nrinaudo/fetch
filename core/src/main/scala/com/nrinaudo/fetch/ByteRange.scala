@@ -2,6 +2,7 @@ package com.nrinaudo.fetch
 
 import scala.util.Try
 
+// TODO: this is currently not according to HTTP spec. See http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35.1
 object ByteRange {
   private val Extractor = """([0-9]+)?-([0-9]+)?""".r
 
