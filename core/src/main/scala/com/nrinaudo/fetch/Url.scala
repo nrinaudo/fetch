@@ -2,19 +2,15 @@ package com.nrinaudo.fetch
 
 import java.net.URLEncoder
 import scala.util.Try
+import java.net.URL
 
 object Url {
-  import java.net.URL
-
-
   // - URL-based construction ------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def unapply(url: URL): Option[Url] = Some(apply(url))
 
-  def apply(url: URL): Url = {
-    val Protocol(protocol) = url.getProtocol
-    Url(protocol, url.getHost, url.getPort, splitPath(url.getPath), QueryString(url.getQuery), Option(url.getRef))
-  }
+  def apply(url: URL): Url =
+    Url(Protocol(url.getProtocol), url.getHost, url.getPort, splitPath(url.getPath), QueryString(url.getQuery), Option(url.getRef))
 
   private def splitPath(path: String) = path.split("/").toList.filter(!_.isEmpty)
 
@@ -30,7 +26,7 @@ object Url {
  * @author Nicolas Rinaudo
  */
 case class Url(protocol: Protocol, host: String, port: Int, path: List[String] = List(),
-               query: QueryString = new QueryString(), ref: Option[String] = None) {
+               query: QueryString = new QueryString(), fragment: Option[String] = None) {
   // - Url building ----------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def protocol(value: Protocol): Url = copy(protocol = value)
@@ -38,7 +34,7 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
   def port(value: Int): Url = copy(port = value)
   def path(value: String): Url = copy(path = value.split("/").toList)
   def path(value: List[String]): Url = copy(path = value)
-  def ref(value: Option[String]): Url = copy(ref = value)
+  def fragment(value: Option[String]): Url = copy(fragment = value)
   def query(value: QueryString): Url = copy(query = value)
   def param[T: ValueWriter](name: String, values: T*) = query(query.set(name, values: _*))
 
@@ -68,7 +64,7 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
     // Query String.
     query.writeTo(builder)
 
-    ref.foreach {r => builder.append(URLEncoder.encode(r, "utf-8"))}
+    fragment.foreach {r => builder.append(URLEncoder.encode(r, "utf-8"))}
 
     builder.toString()
   }
