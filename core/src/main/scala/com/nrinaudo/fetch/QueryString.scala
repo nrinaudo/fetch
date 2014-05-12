@@ -1,6 +1,6 @@
 package com.nrinaudo.fetch
 
-import scala.util.Try
+import scala.util.{Success, Try}
 import java.net.URLEncoder
 
 
@@ -35,6 +35,15 @@ object QueryString {
 }
 
 class QueryString(val values: Map[String, List[String]] = Map()) {
+  def &[T: ValueWriter](param: (String, T)): QueryString = set(param._1, param._2)
+
+
+  def add[T: ValueWriter](name: String, values: T*): QueryString =
+    ValueWriter.sequence(values).fold(this) { list =>
+      new QueryString(this.values + (name -> this.values.get(name).fold(list.toList) {_ ::: list.toList}))
+    }
+
+
   def set[T: ValueWriter](name: String, values: T*): QueryString = ValueWriter.sequence(values).fold(this) { list =>
     new QueryString(this.values + (name -> list.toList))
   }

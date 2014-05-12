@@ -6,6 +6,7 @@ import scala.language.implicitConversions
 import java.net.URL
 import com.nrinaudo.fetch.ResponseEntity.EntityParser
 import java.util.Locale
+import com.nrinaudo.fetch.Request.Engine
 
 /**
  * @author Nicolas Rinaudo
@@ -54,6 +55,8 @@ package object fetch {
 
   // - Implicit conversions --------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
+  implicit def urlToRequest(url: Url)(implicit engine: Engine): Request = Request(url)(engine)
+
   // Request entities.
   implicit def stringToEntity(str: String)          = RequestEntity(str)
   implicit def readerToEntity(reader: Reader)       = RequestEntity(reader)

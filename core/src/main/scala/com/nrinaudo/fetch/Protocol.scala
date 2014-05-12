@@ -23,4 +23,10 @@ object Protocol {
   * @param name        name of the protocol as used in URL strings.
   * @param defaultPort default port associated with this protocol, if any.
   */
-case class Protocol(name: String, defaultPort: Option[Int])
+case class Protocol(name: String, defaultPort: Option[Int]) {
+  /** Creates a new [[Url]] using on the specified host using this protocol.
+    *
+    * Note that this method is unsafe and will throw for protocols that do not have a default port associated.
+    */
+  def host(name: String) = new Url(this, name, defaultPort.get)
+}

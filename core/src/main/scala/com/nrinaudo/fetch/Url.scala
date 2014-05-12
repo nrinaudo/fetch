@@ -15,16 +15,12 @@ object Url {
   private def splitPath(path: String) = path.split("/").toList.filter(!_.isEmpty)
 
 
-
   // - String-based construction ---------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def unapply(url: String): Option[Url] = Try {apply(url)}.toOption
   def apply(url: String): Url = Url(new URL(url))
 }
 
-/**
- * @author Nicolas Rinaudo
- */
 case class Url(protocol: Protocol, host: String, port: Int, path: List[String] = List(),
                query: QueryString = new QueryString(), fragment: Option[String] = None) {
   // - Url building ----------------------------------------------------------------------------------------------------
@@ -36,7 +32,14 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
   def path(value: List[String]): Url = copy(path = value)
   def fragment(value: Option[String]): Url = copy(fragment = value)
   def query(value: QueryString): Url = copy(query = value)
-  def param[T: ValueWriter](name: String, values: T*) = query(query.set(name, values: _*))
+  def param[T: ValueWriter](name: String, values: T*): Url = query(query.set(name, values: _*))
+
+  // TODO: maybe a list, with its slow appends, is not the best solution for storing paths?
+  def /(segment: String): Url = path(path :+ segment)
+
+  def ?(value: QueryString): Url = query(value)
+
+  def &[T: ValueWriter](param: (String, T)): Url = query(query & param)
 
 
 

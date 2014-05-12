@@ -70,6 +70,18 @@ case class Request(engine:  Engine,
   def apply(body: RequestEntity)(implicit context: ExecutionContext): Future[Response[ResponseEntity]] = apply(Some(body))
 
 
+  // - Url manipulation ------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  def url(value: Url): Request = copy(url = value)
+
+  def /(segment: String): Request = url(url / segment)
+
+  def ?(value: QueryString): Request = url(url ? value)
+
+  def &[T: ValueWriter](param: (String, T)): Request = url(url & param)
+
+
+
 
   // - HTTP methods ----------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
