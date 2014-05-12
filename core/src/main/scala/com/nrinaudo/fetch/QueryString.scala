@@ -1,6 +1,6 @@
 package com.nrinaudo.fetch
 
-import scala.util.{Success, Try}
+import scala.util.Try
 import java.net.URLEncoder
 
 
@@ -20,11 +20,8 @@ object QueryString {
 
   // - Query string parsing --------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def apply(query: String): QueryString =
-    // Protection against java.net.URL.getQuery returning null rather than the empty string.
-    if(query == null) new QueryString()
-
-    else new QueryString(query.split("&").foldLeft(Map[String, List[String]]()) {
+  def apply(query: String): QueryString = {
+    def extract(str: String) = new QueryString(str.split("&").foldLeft(Map[String, List[String]]()) {
       case (map, entry) =>
         val (name, v) = entry.splitAt(entry.indexOf('='))
         val value = v.substring(1)
@@ -32,26 +29,66 @@ object QueryString {
         // TODO: appending at the end of the list has a complexity of O(n) and is inefficient for long lists. Fix.
         map + (name -> map.get(name).fold(List(value))(_ :+ value))
     })
+
+    // Protection against java.net.URL.getQuery returning null rather than the empty string.
+    if(query == null || query.isEmpty) new QueryString()
+    else if(query.charAt(0) == '?')    extract(query.substring(1))
+    else                               extract(query)
+  }
 }
 
-class QueryString(val values: Map[String, List[String]] = Map()) {
+/** Represents an [[Url]]'s query string. */
+case class QueryString(values: Map[String, List[String]] = Map()) {
+  // - Parameter setting -----------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  /** Sets the specified parameter to the specified value.
+    *
+    * The main purpose of this method is to let application developers write code such as:
+    * {{{
+    * new QueryString() & ("param1" -> "value1") & ("param2" -> "value2")
+    * }}}
+    * Note that this method only accepts a single value, and will always replace any previous value for the specified
+    * name. If you need to specify the same parameter multiple times, use [[add]] instead.
+    *
+    * @param  param tuple whose first entry if the parameter's name and second entry its value.
+    * @tparam T     type of the value to set.
+    * @return       an updated query string.
+    */
   def &[T: ValueWriter](param: (String, T)): QueryString = set(param._1, param._2)
 
-
-  def add[T: ValueWriter](name: String, values: T*): QueryString =
-    ValueWriter.sequence(values).fold(this) { list =>
-      new QueryString(this.values + (name -> this.values.get(name).fold(list.toList) {_ ::: list.toList}))
-    }
-
+  def add[T: ValueWriter](name: String, values: T*): QueryString = ValueWriter.sequence(values).fold(this) { list =>
+    new QueryString(this.values + (name -> this.values.get(name).fold(list.toList) {_ ::: list.toList}))
+  }
 
   def set[T: ValueWriter](name: String, values: T*): QueryString = ValueWriter.sequence(values).fold(this) { list =>
     new QueryString(this.values + (name -> list.toList))
   }
 
+
+
+  // - Parameter getting -----------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  def getFirst[T: ValueReader](name: String): Option[Try[T]] =  get[T](name) map (_ map (_(0)))
+
   def get[T: ValueReader](name: String): Option[Try[List[T]]] = values.get(name).map { list =>
     ValueReader.sequence(list)(implicitly[ValueReader[T]])
   }
 
+  def getFirstOpt[T: ValueReader](name: String): Option[T] = getOpt[T](name) map(_(0))
+
+  def getOpt[T: ValueReader](name: String): Option[List[T]] = for {
+    v1 <- values.get(name)
+    v2 <- ValueReader.sequence(v1)(implicitly[ValueReader[T]]).toOption
+  } yield v2
+
+  def apply[T: ValueReader](name: String): List[T] = values(name) map {implicitly[ValueReader[T]].read(_).get}
+
+  def first[T: ValueReader](name: String): T = apply[T](name).apply(0)
+
+
+
+  // - Serialization ---------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
   // TODO: implement proper percent encoding.
   private def encode(str: String) = URLEncoder.encode(str, "utf-8").replaceAll("\\+", "%20")
     .replaceAll("\\%21", "!")

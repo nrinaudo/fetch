@@ -24,17 +24,6 @@ object UrlSpec {
   /** Generates a valid path. */
   def path = Gen.listOf(Gen.identifier)
 
-  /** Returns a single query parameter. */
-  def param = for {
-    name   <- Gen.identifier
-    values <- Gen.listOf(Gen.identifier)
-  } yield (name, values)
-
-  /** Returns a query string. */
-  def query = for {
-    query <- Gen.listOf(param)
-  } yield query.foldLeft(new QueryString()) {(map, param) => map.set(param._1, param._2: _*)}
-
   def ref = Gen.oneOf(true, false) flatMap {b =>
     if(b) None
     else  Gen.identifier.map(Some(_))
@@ -45,7 +34,7 @@ object UrlSpec {
     h  <- host
     p  <- port
     s  <- path
-    q  <- query
+    q  <- QueryStringSpec.query
     r  <- ref
   } yield Url(pr, h, p, s, q, r)
 }

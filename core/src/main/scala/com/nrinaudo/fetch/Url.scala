@@ -39,6 +39,10 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
 
   def ?(value: QueryString): Url = query(value)
 
+  /** Appends the specified parameter to the request's [[Url]].
+    *
+    * This is purely a convenience method for [[Url.&]].
+    */
   def &[T: ValueWriter](param: (String, T)): Url = query(query & param)
 
 

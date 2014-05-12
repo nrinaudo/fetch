@@ -102,22 +102,21 @@ object Headers {
 }
 
 class Headers(val values: Map[String, String] = Map()) {
-  def apply[T](name: String)(implicit reader: ValueReader[T]): T =
-    reader.read(values(name)).get
+  def apply[T: ValueReader](name: String): T = implicitly[ValueReader[T]].read(values(name)).get
 
-  def getOpt[T](name: String)(implicit reader: ValueReader[T]): Option[T] = for {
+  def getOpt[T: ValueReader](name: String): Option[T] = for {
     raw    <- values.get(name)
-    parsed <- reader.read(raw).toOption
+    parsed <- implicitly[ValueReader[T]].read(raw).toOption
   } yield parsed
 
-  def get[T](name: String)(implicit reader: ValueReader[T]): Option[Try[T]] = values.get(name) map reader.read
+  def get[T: ValueReader](name: String): Option[Try[T]] = values.get(name) map implicitly[ValueReader[T]].read
 
-  def set[T](name: String, value: T)(implicit writer: ValueWriter[T]): Headers =
-    writer.write(value).fold(this)(set(name, _))
+  def set[T: ValueWriter](name: String, value: T): Headers =
+    implicitly[ValueWriter[T]].write(value).fold(this)(set(name, _))
 
   def set(name: String, value: String): Headers = new Headers(values + (name -> value))
 
-  def setIfEmpty[T](name: String, value: T)(implicit writer: ValueWriter[T]): Headers =
+  def setIfEmpty[T: ValueWriter](name: String, value: T): Headers =
     if(contains(name)) this
     else               set(name, value)
 

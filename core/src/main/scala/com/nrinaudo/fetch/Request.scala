@@ -162,7 +162,7 @@ case class Request(engine:  Engine,
   /** Sets the value of the specified header.
     *
     * This method expects an appropriate implicit [[ValueWriter]] to be in scope. Standard formats are declared
-    * in [[Header$ Header]].
+    * in [[Headers$ Headers]].
     */
   def header[T: ValueWriter](name: String, value: T): Request = copy(headers = headers.set(name, value))
 
