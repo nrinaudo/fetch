@@ -6,7 +6,7 @@ import com.nrinaudo.fetch._
 import com.nrinaudo.fetch.Response
 import com.nrinaudo.fetch.Status
 import scala.collection.JavaConverters._
-import com.nrinaudo.fetch.Request.Engine
+import com.nrinaudo.fetch.Request.HttpEngine
 import java.io.InputStream
 import scala.concurrent._
 
@@ -26,7 +26,7 @@ object UrlEngine {
  * @author Nicolas Rinaudo
  */
 case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedirect: Boolean = false,
-                      chunkSize: Int = UrlEngine.DefaultChunkSize)(implicit val context: ExecutionContext) extends Engine {
+                      chunkSize: Int = UrlEngine.DefaultChunkSize)(implicit val context: ExecutionContext) extends HttpEngine {
   /** Configures the specified connection to this client's preferences. */
   private def configure(con: HttpURLConnection) {
     con.setConnectTimeout(connectTimeout)

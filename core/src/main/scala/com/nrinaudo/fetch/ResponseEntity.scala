@@ -18,7 +18,7 @@ class ResponseEntity(val mime: Option[MimeType], private val stream: InputStream
 
   def decode(encoding: Encoding): ResponseEntity = new ResponseEntity(mime, encoding.decode(stream))
 
-  def as[T : EntityParser] = implicitly[EntityParser[T]].apply(this)
+  def as[T : EntityParser]: T = implicitly[EntityParser[T]].apply(this)
 
   /** Charset in which the entity is written, if any. */
   def charset: Option[Charset] = for {

@@ -13,7 +13,7 @@ import unfiltered.response.ResponseString
 import scala.io.Source
 import unfiltered.jetty.Server
 import scala.concurrent.ExecutionContext
-import com.nrinaudo.fetch.Request.Engine
+import com.nrinaudo.fetch.Request.HttpEngine
 
 /** Web server used for unit tests. */
 object TestPlan extends Plan {
@@ -58,7 +58,7 @@ object TestPlan extends Plan {
   def create: Server = unfiltered.jetty.Http.anylocal.plan(TestPlan)
   def start(implicit server: Server) = server.start()
   def stop(implicit server: Server) = server.stop()
-  def request(path: String)(implicit context: ExecutionContext, server: Server, engine: Engine) = Request(server.url + path)
+  def request(path: String)(implicit context: ExecutionContext, server: Server, engine: HttpEngine) = Request(server.url + path)
 
 
 

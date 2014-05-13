@@ -82,8 +82,8 @@ trait RequestEntity {
   /** Writes this entity to the specified output stream.
     *
     * Note that this method should not be called directly, as it ignores modifiers such that content encoding.
-    * When you absolutely need to write the entity (such as when, say, implementing a non-defaul
-    * [[com.nrinaudo.fetch.Request.Engine Engine]]), you should call [[RequestEntity!.apply]] instead.
+    * When you absolutely need to write the entity (such as when, say, implementing a non-default
+    * [[com.nrinaudo.fetch.Request.HttpEngine HttpEngine]]), you should call [[RequestEntity!.apply]] instead.
     *
     * Implementations should not close the specified stream.
     */
