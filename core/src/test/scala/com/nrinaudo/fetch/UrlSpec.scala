@@ -3,7 +3,6 @@ package com.nrinaudo.fetch
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.Gen
-import QueryString._
 
 object UrlSpec {
   def domainSeg = for {
@@ -49,16 +48,17 @@ class UrlSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
   describe("An Url") {
     it("should ignore default ports") {
       forAll(protocol, host) {(protocol, host) =>
-        Url(protocol, host, protocol.defaultPort.get).toString should be(protocol.name + "://" + host + "/")
+        Url(protocol, host, protocol.defaultPort).toString should be(protocol.name + "://" + host + "/")
       }
     }
 
     it("should include non-default ports") {
-      forAll(host, port) {(host, port) =>
-        Url(Protocol("http", None), host, port).toString should be("http://" + host + ":" + port + "/")
+      forAll(host, port.suchThat(_ != Protocol.Http.defaultPort)) { (host, port) =>
+        Protocol.Http.host(host).port(port).toString should be("http://" + host + ":" + port + "/")
       }
     }
 
+    // TODO: Bug here is the Url's path isn't an ascii character.
     it("should serialize to itself") {
       forAll(url) {url =>
         Url(url.toString) should be(url)

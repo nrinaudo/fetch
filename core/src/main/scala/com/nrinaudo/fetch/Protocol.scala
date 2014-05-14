@@ -2,13 +2,13 @@ package com.nrinaudo.fetch
 
 /** Known protocols. */
 object Protocol {
-  object Http extends Protocol("http", Some(80))
-  object Https extends Protocol("https", Some(443))
+  object Http extends Protocol("http", 80)
+  object Https extends Protocol("https", 443)
 
   def unapply(str: String): Option[Protocol] = str match {
     case Http.name  => Some(Http)
     case Https.name => Some(Https)
-    case _          => Some(Protocol(str, None))
+    case _          => None
   }
 
   def apply(str: String): Protocol = unapply(str) getOrElse {
@@ -21,12 +21,12 @@ object Protocol {
   * See the [[Protocol$ companion object]] for standard instances.
   *
   * @param name        name of the protocol as used in URL strings.
-  * @param defaultPort default port associated with this protocol, if any.
+  * @param defaultPort default port associated with this protocol.
   */
-case class Protocol(name: String, defaultPort: Option[Int]) {
-  /** Creates a new [[Url]] using on the specified host using this protocol.
-    *
-    * Note that this method is unsafe and will throw for protocols that do not have a default port associated.
-    */
-  def host(name: String) = new Url(this, name, defaultPort.get)
+case class Protocol(name: String, defaultPort: Int) {
+  /** Creates a new [[Url]] using on the specified host using this protocol. */
+  def host(name: String): Url = new Url(this, name, defaultPort)
+
+  /** Syntactic sugar for [[host]]. It unfortunately can't be `://`, as this isn't a legal scala identifier. */
+  def :/(name: String): Url = host(name)
 }

@@ -8,10 +8,16 @@ import QueryString._
 import scala.util.Success
 
 object QueryStringSpec {
+  def paramChar = Gen.oneOf(alphaChar, oneOf("!", "'", "(", ")", "~", ",", "/"))
+  def escapableString = for {
+    c <- alphaNumChar
+    cs <- listOf(paramChar)
+  } yield (c :: cs).mkString
+
   /** Returns a single query parameter. */
   def queryParam: Gen[(String, List[String])] = for {
       name   <- identifier
-      values <- nonEmptyListOf(identifier)
+      values <- nonEmptyListOf(identifier) // TODO: use escapableString here.
     } yield (name, values)
 
   def queryParams: Gen[Map[String, List[String]]] = for {

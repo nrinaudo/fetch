@@ -9,8 +9,11 @@ object Url {
   // -------------------------------------------------------------------------------------------------------------------
   def unapply(url: URL): Option[Url] = Some(apply(url))
 
-  def apply(url: URL): Url =
-    Url(Protocol(url.getProtocol), url.getHost, url.getPort, splitPath(url.getPath), QueryString(url.getQuery), Option(url.getRef))
+  def apply(url: URL): Url = {
+    val protocol = Protocol(url.getProtocol)
+    Url(protocol, url.getHost, if(url.getPort == -1) protocol.defaultPort else url.getPort,
+      splitPath(url.getPath), QueryString(url.getQuery), Option(url.getRef))
+  }
 
   private def splitPath(path: String) = path.split("/").toList.filter(!_.isEmpty)
 
@@ -39,9 +42,9 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
 
   def ?(value: QueryString): Url = query(value)
 
-  /** Appends the specified parameter to the request's [[Url]].
+  /** Appends the specified parameter to the url's [[QueryString]].
     *
-    * This is purely a convenience method for [[Url.&]].
+    * This is purely a convenience method for [[QueryString.&]].
     */
   def &[T: ValueWriter](param: (String, T)): Url = query(query & param)
 
@@ -49,13 +52,6 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
 
   // - Object methods --------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  override def hashCode: Int = toString.hashCode
-
-  override def equals(o: Any): Boolean = o match {
-    case u: Url => toString == u.toString
-    case _      => false
-  }
-
   override lazy val toString = {
     val builder = new StringBuilder
 
@@ -63,7 +59,7 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
     builder.append(protocol.name).append("://").append(host)
 
     // Appends the port if different from the default one.
-    if(protocol.defaultPort.filter(_ == port).isEmpty) builder.append(':').append(port)
+    if(protocol.defaultPort != port) builder.append(':').append(port)
 
     // Path
     builder.append(path.map(URLEncoder.encode(_, "utf-8")).mkString("/", "/", ""))
@@ -71,7 +67,7 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
     // Query String.
     query.writeTo(builder)
 
-    fragment.foreach {r => builder.append(URLEncoder.encode(r, "utf-8"))}
+    fragment.foreach {r => builder.append("#").append(URLEncoder.encode(r, "utf-8"))}
 
     builder.toString()
   }
