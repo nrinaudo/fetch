@@ -1,6 +1,6 @@
 package com.nrinaudo.fetch.net
 
-import java.net.{URL, ProtocolException, HttpURLConnection}
+import java.net.{URI, URL, ProtocolException, HttpURLConnection}
 import javax.net.ssl.HttpsURLConnection
 import com.nrinaudo.fetch._
 import com.nrinaudo.fetch.Response
@@ -86,7 +86,7 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
   }
 
   def apply(url: Url, method: Method, body: Option[RequestEntity], headers: Headers): Future[Response[ResponseEntity]] =
-    new URL(url.toString).openConnection() match {
+    new URI(url.toString).toURL.openConnection() match {
       case con: HttpURLConnection => Future {process(con, method, body, headers)}
       case _                      => Future.failed {new AssertionError("An URL opened a non-URL HTTP connection.")}
     }

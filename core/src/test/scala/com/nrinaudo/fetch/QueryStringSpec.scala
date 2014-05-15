@@ -2,22 +2,17 @@ package com.nrinaudo.fetch
 
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.Gen
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Gen._
 import QueryString._
 import scala.util.Success
 
 object QueryStringSpec {
-  def paramChar = Gen.oneOf(alphaChar, oneOf("!", "'", "(", ")", "~", ",", "/"))
-  def escapableString = for {
-    c <- alphaNumChar
-    cs <- listOf(paramChar)
-  } yield (c :: cs).mkString
-
   /** Returns a single query parameter. */
   def queryParam: Gen[(String, List[String])] = for {
       name   <- identifier
-      values <- nonEmptyListOf(identifier) // TODO: use escapableString here.
+      values <- nonEmptyListOf(Arbitrary.arbitrary[String])
+      //values <- nonEmptyListOf(identifier)
     } yield (name, values)
 
   def queryParams: Gen[Map[String, List[String]]] = for {

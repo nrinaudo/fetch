@@ -2,7 +2,7 @@ package com.nrinaudo.fetch
 
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.Gen
+import org.scalacheck.{Arbitrary, Gen}
 
 object UrlSpec {
   def domainSeg = for {
@@ -21,7 +21,7 @@ object UrlSpec {
   def port = Gen.choose(1, 65535)
 
   /** Generates a valid path. */
-  def path = Gen.listOf(Gen.identifier)
+  def path = Gen.listOf(Arbitrary.arbitrary[String].suchThat(!_.isEmpty))
 
   def ref = Gen.oneOf(true, false) flatMap {b =>
     if(b) None
@@ -58,7 +58,6 @@ class UrlSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
       }
     }
 
-    // TODO: Bug here is the Url's path isn't an ascii character.
     it("should serialize to itself") {
       forAll(url) {url =>
         Url(url.toString) should be(url)

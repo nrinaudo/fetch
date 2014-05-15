@@ -1,27 +1,26 @@
 package com.nrinaudo.fetch
 
-import java.net.URLEncoder
+import java.net.URI
 import scala.util.Try
-import java.net.URL
 
 object Url {
   // - URL-based construction ------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def unapply(url: URL): Option[Url] = Some(apply(url))
+  def unapply(url: URI): Option[Url] = Some(apply(url))
 
-  def apply(url: URL): Url = {
-    val protocol = Protocol(url.getProtocol)
-    Url(protocol, url.getHost, if(url.getPort == -1) protocol.defaultPort else url.getPort,
-      splitPath(url.getPath), QueryString(url.getQuery), Option(url.getRef))
+  def apply(uri: URI): Url = {
+    val protocol = Protocol(uri.getScheme)
+    Url(protocol, uri.getHost, if(uri.getPort == -1) protocol.defaultPort else uri.getPort,
+      splitPath(uri.getRawPath), QueryString(uri.getRawQuery), Option(uri.getFragment))
   }
 
-  private def splitPath(path: String) = path.split("/").toList.filter(!_.isEmpty)
+  private def splitPath(path: String) = path.split("/").toList.filter(!_.isEmpty).map(UrlEncoder.decode)
 
 
   // - String-based construction ---------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def unapply(url: String): Option[Url] = Try {apply(url)}.toOption
-  def apply(url: String): Url = Url(new URL(url))
+  def apply(url: String): Url = Url(new URI(url))
 }
 
 case class Url(protocol: Protocol, host: String, port: Int, path: List[String] = List(),
@@ -62,12 +61,12 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
     if(protocol.defaultPort != port) builder.append(':').append(port)
 
     // Path
-    builder.append(path.map(URLEncoder.encode(_, "utf-8")).mkString("/", "/", ""))
+    builder.append(path.filter(!_.isEmpty).map(UrlEncoder.encode).mkString("/", "/", ""))
 
     // Query String.
     query.writeTo(builder)
 
-    fragment.foreach {r => builder.append("#").append(URLEncoder.encode(r, "utf-8"))}
+    fragment.foreach {r => builder.append("#").append(UrlEncoder.encode(r))}
 
     builder.toString()
   }

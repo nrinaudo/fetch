@@ -3,7 +3,7 @@ package com.nrinaudo
 import java.io._
 import java.nio.charset.Charset
 import scala.language.implicitConversions
-import java.net.URL
+import java.net.{URI, URL}
 import com.nrinaudo.fetch.ResponseEntity.EntityParser
 import java.util.Locale
 import com.nrinaudo.fetch.Request.HttpEngine
@@ -66,7 +66,7 @@ package object fetch {
 
   // URLs.
   implicit def stringToURL(str: String)             = Url(str)
-  implicit def urlToURL(url: URL)                   = Url(url)
+  implicit def uriToURL(url: URI)                   = Url(url)
 
   // Content negotiation headers.
   implicit def mimeToConneg(mime: MimeType)         = Conneg(mime)

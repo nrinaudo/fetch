@@ -1,7 +1,6 @@
 package com.nrinaudo.fetch
 
 import scala.util.Try
-import java.net.URLEncoder
 
 
 object QueryString {
@@ -23,8 +22,10 @@ object QueryString {
   def apply(query: String): QueryString = {
     def extract(str: String) = new QueryString(str.split("&").foldLeft(Map[String, List[String]]()) {
       case (map, entry) =>
-        val (name, v) = entry.splitAt(entry.indexOf('='))
-        val value = v.substring(1)
+        val (n, v) = entry.splitAt(entry.indexOf('='))
+
+        val name  = UrlEncoder.decode(n)
+        val value = UrlEncoder.decode(v.substring(1))
 
         // TODO: appending at the end of the list has a complexity of O(n) and is inefficient for long lists. Fix.
         map + (name -> map.get(name).fold(List(value))(_ :+ value))
@@ -89,14 +90,6 @@ case class QueryString(values: Map[String, List[String]] = Map()) {
 
   // - Serialization ---------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  // TODO: implement proper percent encoding.
-  private def encode(str: String) = URLEncoder.encode(str, "utf-8").replaceAll("\\+", "%20")
-    .replaceAll("\\%21", "!")
-    .replaceAll("\\%27", "'")
-    .replaceAll("\\%28", "(")
-    .replaceAll("\\%29", ")")
-    .replaceAll("\\%7E", "~")
-
   def writeTo(builder: StringBuilder): StringBuilder = {
     if(values.isEmpty) builder
     else {
@@ -107,7 +100,7 @@ case class QueryString(values: Map[String, List[String]] = Map()) {
       for((name, list) <- values; value <- list) {
         if(first) first = false
         else      builder.append("&")
-        builder.append(name).append('=').append(encode(value))
+        builder.append(name).append('=').append(UrlEncoder.encode(value))
       }
 
       builder

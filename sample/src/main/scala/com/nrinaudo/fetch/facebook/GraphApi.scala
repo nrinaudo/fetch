@@ -19,5 +19,5 @@ object GraphApi {
     else                     throw new FacebookException(res.body.as[JValue] \ "error")
 
   def apply(token: String)(implicit engine: HttpEngine, context: ExecutionContext) =
-    new GraphApi(Request(RootUri).map(filterErrors) & "access_token" -> token)
+    new GraphApi(RootUri.map(filterErrors) & "access_token" -> token)
 }
