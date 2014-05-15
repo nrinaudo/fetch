@@ -53,47 +53,49 @@ public class UrlEncoder {
             "%f8", "%f9", "%fa", "%fb", "%fc", "%fd", "%fe", "%ff"
     };
 
-    public static String encode(String s)
-    {
-        StringBuffer sbuf = new StringBuffer();
+    public static StringBuilder encodeInto(String s, StringBuilder builder) {
         int len = s.length();
         for (int i = 0; i < len; i++) {
             int ch = s.charAt(i);
             if ('A' <= ch && ch <= 'Z') {		// 'A'..'Z'
-                sbuf.append((char)ch);
+                builder.append((char)ch);
             } else if ('a' <= ch && ch <= 'z') {	// 'a'..'z'
-                sbuf.append((char)ch);
+                builder.append((char)ch);
             } else if ('0' <= ch && ch <= '9') {	// '0'..'9'
-                sbuf.append((char)ch);
+                builder.append((char)ch);
             } else if (ch == ' ') {			// space
-                sbuf.append('+');
+                builder.append('+');
             } else if (ch == '-' || ch == '_'		// unreserved
                        || ch == '.' || ch == '!'
                        || ch == '~' || ch == '*'
                        || ch == '\'' || ch == '('
                        || ch == ')') {
-                sbuf.append((char)ch);
+                builder.append((char)ch);
             } else if (ch <= 0x007f) {		// other ASCII
-                sbuf.append(hex[ch]);
+                builder.append(hex[ch]);
             } else if (ch <= 0x07FF) {		// non-ASCII <= 0x7FF
-                sbuf.append(hex[0xc0 | (ch >> 6)]);
-                sbuf.append(hex[0x80 | (ch & 0x3F)]);
+                builder.append(hex[0xc0 | (ch >> 6)]);
+                builder.append(hex[0x80 | (ch & 0x3F)]);
             } else {					// 0x7FF < ch <= 0xFFFF
-                sbuf.append(hex[0xe0 | (ch >> 12)]);
-                sbuf.append(hex[0x80 | ((ch >> 6) & 0x3F)]);
-                sbuf.append(hex[0x80 | (ch & 0x3F)]);
+                builder.append(hex[0xe0 | (ch >> 12)]);
+                builder.append(hex[0x80 | ((ch >> 6) & 0x3F)]);
+                builder.append(hex[0x80 | (ch & 0x3F)]);
             }
         }
-        return sbuf.toString();
+        return builder;
     }
 
-    public static String decode(String s) {
-        StringBuffer sbuf = new StringBuffer () ;
+    public static String encode(String s)
+    {
+        return encodeInto(s, new StringBuilder()).toString();
+    }
+
+    public static StringBuilder decodeInto(String s, StringBuilder builder) {
         int l  = s.length() ;
-        int ch = -1 ;
+        int ch;
         int b, sumb = 0;
         for (int i = 0, more = -1 ; i < l ; i++) {
-         /* Get next byte b from URL segment s */
+                 /* Get next byte b from URL segment s */
             switch (ch = s.charAt(i)) {
                 case '%':
                     ch = s.charAt (++i) ;
@@ -112,12 +114,12 @@ public class UrlEncoder {
                 default:
                     b = ch ;
             }
-         /* Decode byte b as UTF-8, sumb collects incomplete chars */
+                 /* Decode byte b as UTF-8, sumb collects incomplete chars */
             if ((b & 0xc0) == 0x80) {			// 10xxxxxx (continuation byte)
                 sumb = (sumb << 6) | (b & 0x3f) ;	// Add 6 bits to sumb
-                if (--more == 0) sbuf.append((char) sumb) ; // Add char to sbuf
+                if (--more == 0) builder.append((char) sumb) ; // Add char to builder
             } else if ((b & 0x80) == 0x00) {		// 0xxxxxxx (yields 7 bits)
-                sbuf.append((char) b) ;			// Store in sbuf
+                builder.append((char)b) ;			// Store in builder
             } else if ((b & 0xe0) == 0xc0) {		// 110xxxxx (yields 5 bits)
                 sumb = b & 0x1f;
                 more = 1;				// Expect 1 more byte
@@ -134,8 +136,12 @@ public class UrlEncoder {
                 sumb = b & 0x01;
                 more = 5;				// Expect 5 more bytes
             }
-         /* We don't test if the UTF-8 encoding is well-formed */
+                 /* We don't test if the UTF-8 encoding is well-formed */
         }
-        return sbuf.toString() ;
+        return builder;
+    }
+
+    public static String decode(String s) {
+        return decodeInto(s, new StringBuilder()).toString();
     }
 }

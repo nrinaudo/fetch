@@ -4,7 +4,7 @@ import java.net.URI
 import scala.util.Try
 
 object Url {
-  // - URL-based construction ------------------------------------------------------------------------------------------
+  // - URI-based construction ------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def unapply(url: URI): Option[Url] = Some(apply(url))
 
@@ -51,6 +51,10 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
 
   // - Object methods --------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
+  // Note: I wanted to implement this properly with the correct URI constructor and all, but it turns out this creates
+  // a string and then parses it...
+  lazy val toURI: URI = new URI(toString)
+
   override lazy val toString = {
     val builder = new StringBuilder
 
@@ -64,7 +68,7 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
     builder.append(path.filter(!_.isEmpty).map(UrlEncoder.encode).mkString("/", "/", ""))
 
     // Query String.
-    query.writeTo(builder)
+    if(!query.values.isEmpty) query.writeTo(builder.append('?'))
 
     fragment.foreach {r => builder.append("#").append(UrlEncoder.encode(r))}
 

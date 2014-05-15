@@ -2,31 +2,32 @@ package com.nrinaudo.fetch
 
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Gen._
+import org.scalacheck.Arbitrary._
 import java.net.URI
 
 object UrlSpec {
   def domainSeg = for {
-    first   <- Gen.alphaChar
-    length  <- Gen.choose(1, 10)
-    content <- Gen.listOfN(length, Gen.alphaLowerChar)
+    first   <- alphaChar
+    length  <- choose(1, 10)
+    content <- listOfN(length, alphaLowerChar)
   } yield (first :: content).mkString
 
   /** Generates a valid host. */
   def host = for {
     name <- domainSeg
-    ext  <- Gen.oneOf("com", "fr", "es", "it", "co.uk", "co.jp", "io")
+    ext  <- oneOf("com", "fr", "es", "it", "co.uk", "co.jp", "io")
   } yield name + "." + ext
 
   /** Generates a valid port. */
-  def port = Gen.choose(1, 65535)
+  def port = choose(1, 65535)
 
   /** Generates a valid path. */
-  def path = Gen.listOf(Arbitrary.arbitrary[String].suchThat(!_.isEmpty))
+  def path = listOf(arbitrary[String].suchThat(!_.isEmpty))
 
-  def ref = Gen.oneOf(true, false) flatMap {b =>
+  def ref = oneOf(true, false) flatMap {b =>
     if(b) None
-    else  Gen.identifier.map(Some(_))
+    else  arbitrary[String].map(Some(_))
   }
 
   def url = for {
@@ -59,9 +60,14 @@ class UrlSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
       }
     }
 
+    it("should correctly transform to instances of URI") {
+      forAll(url) {url =>
+        url.toURI should be(new URI(url.toString))
+      }
+    }
+
     it("should serialize to itself") {
       forAll(url) {url =>
-        new URI(url.toString).toString should be(url.toString)
         Url(url.toString) should be(url)
       }
     }

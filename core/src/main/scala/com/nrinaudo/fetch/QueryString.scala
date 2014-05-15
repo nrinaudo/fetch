@@ -91,21 +91,17 @@ case class QueryString(values: Map[String, List[String]] = Map()) {
   // - Serialization ---------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def writeTo(builder: StringBuilder): StringBuilder = {
-    if(values.isEmpty) builder
-    else {
-      builder.append('?')
+    var first = true
 
-      var first = true
+    for((name, list) <- values; value <- list) {
+      if(first) first = false
+      else      builder.append("&")
 
-      for((name, list) <- values; value <- list) {
-        if(first) first = false
-        else      builder.append("&")
-        builder.append(name).append('=').append(UrlEncoder.encode(value))
-      }
-
-      builder
+      builder.append(UrlEncoder.encode(name)).append('=').append(UrlEncoder.encode(value))
     }
+
+    builder
   }
 
-  override def toString: String = writeTo(new StringBuilder).result()
+  override lazy val toString: String = writeTo(new StringBuilder).result()
 }
