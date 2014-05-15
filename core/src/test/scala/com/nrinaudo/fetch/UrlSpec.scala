@@ -3,6 +3,7 @@ package com.nrinaudo.fetch
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
+import java.net.URI
 
 object UrlSpec {
   def domainSeg = for {
@@ -60,6 +61,7 @@ class UrlSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
 
     it("should serialize to itself") {
       forAll(url) {url =>
+        new URI(url.toString).toString should be(url.toString)
         Url(url.toString) should be(url)
       }
     }
