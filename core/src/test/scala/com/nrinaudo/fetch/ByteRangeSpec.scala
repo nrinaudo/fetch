@@ -26,7 +26,7 @@ object ByteRangeSpec {
   // live code.
   } yield ByteRange(if(opt == 1) None else Some(from), if(opt ==2 ) None else Some(to))
 
-  def byteRanges = HeaderSpec.headers(byteRange)
+  def byteRanges = HeadersSpec.headers(byteRange)
 }
 
 /** Tests the [[ByteRange]] class. */

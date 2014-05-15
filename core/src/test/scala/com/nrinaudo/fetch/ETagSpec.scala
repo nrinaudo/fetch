@@ -12,14 +12,14 @@ object ETagSpec {
     if(weak) WeakTag(value)
     else     StrongTag(value)
 
-  def etags = HeaderSpec.headers(etag)
+  def etags = HeadersSpec.headers(etag)
 }
 
 class ETagSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
   import ETagSpec._
 
   describe("An ETag") {
-    it("should parse valid instances correctly") {
+    it("should serialize to itself") {
       forAll(etag) { etag =>
         ETag(etag.toString) should be(etag)
       }

@@ -7,7 +7,7 @@ object ByteRange {
   private val Extractor = """([0-9]+)?-([0-9]+)?""".r
 
   def unapply(str: String): Option[ByteRange] = str match {
-    case Extractor(left, right) => Try {ByteRange(Option(left).map {_.toInt}, Option(right).map {_.toInt})}.toOption
+    case Extractor(left, right) => Try {ByteRange(Option(left).map(_.toInt), Option(right).map(_.toInt))}.toOption
     case _                      => None
   }
 

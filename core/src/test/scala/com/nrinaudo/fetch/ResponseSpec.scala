@@ -7,7 +7,7 @@ import com.nrinaudo.fetch.net.UrlEngine
 import org.scalacheck.Gen
 
 class ResponseSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
-  import HeaderSpec._
+  import HeadersSpec._
   import TestPlan._
   import Headers._
   import ETagSpec._

@@ -7,6 +7,7 @@ import org.scalacheck.Gen
 object MimeTypeSpec {
   def main = Gen.oneOf("text", "application", "video", "audio", "image", "message", "multipart")
   def sub = Gen.oneOf("plain", "png", "jpg", "rdf", "html", "rdf+xml", "json", "x-fixed-field")
+  // TODO: can this be relaxed and aribtrary strings be used instead.
   def param = for {
     name  <- Gen.identifier
     value <- Gen.identifier

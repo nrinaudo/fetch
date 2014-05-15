@@ -13,7 +13,7 @@ object HeaderFormatSpec {
 }
 
 class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  import HeaderSpec._
+  import HeadersSpec._
   import HeaderFormatSpec._
   import ConnegSpec._
   import MimeTypeSpec._

@@ -2,7 +2,7 @@ package com.nrinaudo.fetch
 
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Gen
 import org.scalacheck.Gen._
 import org.scalacheck.Arbitrary._
 import QueryString._
