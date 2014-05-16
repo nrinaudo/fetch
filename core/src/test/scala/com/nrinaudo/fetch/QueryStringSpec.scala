@@ -12,11 +12,13 @@ object QueryStringSpec {
   /** Returns a single query parameter. */
   def queryParam: Gen[(String, List[String])] = for {
       name   <- arbitrary[String].suchThat(!_.isEmpty)
-      values <- nonEmptyListOf(arbitrary[String])
+      count  <- choose(1, 10)
+      values <- listOfN(count, arbitrary[String])
     } yield (name, values)
 
   def queryParams: Gen[Map[String, List[String]]] = for {
-    params <- listOf(queryParam)
+    count  <- choose(1, 10)
+    params <- listOfN(count, queryParam)
   } yield params.foldLeft(Map(): Map[String, List[String]]) { (map, param) => map + param}
 
 

@@ -2,70 +2,45 @@ package com.nrinaudo.fetch
 
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.{Gen, Arbitrary}
-import scala.util.Success
+import org.scalacheck.Arbitrary
+import scala.Some
 
-class ValueWriterSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  implicit val Ints    = ValueFormat.Ints
-  implicit val Strings = Headers.StringFormat
-
-  describe("ValueWriter") {
-    it("should sequence non-empty lists properly") {
-      forAll(Gen.listOf(Arbitrary.arbitrary[Int]).suchThat(!_.isEmpty)) { values =>
-        ValueWriter.sequence(values) should be(Some(values.map(_.toString)))
-      }
-    }
-
-    it("should sequence empty lists properly") {
-      ValueWriter.sequence(Nil: List[Int]) should be(None)
-    }
-
-    it("should sequence non-empty lists of empty elements properly") {
-      forAll(Gen.choose(1, 10)) { size =>
-        ValueWriter.sequence(List.fill(size)("")) should be(None)
-      }
-    }
-
-    it("should sequence lists with some empty elements properly") {
-      forAll(Gen.nonEmptyListOf(Arbitrary.arbitrary[String])) { values =>
-        val e1 = values.filter(!_.isEmpty)
-        val e2 = if(e1.isEmpty) None else Some(e1)
-
-        ValueWriter.sequence(values) should be(e2)
-      }
-    }
+class ValueFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
+  def cycle[A](value: A, format: ValueFormat[A]) {
+    format.write(value).flatMap(format.read(_).toOption) should be(Some(value))
   }
-}
 
-class ValueReaderSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  implicit val Ints = ValueFormat.Ints
-
-  describe("ValueReader") {
-    it("should sequence empty lists properly") {
-      ValueReader.sequence[Int](Nil) should be(Success(Nil))
+  describe("ValueFormat") {
+    it("should have a working default Double implementation") {
+      forAll(Arbitrary.arbitrary[Double]) { value => cycle(value, ValueFormat.Doubles)}
     }
 
-    it("should sequence successes properly") {
-      forAll(Gen.listOf(Arbitrary.arbitrary[Int])) { values =>
-        ValueReader.sequence[Int](values.map(_.toString)) should be(Success(values))
-      }
+    it("should have a working default Long implementation") {
+      forAll(Arbitrary.arbitrary[Long]) { value => cycle(value, ValueFormat.Longs)}
     }
 
-    def brokenSequence = for {
-      ints <- Gen.nonEmptyListOf(Arbitrary.arbitrary[Int])
-      pos  <- Gen.choose(0, ints.length)
-    } yield {
-      val (h, t) = ints.map(_.toString).splitAt(pos)
-      h ::: ("test" :: t)
+    it("should have a working default Short implementation") {
+      forAll(Arbitrary.arbitrary[Short]) { value => cycle(value, ValueFormat.Shorts)}
     }
 
-    it("should sequence failures properly") {
-      forAll(brokenSequence) { values =>
-        val failure = ValueReader.sequence[Int](values)
+    it("should have a working default Int implementation") {
+      forAll(Arbitrary.arbitrary[Int]) { value => cycle(value, ValueFormat.Ints)}
+    }
 
-        failure.isFailure should be(true)
-        intercept[NumberFormatException](failure.get)
-      }
+    it("should have a working default Byte implementation") {
+      forAll(Arbitrary.arbitrary[Byte]) { value => cycle(value, ValueFormat.Bytes)}
+    }
+
+    it("should have a working default Float implementation") {
+      forAll(Arbitrary.arbitrary[Float]) { value => cycle(value, ValueFormat.Floats)}
+    }
+
+    it("should have a working default Boolean implementation") {
+      forAll(Arbitrary.arbitrary[Boolean]) { value => cycle(value, ValueFormat.Booleans)}
+    }
+
+    it("should have a working default String implementation") {
+      forAll(Arbitrary.arbitrary[String]) { value => cycle(value, ValueFormat.Strings)}
     }
   }
 }
