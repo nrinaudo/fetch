@@ -20,8 +20,15 @@ object Headers {
 
   // - Generic default formats -----------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  implicit val StringFormat: ValueFormat[String] = ValueFormat.Strings
-  implicit val IntFormat: ValueFormat[Int]       = ValueFormat.Ints
+  implicit val StringFormat: ValueFormat[String] = new ValueFormat[String] {
+    override def write(value: String): Option[String] =
+    if(value.isEmpty) None
+    else Some(value)
+
+    override def read(value: String): Try[String] = Success(value)
+  }
+
+  implicit val IntFormat: ValueFormat[Int] = ValueFormat.Ints
 
 
   // - Header specific default formats ---------------------------------------------------------------------------------
