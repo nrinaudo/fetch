@@ -2,6 +2,8 @@ import SonatypeKeys._
 
 sonatypeSettings
 
+instrumentSettings
+
 lazy val root = project.in(file(".")).aggregate(core, json4sNative, json4sJackson, sample).settings(packagedArtifacts := Map.empty)
 
 lazy val core = project

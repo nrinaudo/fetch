@@ -1,5 +1,6 @@
-
 sonatypeSettings
+
+instrumentSettings
 
 name := "fetch"
 
