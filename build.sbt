@@ -1,6 +1,5 @@
 import SonatypeKeys._
 
-sonatypeSettings
 
 instrumentSettings
 
