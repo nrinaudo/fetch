@@ -23,7 +23,10 @@ object UrlSpec {
   def port = choose(1, 65535)
 
   /** Generates a valid path. */
-  def path = listOf(arbitrary[String].suchThat(!_.isEmpty))
+  def path = for {
+    count <- choose(0, 5)
+    path <- listOfN(count, arbitrary[String].suchThat(!_.isEmpty))
+  } yield path
 
   def ref = oneOf(true, false) flatMap {b =>
     if(b) None
@@ -67,7 +70,7 @@ class UrlSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
     }
 
     it("should serialize to itself") {
-      forAll(url) {url =>
+      forAll(url) { url =>
         Url(url.toString) should be(url)
       }
     }

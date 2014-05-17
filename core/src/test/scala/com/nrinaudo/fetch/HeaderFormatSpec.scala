@@ -7,6 +7,7 @@ import com.nrinaudo.fetch.Headers._
 import scala.util.Success
 import java.util.Locale
 import java.nio.charset.Charset
+import org.scalacheck.{Gen, Arbitrary}
 
 object HeaderFormatSpec {
   def cycle[T](format: ValueFormat[T], value: T) = format.read(format.write(value).get)
@@ -26,6 +27,11 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     it("should correctly serialize and parse dates") {
       forAll(date) { date => validate(DateFormat, date)}
     }
+
+    it("should refuse illegal dates") {
+      // Starting the string with an arbitrary letter ensures it's not a valid date.
+      forAll(Gen.alphaChar, Arbitrary.arbitrary[String]) {(c, str) => DateFormat.read(c + str).isFailure should be(true)}
+    }
   }
 
   describe("The language formatter") {
@@ -35,6 +41,11 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
 
     it("should correctly serialize and parse lists of languages") {
       forAll(nonEmptyListOf(language)) { langs => validate(compositeFormat[Locale], langs)}
+    }
+
+    it("should refuse illegal languages") {
+      // Starting the language with an arbitrary number ensures it's not a valid language.
+      forAll(Gen.numChar, Arbitrary.arbitrary[String]) {(c, str) => LanguageFormat.read(c + str).isFailure should be(true)}
     }
   }
 
@@ -46,6 +57,12 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     it("should correctly serialize and parse lists of charsets") {
       forAll(nonEmptyListOf(charset)) { charsets => validate(compositeFormat[Charset], charsets)}
     }
+
+    it("should refuse illegal charsets") {
+      forAll(Arbitrary.arbitrary[String].suchThat(!Charset.availableCharsets().containsKey(_))) { str =>
+        CharsetFormat.read(str).isFailure should be(true)
+      }
+    }
   }
 
   describe("The MIME type formatter") {
@@ -56,6 +73,8 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     it("should correctly serialize and parse lists of MIME types") {
       forAll(nonEmptyListOf(mimeType)) { mimes => validate(compositeFormat[MimeType], mimes)}
     }
+
+    // TODO: failure cases.
   }
 
   describe("The content encoding formatter") {
@@ -66,6 +85,8 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     it("should correctly serialize and parse lists of encodings") {
       forAll(nonEmptyListOf(encoding)) { encodings => validate(compositeFormat[Encoding], encodings)}
     }
+
+    // TODO: failure cases.
   }
 
   describe("The byte range encoding formatter") {
@@ -75,6 +96,24 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
 
     it("should correctly serialize and parse lists of byte ranges") {
       forAll(nonEmptyListOf(byteRange)) { ranges => validate(ByteRangesFormat, ranges)}
+    }
+
+    // TODO: failure cases.
+  }
+
+  describe("The method formatter") {
+    it("should correctly serialize and parse methods") {
+      forAll(MethodSpec.httpMethod) { method => validate(MethodFormat, method)}
+    }
+
+    it("should correctly serialize and parse lists of byte ranges") {
+      forAll(nonEmptyListOf(MethodSpec.httpMethod)) { methods => validate(compositeFormat[Method], methods)}
+    }
+
+    it("should refuse illegal methods") {
+      forAll(identifier, identifier) { (a, b) =>
+        MethodFormat.read(a + ' ' + b).isFailure should be(true)
+      }
     }
   }
 }

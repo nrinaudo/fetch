@@ -45,7 +45,7 @@ object Headers {
     override def write(date: Date): Option[String] = Some(HttpDateFormat.synchronized {HttpDateFormat.format(date)})
   }
 
-  private val LanguagePattern = """([^-]+)(?:-([^-]+))?""".r
+  private val LanguagePattern = """(\p{Alpha}\p{Alpha})(?:-(\p{Alpha}\p{Alpha}))?""".r
   implicit object LanguageFormat extends ValueFormat[Locale] {
     override def read (value: String): Try[Locale] = value match {
       case LanguagePattern(lang, null)    => Success(new Locale(lang))
@@ -80,7 +80,7 @@ object Headers {
 
   implicit object MethodFormat extends ValueFormat[Method] {
     override def read(value: String): Try[Method] = Method.unapply(value) map {Success(_)} getOrElse {
-      throw new IllegalArgumentException("Unsupported method: " + value)
+      Failure(new IllegalArgumentException("Unsupported method: " + value))
     }
 
     override def write(value: Method): Option[String] = Some(value.name)

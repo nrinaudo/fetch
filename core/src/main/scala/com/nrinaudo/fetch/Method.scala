@@ -14,18 +14,19 @@ object Method {
   object UNLINK extends Method("UNLINK")
 
   def unapply(value: String): Option[Method] = value match {
-    case GET.name     => Some(GET)
-    case POST.name    => Some(POST)
-    case PUT.name     => Some(PUT)
-    case DELETE.name  => Some(DELETE)
-    case HEAD.name    => Some(HEAD)
-    case OPTIONS.name => Some(OPTIONS)
-    case TRACE.name   => Some(TRACE)
-    case CONNECT.name => Some(CONNECT)
-    case PATCH.name   => Some(PATCH)
-    case LINK.name    => Some(LINK)
-    case UNLINK.name  => Some(UNLINK)
-    case _            => Some(Method(value))
+    case GET.name                        => Some(GET)
+    case POST.name                       => Some(POST)
+    case PUT.name                        => Some(PUT)
+    case DELETE.name                     => Some(DELETE)
+    case HEAD.name                       => Some(HEAD)
+    case OPTIONS.name                    => Some(OPTIONS)
+    case TRACE.name                      => Some(TRACE)
+    case CONNECT.name                    => Some(CONNECT)
+    case PATCH.name                      => Some(PATCH)
+    case LINK.name                       => Some(LINK)
+    case UNLINK.name                     => Some(UNLINK)
+    case str if !str.matches(".*\\s+.*") => Some(Method(str))
+    case _                               => None
   }
 }
 

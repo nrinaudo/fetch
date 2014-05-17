@@ -12,7 +12,7 @@ object QueryStringSpec {
   /** Returns a single query parameter. */
   def queryParam: Gen[(String, List[String])] = for {
       name   <- arbitrary[String].suchThat(!_.isEmpty)
-      count  <- choose(1, 10)
+      count  <- choose(1, 5)
       values <- listOfN(count, arbitrary[String])
     } yield (name, values)
 
