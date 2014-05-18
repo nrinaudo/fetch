@@ -27,7 +27,6 @@ object Encoding {
                              d: (InputStream) => InputStream) extends Encoding {
     override def decode(in: InputStream): InputStream = d(in)
     override def encode(out: OutputStream): OutputStream = e(out)
-    override def toString = name
   }
 
   /** Creates a new content encoding with the specified decoding and encoding functions. */
