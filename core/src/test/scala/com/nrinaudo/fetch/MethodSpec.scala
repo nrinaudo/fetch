@@ -16,8 +16,6 @@ object MethodSpec {
 }
 
 class MethodSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  import MethodSpec._
-
   describe("Method") {
     it("should unapply against known HTTP methods") {
       Method.unapply("GET") should be(Some(Method.GET))
@@ -34,7 +32,9 @@ class MethodSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     }
 
     it("should unapply against unknown but legal HTTP methods") {
-      forAll(Gen.identifier) { method => Method.unapply(method) should be(Some(Method(method)))}
+      forAll(Gen.alphaStr.suchThat(!_.isEmpty)) { method =>
+        Method.unapply(method) should be(Some(Method(method)))
+      }
     }
 
     it("should not unapply against illegal HTTP methods") {

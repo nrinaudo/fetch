@@ -42,6 +42,10 @@ object Status {
   object ServiceUnavailable extends Status(503)
   object GatewayTimeout extends Status(504)
   object HttpVersionNotSupported extends Status(505)
+
+  def unapply(value: Int): Option[Status] =
+    if(value > 0 && value < 600) Some(Status(value))
+    else            None
 }
 
 /**
