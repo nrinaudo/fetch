@@ -1,6 +1,6 @@
 package com.nrinaudo.fetch
 
-import org.scalacheck.Gen
+import org.scalacheck.{Arbitrary, Gen}
 import java.nio.charset.Charset
 import java.util.Locale
 import scala.collection.JavaConverters._
@@ -77,6 +77,23 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     it("should correctly serialize and parse content encodings") {
       forAll(connegs(encoding)) { headers =>
         cycle(Headers.compositeFormat[Conneg[Encoding]], headers) should be(Success(headers))
+      }
+    }
+
+    it("should have a working map implementation") {
+      forAll(conneg(Arbitrary.arbitrary[Int])) { header =>
+        header.map(_.toString).map(_.toInt) should be(header)
+      }
+    }
+
+    it("should have a working flatMap implementation") {
+      forAll(conneg(Arbitrary.arbitrary[Int]), conneg(Arbitrary.arbitrary[Int])) { (a, b) =>
+        val result = for {
+          va <- a
+          vb <- b
+        } yield va + vb
+
+        result.value should be(a.value + b.value)
       }
     }
   }
