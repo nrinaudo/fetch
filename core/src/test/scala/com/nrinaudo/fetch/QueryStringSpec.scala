@@ -55,5 +55,7 @@ class QueryStringSpec extends FunSpec with Matchers with GeneratorDrivenProperty
         QueryString(query.toString) should be(query)
       }
     }
+
+    // TODO: add a test for empty parameters.
   }
 }

@@ -63,8 +63,10 @@ public class UrlEncoder {
                 builder.append((char)ch);
             } else if ('0' <= ch && ch <= '9') {	// '0'..'9'
                 builder.append((char)ch);
-            } else if (ch == ' ') {			// space
-                builder.append('+');
+                // Removed the special case for space: it *should* be encoded as %20, not +. We just need to be able
+                // to decode + properly.
+            /*} else if (ch == ' ') {			// space
+                builder.append('+'); */
             } else if (ch == '-' || ch == '_'		// unreserved
                        || ch == '.' || ch == '!'
                        || ch == '~' || ch == '*'

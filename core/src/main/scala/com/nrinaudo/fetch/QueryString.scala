@@ -93,7 +93,10 @@ case class QueryString(values: Map[String, List[String]] = Map()) {
   def writeTo(builder: StringBuilder): StringBuilder = {
     var first = true
 
-    for((name, list) <- values; value <- list if !value.isEmpty) {
+    for {
+      (name, list) <- values
+      value        <- list if !value.isEmpty
+    } {
       if(first) first = false
       else      builder.append("&")
 

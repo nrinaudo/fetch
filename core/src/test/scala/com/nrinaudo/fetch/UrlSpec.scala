@@ -4,7 +4,6 @@ import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.Gen._
 import org.scalacheck.Arbitrary._
-import java.net.URI
 import QueryStringSpec._
 
 object UrlSpec {
