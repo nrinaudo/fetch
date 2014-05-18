@@ -7,6 +7,7 @@ import scala.collection.JavaConverters._
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import scala.util.Success
+import com.nrinaudo.fetch.Headers.CharsetFormat
 
 object ConnegSpec {
   private lazy val charsets = Charset.availableCharsets().values().asScala.toList

@@ -115,12 +115,6 @@ class UrlSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
       }
     }
 
-    it("should correctly transform to instances of URI") {
-      forAll(url) { url =>
-        url.toURI should be(new URI(url.toString))
-      }
-    }
-
     it("should correctly apply and unapply instances of URI") {
       forAll(url) { url =>
         Url(url.toURI) should be(url)
