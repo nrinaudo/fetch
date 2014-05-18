@@ -90,7 +90,11 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
       forAll(nonEmptyListOf(encoding)) { encodings => validate(compositeFormat[Encoding], encodings)}
     }
 
-    // TODO: failure cases.
+    it("should refuse illegal encodings") {
+      forAll(Arbitrary.arbitrary[String].suchThat(e => !Encoding.DefaultEncodings.contains(e))) { str =>
+        EncodingFormat.read(str).isFailure should be(true)
+      }
+    }
   }
 
   describe("The byte range encoding formatter") {
