@@ -23,7 +23,6 @@ object UrlEngine {
 
 /**
  * `java.net` connector for fetch.
- * @author Nicolas Rinaudo
  */
 case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedirect: Boolean = false,
                       chunkSize: Int = UrlEngine.DefaultChunkSize)(implicit val context: ExecutionContext) extends HttpEngine {

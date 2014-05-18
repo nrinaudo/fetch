@@ -50,7 +50,6 @@ object Status {
 
 /**
  * Represents HTTP statuses.
- * @author Nicolas Rinaudo
  */
 case class Status(code: Int) {
   def isClientError = code >= 400 && code < 500

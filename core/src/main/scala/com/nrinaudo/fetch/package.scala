@@ -9,9 +9,6 @@ import java.util.Locale
 import com.nrinaudo.fetch.Request.HttpEngine
 import scala.concurrent.ExecutionContext
 
-/**
- * @author Nicolas Rinaudo
- */
 package object fetch {
   // - Package constants -----------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------

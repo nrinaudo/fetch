@@ -30,22 +30,21 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
   def protocol(value: Protocol): Url = copy(protocol = value)
   def host(value: String): Url = copy(host = value)
   def port(value: Int): Url = copy(port = value)
-  def path(value: String): Url = copy(path = value.split("/").toList)
   def path(value: List[String]): Url = copy(path = value)
   def fragment(value: Option[String]): Url = copy(fragment = value)
+  // TODO: maybe a list, with its slow appends, is not the best solution for storing paths?
+  def addSegment(value: String): Url = path(path :+ value)
   def query(value: QueryString): Url = copy(query = value)
   def param[T: ValueWriter](name: String, values: T*): Url = query(query.set(name, values: _*))
 
-  // TODO: maybe a list, with its slow appends, is not the best solution for storing paths?
-  def /(segment: String): Url = path(path :+ segment)
+
+  def /(segment: String): Url = addSegment(segment)
 
   def ?(value: QueryString): Url = query(value)
 
-  /** Appends the specified parameter to the url's [[QueryString]].
-    *
-    * This is purely a convenience method for [[QueryString.&]].
-    */
-  def &[T: ValueWriter](param: (String, T)): Url = query(query & param)
+  // TODO: this is currently extremly cumbersome if T happens to be a List[T].
+  // Implicit from ValueFormat[T] to ValueFormat[List[T]]?
+  def &[T: ValueWriter](value: (String, T)): Url = param(value._1, value._2)
 
 
 

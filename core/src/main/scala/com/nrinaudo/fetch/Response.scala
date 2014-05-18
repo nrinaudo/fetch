@@ -5,7 +5,6 @@ import Headers._
 
 /**
  * Represents an HTTP response.
- * @author Nicolas Rinaudo
  */
 case class Response[A](status: Status, headers: Headers, body: A) {
   // - Monadic operations ----------------------------------------------------------------------------------------------

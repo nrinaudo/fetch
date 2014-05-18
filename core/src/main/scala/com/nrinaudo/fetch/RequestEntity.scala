@@ -6,8 +6,6 @@ import java.nio.charset.Charset
 /** Represents the body of an HTTP request.
   *
   * See [[RequestEntity!]] for various creation helpers.
-  *
-  * @author Nicolas Rinaudo
   */
 trait RequestEntity {
   // - Entity length ---------------------------------------------------------------------------------------------------
