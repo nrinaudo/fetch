@@ -74,7 +74,11 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
       forAll(nonEmptyListOf(mimeType)) { mimes => validate(compositeFormat[MimeType], mimes)}
     }
 
-    // TODO: failure cases.
+    it("should refuse illegal MIME types") {
+      forAll(Arbitrary.arbitrary[String].suchThat(_.indexOf('/') == -1)) { str =>
+        MimeTypeFormat.read(str).isFailure should be(true)
+      }
+    }
   }
 
   describe("The content encoding formatter") {
