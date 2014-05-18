@@ -1,5 +1,7 @@
 package com.nrinaudo.fetch
 
+// TODO: since we're only allowing Http and Https, it'd probably make more sense for Protocol to be an enumeration.
+
 /** Known protocols. */
 object Protocol {
   object Http extends Protocol("http", 80)
