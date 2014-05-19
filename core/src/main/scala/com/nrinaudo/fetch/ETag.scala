@@ -3,9 +3,19 @@ package com.nrinaudo.fetch
 object ETag {
   private val TagPattern = """(W/)?"([^"]*)"""".r
 
+  final case class Strong(value: String) extends ETag {
+    override def toString = "\"" + value + "\""
+    override def isWeak: Boolean = false
+  }
+
+  final case class Weak(value: String) extends ETag {
+    override def toString = "W/\"" + value + "\""
+    override def isWeak: Boolean = true
+  }
+
   def unapply(str: String): Option[ETag] = str match {
-    case TagPattern(null, tag) => Some(StrongTag(tag))
-    case TagPattern(_, tag)    => Some(WeakTag(tag))
+    case TagPattern(null, tag) => Some(Strong(tag))
+    case TagPattern(_, tag)    => Some(Weak(tag))
     case _                     => None
   }
 
@@ -14,13 +24,5 @@ object ETag {
 
 sealed trait ETag {
   def value: String
-  require(!value.isEmpty)
-}
-
-case class StrongTag(value: String) extends ETag {
-  override def toString = "\"" + value + "\""
-}
-
-case class WeakTag(value: String) extends ETag {
-  override def toString = "W/\"" + value + "\""
+  def isWeak: Boolean
 }
