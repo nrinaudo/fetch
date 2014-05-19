@@ -6,25 +6,36 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 object ProtocolSpec {
   /** Generates a random supported protocol (http or https). */
-  def protocol = Gen.oneOf(Protocol.Http, Protocol.Https)
+  def protocol: Gen[Protocol] = Gen.oneOf(Protocol.Http, Protocol.Https)
+
+  /** Generates invalid protocol names. */
+  def invalidProtocol: Gen[String] = Arbitrary.arbitrary[String].suchThat(s => s != Protocol.Http.name && s != Protocol.Https.name)
 }
 
 class ProtocolSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
   import ProtocolSpec._
 
-  describe("Protocol") {
-    it("should apply / unapply valid instances correctly") {
-      forAll(protocol) { protocol =>
-        Protocol.unapply(protocol.name) should be(Some(protocol))
-        Protocol(protocol.name) should be(protocol)
-      }
+  describe("The Protocol singleton object") {
+    it("should unapply on valid names") {
+      forAll(protocol) { protocol => Protocol.unapply(protocol.name) should be(Some(protocol)) }
     }
 
-    it("should apply / unapply invalid instances correctly") {
-      forAll(Arbitrary.arbitrary[String].suchThat(s => s != Protocol.Http.name && s != Protocol.Https.name)) { str =>
-        Protocol.unapply(str) should be(None)
-        intercept[IllegalArgumentException] {Protocol(str)}
-      }
+    it("should apply on valid names") {
+      forAll(protocol) { protocol => Protocol(protocol.name) should be(protocol) }
+    }
+
+    it("should refuse to unapply on invalid protocol names") {
+      forAll(invalidProtocol) { str => Protocol.unapply(str) should be(None) }
+    }
+
+    it("should fail to apply on invalid protocol names") {
+      forAll(invalidProtocol) { str => intercept[IllegalArgumentException] {Protocol(str)} }
+    }
+  }
+
+  describe("A Protocol instance") {
+    it("should serialize to itself") {
+      forAll(protocol) { protocol => Protocol(protocol.toString) should be(protocol) }
     }
 
     it("should generate URLs correctly") {

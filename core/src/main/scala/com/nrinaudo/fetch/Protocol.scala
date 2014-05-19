@@ -1,11 +1,16 @@
 package com.nrinaudo.fetch
 
-// TODO: since we're only allowing Http and Https, it'd probably make more sense for Protocol to be an enumeration.
-
-/** Known protocols. */
+/** Declares known protocols and provides convenience methods. */
 object Protocol {
-  object Http extends Protocol("http", 80)
-  object Https extends Protocol("https", 443)
+  /** Underlying implementation. */
+  private case class ProtocolImpl(name: String, defaultPort: Int) extends Protocol {
+    override def toString = name
+  }
+
+  /** The HTTP protocol. */
+  val Http: Protocol  = new ProtocolImpl("http", 80)
+  /** The HTTPs protocol. */
+  val Https: Protocol = new ProtocolImpl("https", 443)
 
   def unapply(str: String): Option[Protocol] = str match {
     case Http.name  => Some(Http)
@@ -13,12 +18,18 @@ object Protocol {
     case _          => None
   }
 
+  /** Extracts a protocol from the specified string.
+    *
+    * Note that this method is unsafe and will throw an `IllegalArgumentException` if `str` isn't a valid protocol name.
+    */
   def apply(str: String): Protocol = unapply(str) getOrElse {
     throw new IllegalArgumentException("Illegal protocol: " + str)
   }
 }
 
 /** Represents a valid URL protocol.
+  *
+  * Supported protocols are declared in the [[Protocol$ companion object]].
   *
   * `Protocol` instances can be used to easily create [[Url urls]]:
   * {{{
@@ -28,11 +39,14 @@ object Protocol {
   * // Syntactic sugar:
   * Protocol.Http :/ "github.com"
   * }}}
-  *
-  * @param name        name of the protocol as used in URL strings.
-  * @param defaultPort default port associated with this protocol.
   */
-case class Protocol(name: String, defaultPort: Int) {
+sealed trait Protocol {
+  /** Name of the protocol as used in the URL string. */
+  val name: String
+
+  /** Default port associated with this protocol. */
+  val defaultPort: Int
+
   /** Creates a new [[Url]] using on the specified host using this protocol.
     *
     * The resulting url will use the default port and have an empty path, query string and fragment.
