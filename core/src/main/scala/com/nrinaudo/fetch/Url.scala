@@ -42,7 +42,7 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
 
   def ?(value: QueryString): Url = query(value)
 
-  // TODO: this is currently extremly cumbersome if T happens to be a List[T].
+  // TODO: this is currently extremely cumbersome if T happens to be a List[T].
   // Implicit from ValueFormat[T] to ValueFormat[List[T]]?
   def &[T: ValueWriter](value: (String, T)): Url = param(value._1, value._2)
 
