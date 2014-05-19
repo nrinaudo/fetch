@@ -17,8 +17,10 @@ object QueryString {
 
 
 
-  // - Query string parsing --------------------------------------------------------------------------------------------
+  // - Instance creation -----------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
+  def apply(content: Map[String, List[String]] = Map()): QueryString = new QueryString(content)
+
   def apply(query: String): QueryString = {
     def extract(str: String) = new QueryString(str.split("&").foldLeft(Map[String, List[String]]()) {
       case (map, entry) =>
@@ -32,16 +34,28 @@ object QueryString {
     })
 
     // Protection against java.net.URL.getQuery returning null rather than the empty string.
-    if(query == null || query.isEmpty) new QueryString()
+    if(query == null || query.isEmpty) new QueryString(Map())
     else if(query.charAt(0) == '?')    extract(query.substring(1))
     else                               extract(query)
   }
 }
 
 /** Represents an [[Url]]'s query string. */
-case class QueryString(values: Map[String, List[String]] = Map()) {
+class QueryString private (content: Map[String, List[String]]) {
+  val values = content.mapValues(_.filter(!_.isEmpty)).filter {
+    case (name, entries) => !(name.isEmpty || entries.isEmpty)
+  }
+
+
   // - Parameter setting -----------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
+  /** Returns `Some[List[String]]` if the specified values map to actual content, `None` otherwise.
+    *
+    * The purpose of this method is to filter out empty value lists.
+    */
+  private def writeValues[T: ValueWriter](values: T*) =
+    ValueWriter.sequence(values).map(_.filter(!_.isEmpty)).filter(!_.isEmpty)
+
   /** Sets the specified parameter to the specified value.
     *
     * The main purpose of this method is to let application developers write code such as:
@@ -57,11 +71,11 @@ case class QueryString(values: Map[String, List[String]] = Map()) {
     */
   def &[T: ValueWriter](param: (String, T)): QueryString = set(param._1, param._2)
 
-  def add[T: ValueWriter](name: String, values: T*): QueryString = ValueWriter.sequence(values).fold(this) { list =>
+  def add[T: ValueWriter](name: String, values: T*): QueryString = writeValues(values: _*).fold(this) { list =>
     new QueryString(this.values + (name -> this.values.get(name).fold(list.toList) {_ ::: list.toList}))
   }
 
-  def set[T: ValueWriter](name: String, values: T*): QueryString = ValueWriter.sequence(values).fold(this) { list =>
+  def set[T: ValueWriter](name: String, values: T*): QueryString = writeValues(values: _*).fold(this) { list =>
     new QueryString(this.values + (name -> list.toList))
   }
 
@@ -88,6 +102,17 @@ case class QueryString(values: Map[String, List[String]] = Map()) {
 
 
 
+  // - Object implementation -------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  override def hashCode(): Int = values.hashCode()
+
+  override def equals(p1: scala.Any): Boolean = p1 match {
+    case q: QueryString => q.values == values
+    case _              => false
+  }
+
+
+
   // - Serialization ---------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def writeTo(builder: StringBuilder): StringBuilder = {
@@ -95,7 +120,7 @@ case class QueryString(values: Map[String, List[String]] = Map()) {
 
     for {
       (name, list) <- values
-      value        <- list if !value.isEmpty
+      value        <- list
     } {
       if(first) first = false
       else      builder.append("&")

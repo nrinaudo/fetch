@@ -24,7 +24,7 @@ object Url {
 }
 
 case class Url(protocol: Protocol, host: String, port: Int, path: List[String] = List(),
-               query: QueryString = new QueryString(), fragment: Option[String] = None) {
+               query: QueryString = QueryString(), fragment: Option[String] = None) {
   // - Url building ----------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def protocol(value: Protocol): Url = copy(protocol = value)
