@@ -20,13 +20,23 @@ object Protocol {
 
 /** Represents a valid URL protocol.
   *
-  * See the [[Protocol$ companion object]] for standard instances.
+  * `Protocol` instances can be used to easily create [[Url urls]]:
+  * {{{
+  * // Verbose:
+  * Protocol.Http.host("github.com")
+  *
+  * // Syntactic sugar:
+  * Protocol.Http :/ "github.com"
+  * }}}
   *
   * @param name        name of the protocol as used in URL strings.
   * @param defaultPort default port associated with this protocol.
   */
 case class Protocol(name: String, defaultPort: Int) {
-  /** Creates a new [[Url]] using on the specified host using this protocol. */
+  /** Creates a new [[Url]] using on the specified host using this protocol.
+    *
+    * The resulting url will use the default port and have an empty path, query string and fragment.
+    */
   def host(name: String): Url = new Url(this, name, defaultPort)
 
   /** Syntactic sugar for [[host]]. It unfortunately can't be `://`, as this isn't a legal scala identifier. */
