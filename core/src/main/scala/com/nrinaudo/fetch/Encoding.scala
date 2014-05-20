@@ -7,13 +7,13 @@ object Encoding {
   // - Standard implementations ----------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Transparent, no-op encoding. */
-  val Identity = apply("identity", (out) => out, (in) => in)
+  val Identity = apply("identity", out => out, in => in)
 
   /** Encoding that gzips and gunzips content. */
-  val Gzip = apply("gzip", (out) => new GZIPOutputStream(out), (in) => new GZIPInputStream(in))
+  val Gzip = apply("gzip", out => new GZIPOutputStream(out), in => new GZIPInputStream(in))
 
   /** Encoding that inflates and deflates content. */
-  val Deflate = apply("deflate", (out) => new DeflaterOutputStream(out), (in) => new InflaterInputStream(in))
+  val Deflate = apply("deflate", out => new DeflaterOutputStream(out), in => new InflaterInputStream(in))
 
   /** Registry of known content encodings. */
   val DefaultEncodings: Map[String, Encoding] = Map(Identity.name -> Identity) + (Gzip.name -> Gzip) +
@@ -23,14 +23,14 @@ object Encoding {
 
   // - Creation helpers ------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  private class EncodingImpl(override val name: String, e: (OutputStream) => OutputStream,
-                             d: (InputStream) => InputStream) extends Encoding {
+  private class EncodingImpl(override val name: String, e: OutputStream => OutputStream,
+                             d: InputStream => InputStream) extends Encoding {
     override def decode(in: InputStream): InputStream = d(in)
     override def encode(out: OutputStream): OutputStream = e(out)
   }
 
   /** Creates a new content encoding with the specified decoding and encoding functions. */
-  def apply(name: String, e: (OutputStream) => OutputStream, d: (InputStream) => InputStream): Encoding =
+  def apply(name: String, e: OutputStream => OutputStream, d: InputStream => InputStream): Encoding =
     new EncodingImpl(name, e, d)
 }
 
