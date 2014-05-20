@@ -51,14 +51,4 @@ case class MimeType(main: String, sub: String, params: Map[String, String] = Map
   override lazy val toString = params.foldLeft(new StringBuilder(main).append('/').append(sub)) {
     case (builder, (name, value)) => builder.append(';').append(name).append('=').append(MimeType.paramValue(value))
   }.result()
-
-  /*
-  override lazy val toString = {
-    val builder = new StringBuilder(main).append('/').append(sub)
-
-    params.foreach {case (name, value) => builder.append(';').append(name).append('=').append(MimeType.paramValue(value))}
-
-    builder.result()
-  }
-  */
 }
