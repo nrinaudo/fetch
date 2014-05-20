@@ -22,6 +22,7 @@ object ETag {
   def apply(str: String): ETag = unapply(str) getOrElse {throw new IllegalArgumentException("Illegal ETag: " + str)}
 }
 
+/** Represents HTTP [[http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.11 entity tags]]. */
 sealed trait ETag {
   def value: String
   def isWeak: Boolean
