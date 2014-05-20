@@ -1,5 +1,7 @@
 package com.nrinaudo.fetch
 
+import java.util.Locale
+
 object Method {
   val GET: Method     = MethodImpl("GET")
   val POST: Method    = MethodImpl("POST")
@@ -20,7 +22,7 @@ object Method {
   def apply(value: String): Method = unapply(value) getOrElse {throw new IllegalArgumentException("Not a valid method: " + value)}
 
   def unapply(value: String): Option[Method] = value match {
-    case MethodPattern(m) => Some(MethodImpl(m))
+    case MethodPattern(m) => Some(MethodImpl(m.toUpperCase(Locale.ENGLISH)))
     case _                => None
   }
 }

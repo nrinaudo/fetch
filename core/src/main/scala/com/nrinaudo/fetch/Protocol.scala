@@ -1,5 +1,7 @@
 package com.nrinaudo.fetch
 
+import java.util.Locale
+
 /** Declares known protocols and provides convenience methods. */
 object Protocol {
   /** Underlying implementation. */
@@ -12,7 +14,7 @@ object Protocol {
   /** The HTTPs protocol. */
   val Https: Protocol = new ProtocolImpl("https", 443)
 
-  def unapply(str: String): Option[Protocol] = str match {
+  def unapply(str: String): Option[Protocol] = str.toLowerCase(Locale.ENGLISH) match {
     case Http.name  => Some(Http)
     case Https.name => Some(Https)
     case _          => None

@@ -2,6 +2,9 @@ package com.nrinaudo.fetch
 
 import java.nio.charset.Charset
 
+// TODO: provide better ways to specify MIME type parameters (ValueReader / ValueWriter).
+// TODO: unapply is broken in that an illegal parameter will cause an exception to be thrown rather than None to be returned.
+
 object MimeType {
   private val TSpecials= Set('(', ')', '<', '>', '@', ',', ';', ':', '\\', ',', '[', ']', '?', '=')
 

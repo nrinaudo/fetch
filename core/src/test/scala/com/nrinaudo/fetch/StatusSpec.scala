@@ -11,24 +11,31 @@ object StatusSpec {
   def serverError = for(status <- Gen.choose(500, 599)) yield Status(status)
 
   def status = Gen.oneOf(success, redirection, clientError, serverError)
+
+  def invalidStatus: Gen[Int] = Arbitrary.arbitrary[Int].suchThat(i => i < 0 || i > 600)
 }
 
 class StatusSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
   import StatusSpec._
 
-  describe("Status") {
-    it("should unapply legal statuses correctly") {
-      forAll(status) { status =>
-        Status.unapply(status.code) should be(Some(status))
-      }
+  describe("The Status companion object") {
+    it("should unapply on legal statuses") {
+      forAll(status) { status => Status.unapply(status.code) should be(Some(status)) }
     }
 
-    it("should refuse to unapply illegal statuses") {
-      forAll(Arbitrary.arbitrary[Int].suchThat(i => i < 0 || i > 600)) { status =>
-        Status.unapply(status) should be(None)
-      }
+    it("should apply on legal statuses") {
+      forAll(status) { status => Status(status.code) should be(status) }
     }
 
+    it("should not unapply on illegal statuses") {
+      forAll(invalidStatus) { status => Status.unapply(status) should be(None) }
+    }
+
+    it("should fail to apply on illegal statuses") {
+      forAll(invalidStatus) { status => intercept[IllegalArgumentException](Status(status)) }
+    }
+  }
+  describe("An instance of Status") {
     it("should detect success statuses correctly") {
       forAll(success) { status =>
         status.isSuccess should be(true)
@@ -62,6 +69,12 @@ class StatusSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
         status.isRedirection should be(false)
         status.isClientError should be(false)
         status.isServerError should be(true)
+      }
+    }
+
+    it("should serialize to itself") {
+      forAll(status) { status =>
+        Status(status.toString.toInt) should be(status)
       }
     }
   }
