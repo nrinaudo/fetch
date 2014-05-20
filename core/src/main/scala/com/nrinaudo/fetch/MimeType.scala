@@ -24,12 +24,12 @@ object MimeType {
   }
 
   private def paramValue(value: String) =
-    if(value.exists {c => TSpecials.contains(c)}) '\"' + value + '\"'
-    else                                          value
+    if(value.exists(TSpecials)) '\"' + value + '\"'
+    else                        value
 
-  val TextPlain = MimeType("text", "plain")
+  val TextPlain             = MimeType("text", "plain")
   val ApplicationOctetSteam = MimeType("application", "octet-stream")
-  val Json = MimeType("application", "json")
+  val Json                  = MimeType("application", "json")
 
   def unapply(str: String): Option[MimeType] = str match {
     case MimePattern(main, sub, ps) => Some(MimeType(main, sub, params(ps)))
@@ -48,6 +48,11 @@ case class MimeType(main: String, sub: String, params: Map[String, String] = Map
 
   def charset(c: String): MimeType = copy(params = params + ("charset" -> c))
 
+  override lazy val toString = params.foldLeft(new StringBuilder(main).append('/').append(sub)) {
+    case (builder, (name, value)) => builder.append(';').append(name).append('=').append(MimeType.paramValue(value))
+  }.result()
+
+  /*
   override lazy val toString = {
     val builder = new StringBuilder(main).append('/').append(sub)
 
@@ -55,4 +60,5 @@ case class MimeType(main: String, sub: String, params: Map[String, String] = Map
 
     builder.result()
   }
+  */
 }
