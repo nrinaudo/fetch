@@ -22,7 +22,7 @@ object MimeTypeSpec {
     main   <- main
     sub    <- sub
     params <- params
-  } yield MimeType(main, sub, params)
+  } yield MimeType(main, sub, new MimeTypeParameters(params))
 }
 
 class MimeTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {

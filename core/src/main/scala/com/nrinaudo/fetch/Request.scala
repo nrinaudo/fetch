@@ -142,9 +142,7 @@ trait Request[A] {
     *
     * @param mimeTypes list of MIME types to declare.
     */
-  def accept(mimeTypes: Conneg[MimeType]*): Request[A] = header("Accept", mimeTypes map {mime =>
-    mime.map {_.copy(params = Map())}
-  })
+  def accept(mimeTypes: Conneg[MimeType]*): Request[A] = header("Accept", mimeTypes.map(_.map(_.clearParams)))
 
   /** Notifies the remote server about response charset preferences.
     *

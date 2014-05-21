@@ -1,6 +1,7 @@
 package com.nrinaudo.fetch
 
 import scala.util.{Failure, Success, Try}
+import java.nio.charset.Charset
 
 object ValueReader {
   def apply[T](f: String => Try[T]): ValueReader[T] = new ValueReader[T] {
@@ -40,6 +41,7 @@ trait ValueWriter[T] {
 object ValueFormat {
   // - Standard formatters ---------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
+  // TODO: Should empty strings format as None by default?
   val Doubles: ValueFormat[Double]   = apply(s => Try {s.toDouble},  d => Some {d.toString})
   val Longs: ValueFormat[Long]       = apply(s => Try {s.toLong},    l => Some {l.toString})
   val Shorts: ValueFormat[Short]     = apply(s => Try {s.toShort},   s => Some {s.toString})
@@ -48,6 +50,10 @@ object ValueFormat {
   val Floats: ValueFormat[Float]     = apply(s => Try {s.toFloat},   f => Some {f.toString})
   val Booleans: ValueFormat[Boolean] = apply(s => Try {s.toBoolean}, b => Some {b.toString})
   val Strings: ValueFormat[String]   = apply(Success(_),             Some(_))
+  val Charsets: ValueFormat[Charset] = new ValueFormat[Charset] {
+    override def write(value: Charset): Option[String] = Some(value.name())
+    override def read(value: String): Try[Charset] = Try {Charset.forName(value)}
+  }
 
   def apply[T](f: String => Try[T], g: T => Option[String]): ValueFormat[T] = apply(ValueReader(f), ValueWriter(g))
 

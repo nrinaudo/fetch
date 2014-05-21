@@ -29,6 +29,9 @@ object Headers {
   }
 
   implicit val IntFormat: ValueFormat[Int] = ValueFormat.Ints
+  implicit val CharsetFormat = ValueFormat.Charsets
+
+
 
 
   // - Header specific default formats ---------------------------------------------------------------------------------
@@ -60,11 +63,6 @@ object Headers {
 
       Some(v)
     }
-  }
-
-  implicit object CharsetFormat extends ValueFormat[Charset] {
-    override def read(value: String): Try[Charset]     = Try {Charset.forName(value)}
-    override def write(value: Charset): Option[String] = Some(value.name())
   }
 
   implicit object EncodingFormat extends ValueFormat[Encoding] {
@@ -108,28 +106,6 @@ object Headers {
   }
 }
 
-class Headers(val values: Map[String, String] = Map()) {
-  def apply[T: ValueReader](name: String): T = implicitly[ValueReader[T]].read(values(name)).get
-
-  def getOpt[T: ValueReader](name: String): Option[T] = for {
-    raw    <- values.get(name)
-    parsed <- implicitly[ValueReader[T]].read(raw).toOption
-  } yield parsed
-
-  def get[T: ValueReader](name: String): Option[Try[T]] = values.get(name) map implicitly[ValueReader[T]].read
-
-  def set[T: ValueWriter](name: String, value: T): Headers =
-    implicitly[ValueWriter[T]].write(value).fold(this)(set(name, _))
-
-  def set(name: String, value: String): Headers = new Headers(values + (name -> value))
-
-  def setIfEmpty[T: ValueWriter](name: String, value: T): Headers =
-    if(contains(name)) this
-    else               set(name, value)
-
-  def remove(name: String): Headers =
-    if(contains(name)) new Headers(values - name)
-    else               this
-
-  def contains(name: String): Boolean = values.contains(name)
+class Headers(val values: Map[String, String] = Map()) extends Parameters[Headers] {
+  override def build(values: Map[String, String]): Headers = new Headers(values)
 }
