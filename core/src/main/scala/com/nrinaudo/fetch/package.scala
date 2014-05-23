@@ -53,7 +53,7 @@ package object fetch {
 
   // - Implicit conversions --------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  implicit def urlToRequest(url: Url)(implicit engine: HttpEngine, context: ExecutionContext): Request[Response[ResponseEntity]] = Request(url)(engine, context)
+  implicit def urlToRequest(url: Url)(implicit engine: HttpEngine): Request[Response[ResponseEntity]] = Request(url)(engine)
 
   // Request entities.
   implicit def stringToEntity(str: String)          = RequestEntity(str)

@@ -3,6 +3,8 @@ package com.nrinaudo.fetch
 import java.io._
 import java.nio.charset.Charset
 
+// TODO: it might be more convenient for the content encoding to be set in the Request than here.
+
 /** Represents the body of an HTTP request.
   *
   * See [[RequestEntity!]] for various creation helpers.

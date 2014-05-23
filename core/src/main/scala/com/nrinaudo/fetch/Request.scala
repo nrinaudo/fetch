@@ -4,7 +4,6 @@ import org.apache.commons.codec.binary.Base64
 import java.util.{Locale, Date}
 import Headers._
 import java.nio.charset.Charset
-import scala.concurrent.{ExecutionContext, Future}
 
 object Request {
   /** Type for underlying HTTP engines.
@@ -13,7 +12,7 @@ object Request {
     * but it might not be applicable to all use-cases. Defining your own engine allows you to use another underlying
     * library, such as [[http://hc.apache.org/httpclient-3.x/ Apache HTTP client]].
     */
-  type HttpEngine = (Url, Method, Option[RequestEntity], Headers) => Future[Response[ResponseEntity]]
+  type HttpEngine = (Url, Method, Option[RequestEntity], Headers) => Response[ResponseEntity]
 
   /** Decodes the specified response according to whatever is specified in the `Content-Encoding` header and the list
     * of encodings we actually support.
@@ -22,10 +21,10 @@ object Request {
     */
   private def decode(response: Response[ResponseEntity]): Response[ResponseEntity] =
     response.contentEncoding.fold(response) { values =>
-      values.reverse.foldLeft(response) { (res, encoding) => res.map(_.decode(encoding)) }
+      values.foldRight(response) { (encoding, res) => res.map(_.decode(encoding))}
     }
 
-  private def http(f: HttpEngine, context: ExecutionContext): HttpEngine = (url, method, body, headers) => {
+  private def http(f: HttpEngine): HttpEngine = (url, method, body, headers) => {
     var h = headers
 
     // Sets body specific HTTP headers (or unsets them if necessary).
@@ -41,11 +40,11 @@ object Request {
     h = h.setIfEmpty("User-Agent", UserAgent).setIfEmpty("Accept", "*/*")
 
     // Executes the query and decodes the response.
-    f(url, method, body, h).map(decode)(context)
+    decode(f(url, method, body, h))
   }
 
-  def apply(url: Url)(implicit engine: HttpEngine, context: ExecutionContext): Request[Response[ResponseEntity]] =
-    new RequestImpl[Response[ResponseEntity]](url, Method.GET, new Headers(), http(engine, context))
+  def apply(url: Url)(implicit engine: HttpEngine): Request[Response[ResponseEntity]] =
+    new RequestImpl[Response[ResponseEntity]](url, Method.GET, new Headers(), http(engine))
 
   // TODO: have the version number be dynamic, somehow.
   val UserAgent = "Fetch/0.2"
@@ -63,15 +62,15 @@ trait Request[A] {
   // - Abstract methods ------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def copy(url: Url, method: Method, headers: Headers): Request[A]
-  def apply(body: Option[RequestEntity]): Future[A]
-  def map[B](f: A => B)(implicit context: ExecutionContext): Request[B]
+  def apply(body: Option[RequestEntity]): A
+  def map[B](f: A => B): Request[B]
 
 
 
   // - Execution -------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def apply(): Future[A] = apply(None)
-  def apply(body: RequestEntity): Future[A] = apply(Some(body))
+  def apply(): A = apply(None)
+  def apply(body: RequestEntity): A = apply(Some(body))
 
 
 
@@ -210,13 +209,13 @@ trait Request[A] {
 private class RequestImpl[A](override val url:     Url,
                              override val method:  Method  = Method.GET,
                              override val headers: Headers = new Headers(Map[String, String]()),
-                             private val engine:   (Url, Method, Option[RequestEntity], Headers) => Future[A])
+                             private val engine:   (Url, Method, Option[RequestEntity], Headers) => A)
   extends Request[A] {
   override def copy(url: Url, method: Method, headers: Headers): Request[A] =
     new RequestImpl[A](url, method, headers, engine)
 
-  override def apply(body: Option[RequestEntity]): Future[A] = engine.apply(url, method, body, headers)
+  override def apply(body: Option[RequestEntity]): A = engine.apply(url, method, body, headers)
 
-  override def map[B](f: (A) => B)(implicit context: ExecutionContext): Request[B] =
-    new RequestImpl(url, method, headers, (a, b, c, d) => engine(a, b, c, d).map(f))
+  override def map[B](f: (A) => B): Request[B] =
+    new RequestImpl(url, method, headers, (a, b, c, d) => f(engine(a, b, c, d)))
 }
