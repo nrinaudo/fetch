@@ -159,7 +159,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     it("should send the correct User-Agent header when specified") {
       // This suchThat statement looks odd, but it's not half as odd as unfiltered's behaviour: when it encounters a
       // User-Agent whose value is "te", it'll silently transform it to "TE", failing this test.
-      forAll(Gen.identifier.suchThat(_ != "te")) { userAgent =>
+      forAll(Gen.identifier.suchThat(!_.equalsIgnoreCase("te"))) { userAgent =>
         request("header/User-Agent").userAgent(userAgent).GET.apply().body.as[String] should be(userAgent)
       }
     }
