@@ -3,11 +3,10 @@ package com.nrinaudo
 import java.io._
 import java.nio.charset.Charset
 import scala.language.implicitConversions
-import java.net.{URI, URL}
+import java.net.URI
 import com.nrinaudo.fetch.ResponseEntity.EntityParser
 import java.util.Locale
 import com.nrinaudo.fetch.Request.HttpEngine
-import scala.concurrent.ExecutionContext
 
 package object fetch {
   // - Package constants -----------------------------------------------------------------------------------------------

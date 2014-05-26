@@ -3,7 +3,6 @@ package com.nrinaudo.fetch
 import java.util.{TimeZone, Locale, Date}
 import java.text.SimpleDateFormat
 import scala.util.{Failure, Success, Try}
-import java.nio.charset.Charset
 
 object Headers {
   // - Composite header formats ----------------------------------------------------------------------------------------

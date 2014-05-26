@@ -6,11 +6,11 @@ import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary._
 import com.nrinaudo.fetch.net.UrlEngine
 import Headers._
-import scala.concurrent.{Future, Await, ExecutionContext}
+import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 import scala.util.Success
 import unfiltered.jetty.Server
-import java.util.concurrent.{TimeUnit, Executors}
+import java.util.concurrent.TimeUnit
 
 object RequestSpec {
   private val connegValue = "([^;]+)(?:;q=(.*))?".r

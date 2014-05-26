@@ -8,7 +8,7 @@ import com.nrinaudo.fetch.Status
 import scala.collection.JavaConverters._
 import com.nrinaudo.fetch.Request.HttpEngine
 import java.io.{FilterInputStream, InputStream}
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.ExecutionContext
 
 object UrlEngine {
   /** Default chunk size (in bytes) when chunked transfer encoding is used. */
