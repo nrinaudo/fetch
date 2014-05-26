@@ -12,7 +12,6 @@ class ResponseSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gen
   import Headers._
   import ETagSpec._
   import scala.concurrent.ExecutionContext.Implicits.global
-  import RequestSpec._
   import MethodSpec._
   import ConnegSpec._
 

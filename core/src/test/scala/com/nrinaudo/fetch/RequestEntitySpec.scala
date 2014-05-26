@@ -3,6 +3,7 @@ package com.nrinaudo.fetch
 import java.io._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen
+import org.scalatest.FunSpec
 
 object RequestEntitySpec {
   // Temporary file used to store request entities.
