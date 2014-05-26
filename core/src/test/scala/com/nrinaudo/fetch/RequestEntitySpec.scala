@@ -3,7 +3,6 @@ package com.nrinaudo.fetch
 import java.io._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen
-import org.scalatest.FunSpec
 
 object RequestEntitySpec {
   // Temporary file used to store request entities.
@@ -31,14 +30,13 @@ object RequestEntitySpec {
 
   def entity: Gen[KnownEntity] = for {
     content <- arbitrary[String].suchThat(!_.isEmpty)
-    impl    <- Gen.choose(0, 5)
+    impl    <- Gen.choose(0, 4)
   } yield KnownEntity(content, (impl match {
       case 0 => RequestEntity.bytes(out => out.write(content.getBytes(DefaultCharset)))
       case 1 => RequestEntity.chars(out => out.write(content))
       case 2 => RequestEntity(new ByteArrayInputStream(content.getBytes(DefaultCharset)))
       case 3 => RequestEntity(new StringReader(content))
       case 4 => RequestEntity(content)
-      case 5 => RequestEntity(content)
-      case e => throw new AssertionError("Unexpected rand(0, 5) value: " + e)
+      case e => throw new AssertionError("Unexpected rand(0, 4) value: " + e)
     }).mimeType(MimeType.TextPlain.charset(DefaultCharset)))
 }
