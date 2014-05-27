@@ -3,7 +3,7 @@ package com.nrinaudo.fetch
 import java.io._
 import java.nio.charset.Charset
 
-trait RequestEntityLike[+Self <: RequestEntityLike[Self]] extends (OutputStream => Unit) {
+trait RequestEntityLike[+Self <: RequestEntityLike[Self]] {
   this: Self =>
 
   /** Length, in bytes, of the request entity.
@@ -48,7 +48,7 @@ trait RequestEntityLike[+Self <: RequestEntityLike[Self]] extends (OutputStream 
   def encoding(value: Encoding): Self = build(mimeType, value)
 
   /** Writes this request entity to the specified output stream, applying its transfer encoding if applicable. */
-  override def apply(out: OutputStream) {
+  def apply(out: OutputStream) {
     val stream = encoding.encode(out)
     try {write(stream)}
     finally {stream.close()}
@@ -56,28 +56,72 @@ trait RequestEntityLike[+Self <: RequestEntityLike[Self]] extends (OutputStream 
 }
 
 object RequestEntity {
-  def bytes(f: OutputStream => Unit): RequestEntity = new StreamRequestEntity(f)
+  // - Stream helpers --------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  private class StreamRequestEntity(private val f: OutputStream => Unit,
+                                    override val mimeType: MimeType = MimeType.ApplicationOctetSteam,
+                                    override val encoding: Encoding = Encoding.Identity) extends RequestEntity {
+    override def length: Option[Long] = None
 
-  def chars(f: Writer => Unit): TextRequestEntity = new WriterRequestEntity(f)
+    override protected def build(mimeType: MimeType, encoding: Encoding): StreamRequestEntity =
+      new StreamRequestEntity(f, mimeType, encoding)
+
+    override protected def write(out: OutputStream): Unit = f(out)
+  }
+
+  def bytes(f: OutputStream => Unit): RequestEntity = new StreamRequestEntity(f)
 
   def apply(in: InputStream): RequestEntity = bytes(writeBytes(in, _))
 
+
+  // - Writer helpers --------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  private class WriterRequestEntity(private val f: Writer => Unit,
+                                    override val mimeType: MimeType = MimeType.TextPlain,
+                                    override val encoding: Encoding = Encoding.Identity) extends TextRequestEntity {
+    override def length: Option[Long] = None
+
+    override protected def build(mimeType: MimeType, encoding: Encoding): WriterRequestEntity =
+      new WriterRequestEntity(f, mimeType, encoding)
+
+    override protected def write(out: Writer): Unit = f(out)
+  }
+
+  def chars(f: Writer => Unit): TextRequestEntity = new WriterRequestEntity(f)
+
   def apply(in: Reader): TextRequestEntity = chars(writeChars(in, _))
 
-  def apply(str: String): TextRequestEntity = new WriterRequestEntity(_.write(str)) {
-    override lazy val length: Option[Long] = Some(str.getBytes(charset).length)
+
+
+  // - String helper ---------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  private class StringEntity(val content: String, override val mimeType: MimeType, override val encoding: Encoding)
+    extends TextRequestEntity with RequestEntityLike[StringEntity] {
+    override lazy val length: Option[Long] = Some(content.getBytes(charset).length)
+    override protected def write(out: Writer): Unit = out.write(content)
+    override protected def build(mimeType: MimeType, encoding: Encoding): StringEntity = new StringEntity(content, mimeType, encoding)
   }
 
-  private def copyFile(file: File, out: OutputStream) {
-    val in = new BufferedInputStream(new FileInputStream(file))
-    try {writeBytes(in, out)}
-    finally {in.close()}
-  }
+  def apply(str: String): TextRequestEntity =
+    new StringEntity(str, MimeType.TextPlain, Encoding.Identity)
 
-  def apply(file: File): RequestEntity = new StreamRequestEntity(copyFile(file, _)) {
+
+
+  // - File helper -----------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  private class FileEntity(val file: File, override val mimeType: MimeType, override val encoding: Encoding)
+    extends RequestEntity with RequestEntityLike[FileEntity] {
+    override def write(out: OutputStream) {
+      val in = new BufferedInputStream(new FileInputStream(file))
+      try {writeBytes(in, out)}
+      finally {in.close()}
+    }
     override lazy val length: Option[Long] = Some(file.length())
+    override protected def build(mimeType: MimeType, encoding: Encoding): FileEntity =
+      new FileEntity(file, mimeType, encoding)
   }
 
+  def apply(file: File): RequestEntity = new FileEntity(file, MimeType.ApplicationOctetSteam, Encoding.Identity)
 }
 
 trait RequestEntity extends RequestEntityLike[RequestEntity]
@@ -93,26 +137,3 @@ trait TextRequestEntity extends RequestEntity with RequestEntityLike[TextRequest
     writer.flush()
   }
 }
-
-class StreamRequestEntity(private val f: OutputStream => Unit,
-                          override val mimeType: MimeType = MimeType.ApplicationOctetSteam,
-                          override val encoding: Encoding = Encoding.Identity) extends RequestEntity {
-  override def length: Option[Long] = None
-
-  override protected def build(mimeType: MimeType, encoding: Encoding): StreamRequestEntity =
-    new StreamRequestEntity(f, mimeType, encoding)
-
-  override protected def write(out: OutputStream): Unit = f(out)
-}
-
-class WriterRequestEntity(private val f: Writer => Unit,
-                          override val mimeType: MimeType = MimeType.TextPlain.charset(DefaultCharset),
-                          override val encoding: Encoding = Encoding.Identity) extends TextRequestEntity {
-  override def length: Option[Long] = None
-
-  override protected def build(mimeType: MimeType, encoding: Encoding): WriterRequestEntity =
-    new WriterRequestEntity(f, mimeType, encoding)
-
-  override protected def write(out: Writer): Unit = f(out)
-}
-

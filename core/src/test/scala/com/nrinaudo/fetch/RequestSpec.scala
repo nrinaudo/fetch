@@ -10,7 +10,6 @@ import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 import scala.util.Success
 import unfiltered.jetty.Server
-import java.util.concurrent.TimeUnit
 
 object RequestSpec {
   private val connegValue = "([^;]+)(?:;q=(.*))?".r
@@ -82,11 +81,11 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     // - Entity submission / reception ---------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
     it("should correctly read and write entity bodies, regardless of the request and response encoding") {
-      forAll(entity, encoding, encoding) { (entity, reqEncoding, resEncoding) =>
+      forAll(knownEntity, encoding, encoding) { (entity, reqEncoding, resEncoding) =>
         val response = request("body").acceptEncoding(resEncoding).PUT(entity.entity.encoding(reqEncoding))
 
-        if(resEncoding == Encoding.Identity) response.headers.getOpt[String]("Content-Encoding") should be(None)
-        else                                 response.headers.getOpt[String]("Content-Encoding") should be(Some(resEncoding.name))
+        if(resEncoding == Encoding.Identity) response.contentEncoding should be(None)
+        else                                 response.contentEncoding should be(Some(List(resEncoding)))
 
         response.body.as[String] should be(entity.content)
       }

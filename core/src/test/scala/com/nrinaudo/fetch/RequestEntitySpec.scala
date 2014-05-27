@@ -3,6 +3,9 @@ package com.nrinaudo.fetch
 import java.io._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen
+import org.scalatest.{Matchers, FunSpec}
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import scala.io.Source
 
 object RequestEntitySpec {
   // Temporary file used to store request entities.
@@ -28,15 +31,65 @@ object RequestEntitySpec {
     */
   case class KnownEntity(content: String, entity: RequestEntity)
 
-  def entity: Gen[KnownEntity] = for {
+  def knownEntity: Gen[KnownEntity] = for {
     content <- arbitrary[String].suchThat(!_.isEmpty)
-    impl    <- Gen.choose(0, 4)
+    impl    <- Gen.choose(0, 5)
   } yield KnownEntity(content, (impl match {
       case 0 => RequestEntity.bytes(out => out.write(content.getBytes(DefaultCharset)))
       case 1 => RequestEntity.chars(out => out.write(content))
       case 2 => RequestEntity(new ByteArrayInputStream(content.getBytes(DefaultCharset)))
       case 3 => RequestEntity(new StringReader(content))
       case 4 => RequestEntity(content)
-      case e => throw new AssertionError("Unexpected rand(0, 4) value: " + e)
+      case 5 => RequestEntity(tmpFile(content))
+      case e => throw new AssertionError("Unexpected rand(0, 5) value: " + e)
     }).mimeType(MimeType.TextPlain.charset(DefaultCharset)))
+
+  def entity: Gen[RequestEntity] = knownEntity.map(_.entity)
+}
+
+class RequestEntitySpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
+  import RequestEntitySpec._
+
+  describe("A RequestEntity instance") {
+    it("should have a working gzip method") {
+      forAll(entity) { _.gzip.encoding should be(Encoding.Gzip) }
+    }
+
+    it("should have a working deflate method") {
+      forAll(entity) { _.deflate.encoding should be(Encoding.Deflate) }
+    }
+
+    it("should have a working encoding method") {
+      forAll(entity, EncodingSpec.encoding) { (entity, encoding) =>
+        entity.encoding(encoding).encoding should be(encoding)
+      }
+    }
+
+    it("should have a working mimeType method") {
+      forAll(entity, MimeTypeSpec.mimeType) { (entity, mimeType) =>
+        entity.mimeType(mimeType).mimeType should be(mimeType)
+      }
+    }
+
+    it("should always have an unknown content length when using a non-identity encoding") {
+      forAll(Gen.oneOf(Encoding.Gzip, Encoding.Deflate), Gen.identifier) { (encoding, content) =>
+        val entity = RequestEntity(content)
+
+        entity.contentLength.isDefined should be(true)
+        entity.length.isDefined should be(true)
+
+        entity.encoding(encoding).length.isDefined should be(true)
+        entity.encoding(encoding).contentLength.isDefined should be(false)
+      }
+    }
+
+    it("should write itself correctly") {
+      forAll(knownEntity, EncodingSpec.encoding) { (entity, encoding) =>
+        val out = new ByteArrayOutputStream()
+        entity.entity.encoding(encoding).apply(out)
+
+        Source.fromInputStream(encoding.decode(new ByteArrayInputStream(out.toByteArray)), DefaultCharset.name()).mkString should be(entity.content)
+      }
+    }
+  }
 }
