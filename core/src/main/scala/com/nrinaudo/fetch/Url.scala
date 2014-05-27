@@ -52,7 +52,7 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
   // -------------------------------------------------------------------------------------------------------------------
   // Note: I wanted to implement this properly with the correct URI constructor and all, but it turns out this creates
   // a string and then parses it...
-  lazy val toURI: URI = new URI(toString)
+  def toURI: URI = new URI(toString)
 
   override lazy val toString = {
     val builder = new StringBuilder
