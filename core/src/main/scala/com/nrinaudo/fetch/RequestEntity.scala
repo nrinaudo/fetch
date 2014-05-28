@@ -100,6 +100,7 @@ object RequestEntity {
     override lazy val length: Option[Long] = Some(content.getBytes(charset).length)
     override protected def write(out: Writer): Unit = out.write(content)
     override protected def build(mimeType: MimeType, encoding: Encoding): StringEntity = new StringEntity(content, mimeType, encoding)
+    override def toString = "String(%s)" format content
   }
 
   def apply(str: String): TextRequestEntity =
@@ -119,6 +120,7 @@ object RequestEntity {
     override lazy val length: Option[Long] = Some(file.length())
     override protected def build(mimeType: MimeType, encoding: Encoding): FileEntity =
       new FileEntity(file, mimeType, encoding)
+    override def toString = "File(%s)" format file
   }
 
   def apply(file: File): RequestEntity = new FileEntity(file, MimeType.ApplicationOctetSteam, Encoding.Identity)

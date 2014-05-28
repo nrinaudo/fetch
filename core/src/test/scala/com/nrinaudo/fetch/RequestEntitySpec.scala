@@ -8,20 +8,23 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import scala.io.Source
 
 object RequestEntitySpec {
-  // Temporary file used to store request entities.
-  private lazy val tmpFile: File = {
-    val f = File.createTempFile("fetch", "request")
-    f.deleteOnExit()
-    f
+  private val tmpFiles = new ThreadLocal[File] {
+    override def initialValue(): File = {
+      val f = File.createTempFile("fetch", "request")
+      f.deleteOnExit()
+      f
+    }
   }
 
   /** Generates a temporary file containing the specified content (UTF-8 encoded). */
   def tmpFile(content: String): File = {
-    val out = new OutputStreamWriter(new FileOutputStream(tmpFile), DefaultCharset)
+    val file = tmpFiles.get
+
+    val out = new OutputStreamWriter(new FileOutputStream(file), DefaultCharset)
     try {out.write(content)}
     finally {out.close()}
 
-    tmpFile
+    file
   }
 
   /** Represents an entity and its expected content one serialized.
