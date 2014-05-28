@@ -2,7 +2,7 @@ package com.nrinaudo.fetch
 
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.Gen
+import org.scalacheck.{Arbitrary, Gen}
 
 object MimeTypeSpec {
   def main = Gen.oneOf("text", "application", "video", "audio", "image", "message", "multipart")
@@ -23,6 +23,8 @@ object MimeTypeSpec {
     sub    <- sub
     params <- params
   } yield MimeType(main, sub, new MimeTypeParameters(params))
+
+  def illegalMimeType = Arbitrary.arbitrary[String].suchThat(_.indexOf('/') == -1)
 }
 
 class MimeTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
@@ -30,9 +32,7 @@ class MimeTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChe
 
   describe("A MIME type") {
     it("should serialize to itself") {
-      forAll(mimeType) { mime =>
-        MimeType(mime.toString) should be(mime)
-      }
+      forAll(mimeType) { mime => MimeType(mime.toString) should be(mime) }
     }
   }
 }

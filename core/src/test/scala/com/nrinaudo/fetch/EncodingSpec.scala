@@ -14,6 +14,8 @@ object EncodingSpec {
   // -------------------------------------------------------------------------------------------------------------------
   def encoding: Gen[Encoding] = Gen.oneOf(Encoding.Gzip, Encoding.Deflate, Encoding.Identity)
 
+  def illegalEncoding = Arbitrary.arbitrary[String].suchThat(e => !Encoding.DefaultEncodings.contains(e))
+
 
 
   // - Helper functions ------------------------------------------------------------------------------------------------

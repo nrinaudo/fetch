@@ -14,10 +14,14 @@ object ConnegSpec {
 
   def charset: Gen[Charset] = Gen.oneOf(charsets)
 
+  def illegalCharset = Arbitrary.arbitrary[String].suchThat(!Charset.availableCharsets().containsKey(_))
+
   def language: Gen[Locale] = Gen.oneOf(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN, Locale.ITALIAN, Locale.JAPANESE,
     Locale.KOREAN, Locale.CHINESE, Locale.SIMPLIFIED_CHINESE, Locale.TRADITIONAL_CHINESE, Locale.FRANCE, Locale.GERMANY,
     Locale.ITALY, Locale.JAPAN, Locale.KOREA, Locale.CHINA, Locale.PRC, Locale.TAIWAN, Locale.UK, Locale.US,
     Locale.CANADA, Locale.CANADA_FRENCH)
+
+  def illegalLanguage = Arbitrary.arbitrary[String].suchThat {_.matches(".*[^a-zA-Z_-].*")}
 
 
   def conneg[T](gen: Gen[T]): Gen[Conneg[T]] = for {

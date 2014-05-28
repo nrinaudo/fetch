@@ -53,6 +53,22 @@ object RequestEntitySpec {
 class RequestEntitySpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
   import RequestEntitySpec._
 
+  describe("A StringEntity instance") {
+    // This does not look terribly useful, but I've been known to mess my string patterns in toString methods and
+    // discover it much too late.
+    it("should have a working toString method") {
+      forAll(arbitrary[String]) { s => RequestEntity(s).toString }
+    }
+  }
+
+  describe("A FileEntity instance") {
+      // This does not look terribly useful, but I've been known to mess my string patterns in toString methods and
+      // discover it much too late.
+      it("should have a working toString method") {
+        forAll(arbitrary[String]) { s => RequestEntity(tmpFile(s)).toString }
+      }
+    }
+
   describe("A RequestEntity instance") {
     it("should have a working gzip method") {
       forAll(entity) { _.gzip.encoding should be(Encoding.Gzip) }

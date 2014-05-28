@@ -1,14 +1,13 @@
 package com.nrinaudo.fetch
 
-import scala.util.Try
-
-// TODO: this is currently not according to HTTP spec. See http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35.1
 object ByteRange {
   private val Extractor = """([0-9]+)?-([0-9]+)?""".r
 
   def unapply(str: String): Option[ByteRange] = str match {
-    case Extractor(left, right) => Try {ByteRange(Option(left).map(_.toInt), Option(right).map(_.toInt))}.toOption
-    case _                      => None
+    case Extractor(prefix, null)   => Some(PrefixRange(prefix.toInt))
+    case Extractor(null,   suffix) => Some(SuffixRange(suffix.toInt))
+    case Extractor(prefix, suffix) => Some(FullRange(prefix.toInt, suffix.toInt))
+    case _                         => None
   }
 
   def apply(str: String): ByteRange = unapply(str) getOrElse {
@@ -16,23 +15,22 @@ object ByteRange {
   }
 }
 
-/** Represents an acceptable value for the `Range` HTTP header. */
-case class ByteRange(from: Option[Int], to: Option[Int]) {
-  // Sanity checks.
-  require(from.isDefined || to.isDefined, "At least one boundary of the range must be defined")
-  require(!from.isDefined || from.get >= 0, "When defined, the lower boundary must be greater than or equal to 0")
-  require(!to.isDefined || to.get >= 0, "When defined, the upper boundary must be greater than or equal to 0")
-  require(!(from.isDefined && to.isDefined) || to.get >= from.get,
-    "When both defined, the upper boundary must be greater than or equal to the lower one")
+sealed trait ByteRange
 
-  /** Represents this instance as a `[from]-[to]` string. */
-  override def toString = {
-    val builder = new StringBuilder
+case class SuffixRange(to: Int) extends ByteRange {
+  require(to >= 0)
 
-    from.foreach(builder.append)
-    builder.append('-')
-    to.foreach(builder.append)
+  override def toString = "-%d" format to
+}
 
-    builder.result()
-  }
+case class PrefixRange(from: Int) extends ByteRange {
+  require(from >= 0)
+
+  override def toString = "%d-" format from
+}
+
+case class FullRange(from: Int, to: Int) extends ByteRange {
+  require(from >= 0 && to >= from)
+
+  override def toString = "%d-%d" format(from, to)
 }

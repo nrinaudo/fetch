@@ -9,7 +9,7 @@ object MethodSpec {
   def httpMethod = Gen.oneOf(Method.GET, Method.POST, Method.PUT, Method.DELETE, Method.OPTIONS, Method.TRACE,
     Method.PATCH, Method.LINK, Method.UNLINK)
 
-  def invalidMethod: Gen[String] = Arbitrary.arbitrary[String].suchThat(_.exists(!_.isLetter))
+  def illegalMethod: Gen[String] = Arbitrary.arbitrary[String].suchThat(_.exists(!_.isLetter))
 
   def httpMethods = for {
     count <- Gen.choose(1, 5)
@@ -34,11 +34,11 @@ class MethodSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     }
 
     it("should not unapply on illegal HTTP methods") {
-      forAll(invalidMethod) { method => Method.unapply(method) should be(None) }
+      forAll(illegalMethod) { method => Method.unapply(method) should be(None) }
     }
 
     it("should fail to apply on illegal HTTP methods") {
-      forAll(invalidMethod) { method => intercept[IllegalArgumentException](Method(method)) }
+      forAll(illegalMethod) { method => intercept[IllegalArgumentException](Method(method)) }
     }
   }
 
