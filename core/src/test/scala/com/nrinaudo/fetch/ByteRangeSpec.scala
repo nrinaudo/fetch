@@ -8,6 +8,8 @@ import org.scalacheck.{Arbitrary, Gen}
 object ByteRangeSpec {
   def illegalRange = Arbitrary.arbitrary[String].suchThat(_.matches(".*[^0-9-].*"))
 
+  def illegalRanges = Arbitrary.arbitrary[String].suchThat(!_.startsWith("bytes="))
+
   /** Generates valid byte range boundaries. */
   def boundary = Gen.choose(0, 1000)
 

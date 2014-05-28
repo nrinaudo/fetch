@@ -7,7 +7,7 @@ import com.nrinaudo.fetch.Headers._
 import scala.util.Success
 import java.util.Locale
 import java.nio.charset.Charset
-import org.scalacheck.{Gen, Arbitrary}
+import org.scalacheck.Arbitrary
 
 object HeaderFormatSpec {
   def cycle[T](format: ValueFormat[T], value: T) = format.read(format.write(value).get)
@@ -24,7 +24,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
 
   def validate[T](format: ValueFormat[T], value: T) = cycle(format, value) should be(Success(value))
 
-  describe("The date formatter") {
+  describe("DateFormat") {
     it("should correctly serialize and parse dates") {
       forAll(date) { date => validate(DateFormat, date)}
     }
@@ -34,7 +34,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
   }
 
-  describe("The language formatter") {
+  describe("LanguageFormat") {
     it("should correctly serialize and parse languages") {
       forAll(language) { lang => validate(LanguageFormat, lang)}
     }
@@ -48,7 +48,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
   }
 
-  describe("The charset formatter") {
+  describe("CharsetFormat") {
     it("should correctly serialize and parse charsets") {
       forAll(charset) { charset => validate(CharsetFormat, charset)}
     }
@@ -62,7 +62,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
   }
 
-  describe("The MIME type formatter") {
+  describe("MimeTypeFormat") {
     it("should correctly serialize and parse MIME types") {
       forAll(mimeType) { mime => validate(MimeTypeFormat, mime)}
     }
@@ -76,7 +76,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
   }
 
-  describe("The content encoding formatter") {
+  describe("EncodingFormat") {
     it("should correctly serialize and parse encodings") {
       forAll(encoding) { encoding => validate(EncodingFormat, encoding)}
     }
@@ -92,13 +92,9 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
   }
 
-  describe("The byte range formatter") {
+  describe("ByteRangeFormat") {
     it("should correctly serialize and parse byte ranges") {
       forAll(byteRange) { range => validate(ByteRangeFormat, range)}
-    }
-
-    it("should correctly serialize and parse lists of byte ranges") {
-      forAll(nonEmptyListOf(byteRange)) { ranges => validate(ByteRangesFormat, ranges)}
     }
 
     it("should refuse illegal byte ranges") {
@@ -106,7 +102,17 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
   }
 
-  describe("The method formatter") {
+  describe("ByteRangesFormat") {
+    it("should correctly serialize and parse byte range lists") {
+      forAll(nonEmptyListOf(byteRange)) { ranges => validate(ByteRangesFormat, ranges)}
+    }
+
+    it("should refuse illegal lists of byte ranges") {
+      forAll(illegalRanges) { str => ByteRangesFormat.read(str).isFailure should be(true) }
+    }
+  }
+
+  describe("MethodFormat") {
     it("should correctly serialize and parse methods") {
       forAll(httpMethod) { method => validate(MethodFormat, method)}
     }
