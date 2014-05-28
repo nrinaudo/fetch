@@ -5,26 +5,16 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 
 object MimeTypeSpec {
-  def main = Gen.oneOf("text", "application", "video", "audio", "image", "message", "multipart")
-  def sub = Gen.oneOf("plain", "png", "jpg", "rdf", "html", "rdf+xml", "json", "x-fixed-field")
-  // TODO: can this be relaxed and arbitrary strings be used instead?
-  def param = for {
-    name  <- Gen.identifier
-    value <- Gen.identifier
-  } yield (name, value)
+  def main: Gen[String] = Gen.oneOf("text", "application", "video", "audio", "image", "message", "multipart")
+  def sub: Gen[String] = Gen.oneOf("plain", "png", "jpg", "rdf", "html", "rdf+xml", "json", "x-fixed-field")
 
-  def params = for {
-    n    <- Gen.choose(0, 10)
-    list <- Gen.listOfN(n, param)
-  } yield list.foldLeft(Map[String, String]()) {case (map, (name, value)) => map + (name -> value)}
-
-  def mimeType = for {
+  def mimeType: Gen[MimeType] = for {
     main   <- main
     sub    <- sub
-    params <- params
-  } yield MimeType(main, sub, new MimeTypeParameters(params))
+    params <- MimeTypeParametersSpec.params
+  } yield MimeType(main, sub, params)
 
-  def illegalMimeType = Arbitrary.arbitrary[String].suchThat(_.indexOf('/') == -1)
+  def illegalMimeType: Gen[String] = Arbitrary.arbitrary[String].suchThat(_.indexOf('/') == -1)
 }
 
 class MimeTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {

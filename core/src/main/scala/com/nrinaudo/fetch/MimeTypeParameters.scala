@@ -14,8 +14,8 @@ object MimeTypeParameters {
   }
 
   def unapply(str: String): Option[MimeTypeParameters] = {
-    if(str == null) Some(new MimeTypeParameters())
-    else            str.split(";").map(param).foldLeft(Some(new MimeTypeParameters()): Option[MimeTypeParameters]) {
+    if(str == null)Some(new MimeTypeParameters())
+    else str.split(";").filter(!_.isEmpty).map(param).foldLeft(Some(new MimeTypeParameters()): Option[MimeTypeParameters]) {
       case (a, p) => for {
         va <- a
         vp <- p
@@ -24,10 +24,14 @@ object MimeTypeParameters {
   }
 
   def apply(str: String): MimeTypeParameters = unapply(str).getOrElse {
-    throw new IllegalArgumentException("Not a valid MIME type: " + str)
+    throw new IllegalArgumentException("Not a valid MIME type parameter list: " + str)
   }
 }
 
 class MimeTypeParameters(override val values: Map[String, String] = Map()) extends Parameters[MimeTypeParameters] {
   override def build(values: Map[String, String]): MimeTypeParameters = new MimeTypeParameters(values)
+
+  override lazy val toString = values.toSeq.map {
+    case (name, value) => name + '=' + value
+  }.mkString(";")
 }
