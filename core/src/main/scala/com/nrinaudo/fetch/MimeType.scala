@@ -41,7 +41,5 @@ case class MimeType(main: String, sub: String, params: MimeTypeParameters = new 
 
   def charset(charset: Charset): MimeType = param("charset", charset)
 
-  override lazy val toString = params.values.foldLeft(new StringBuilder(main).append('/').append(sub)) {
-    case (builder, (name, value)) => builder.append(';').append(name).append('=').append(MimeType.paramValue(value))
-  }.result()
+  override lazy val toString = params.writeTo(new StringBuilder(main).append('/').append(sub)).result()
 }

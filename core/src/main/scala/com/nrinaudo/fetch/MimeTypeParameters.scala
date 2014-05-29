@@ -31,7 +31,10 @@ object MimeTypeParameters {
 class MimeTypeParameters(override val values: Map[String, String] = Map()) extends Parameters[MimeTypeParameters] {
   override def build(values: Map[String, String]): MimeTypeParameters = new MimeTypeParameters(values)
 
-  override lazy val toString = values.toSeq.map {
-    case (name, value) => name + '=' + value
-  }.mkString(";")
+  def writeTo(builder: StringBuilder): StringBuilder = {
+    values.foreach { case (name, value) => builder.append(';').append(name).append('=').append(value) }
+    builder
+  }
+
+  override lazy val toString = writeTo(new StringBuilder()).result()
 }
