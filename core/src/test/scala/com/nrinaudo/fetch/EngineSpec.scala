@@ -4,11 +4,7 @@ import org.scalatest.{Matchers, BeforeAndAfterAll, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 import Arbitrary._
-import com.nrinaudo.fetch.net.UrlEngine
 import Headers._
-import scala.concurrent.{Future, Await}
-import scala.concurrent.duration._
-import scala.util.Success
 import unfiltered.jetty.Server
 import com.nrinaudo.fetch.Request._
 import scala.Some
@@ -28,11 +24,9 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
   import HeadersSpec._
   import ETagSpec._
   import MethodSpec._
-  import scala.concurrent.ExecutionContext.Implicits.global
-  import TestPlan._
 
 
-  implicit def engine: HttpEngine
+  def httpEngine: HttpEngine
   def name: String
 
 
@@ -47,6 +41,8 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
   override def afterAll() {
     TestPlan.stop
   }
+
+  def request(path: String) = Request(server.url + path)(httpEngine)
 
 
 

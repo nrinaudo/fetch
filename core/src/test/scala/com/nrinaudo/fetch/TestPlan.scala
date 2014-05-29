@@ -58,7 +58,6 @@ object TestPlan extends Plan {
   def create: Server = unfiltered.jetty.Http.anylocal.plan(TestPlan)
   def start(implicit server: Server) = server.start()
   def stop(implicit server: Server) = server.stop()
-  def request(path: String)(implicit context: ExecutionContext, server: Server, engine: HttpEngine) = Request(server.url + path)
 
 
 
