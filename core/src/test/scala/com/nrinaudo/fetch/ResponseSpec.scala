@@ -2,93 +2,96 @@ package com.nrinaudo.fetch
 
 import org.scalatest.{Matchers, BeforeAndAfterAll, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import unfiltered.jetty.Server
-import com.nrinaudo.fetch.net.UrlEngine
 import org.scalacheck.Gen
 
 class ResponseSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
   import HeadersSpec._
-  import TestPlan._
   import Headers._
   import ETagSpec._
-  import scala.concurrent.ExecutionContext.Implicits.global
   import MethodSpec._
   import ConnegSpec._
+  import EncodingSpec._
 
 
+  val response = new Response[String](Status.Ok, new Headers(), "test")
 
-  // - Test HTTP server ------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
-  implicit val server: Server = TestPlan.create
-  implicit val engine = UrlEngine()
-
-  override def beforeAll() {
-    TestPlan.start
-  }
-
-  override def afterAll() {
-    TestPlan.stop
-  }
-
-
-
-  // - Actual tests ----------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
   describe("A Response") {
-    it("should have the expected Date header") {
+    it("should have the expected Date header when set") {
       forAll(date) { date =>
-        request("header/Date").POST.apply(DateFormat.write(date).get).date should be(Some(date))
+        response.copy(headers = response.headers.set("Date", date)).date should be(Some(date))
       }
     }
+
+    it("should not have a Date header when not set") { response.date should be(None) }
 
     it("should have the expected Last-Modified header") {
       forAll(date) { date =>
-        request("header/Last-Modified").POST.apply(DateFormat.write(date).get).lastModified should be(Some(date))
+        response.copy(headers = response.headers.set("Last-Modified", date)).lastModified should be(Some(date))
       }
     }
+
+    it("should not have a Last-Modified header when not set") { response.lastModified should be(None) }
 
     it("should have the expected Expires header") {
       forAll(date) { date =>
-        request("header/Expires").POST.apply(DateFormat.write(date).get).expires should be(Some(date))
+        response.copy(headers = response.headers.set("Expires", date)).expires should be(Some(date))
       }
     }
+
+    it("should not have an Expire header when not set") { response.expires should be(None) }
 
     it("should have the expected Content-Language header") {
       forAll(language) { lang =>
-        request("header/Content-Language").POST.apply(LanguageFormat.write(lang).get).contentLanguage should be(Some(List(lang)))
+        response.copy(headers = response.headers.set("Content-Language", lang)).contentLanguage should be(Some(List(lang)))
       }
     }
+
+    it("should not have a Content-Language header when not set") { response.contentLanguage should be(None) }
 
     it("should have the expected ETag header") {
       forAll(etag) { etag =>
-        request("header/ETag").POST.apply(ETagFormat.write(etag).get).etag should be(Some(etag))
+        response.copy(headers = response.headers.set("ETag", etag)).etag should be(Some(etag))
       }
     }
+
+    it("should not have an Etag header when not set") { response.etag should be(None) }
 
     it("should have the expected Server header") {
       forAll(Gen.identifier) { id =>
-        request("header/Server").POST.apply(id).server should be(Some(id))
+        response.copy(headers = response.headers.set("Server", id)).server should be(Some(id))
       }
     }
+
+    it("should not have a Server header when not set") { response.server should be(None) }
 
     it("should have the expected Allow header") {
       forAll(httpMethods) { methods =>
-        request("header/Allow").POST.apply(methods.map(_.name).mkString(",")).allow should be(Some(methods))
+        response.copy(headers = response.headers.set("Allow", methods.map(_.name).mkString(","))).allow should be(Some(methods))
       }
     }
+
+    it("should not have an Allow header when not set") { response.allow should be(None) }
 
     it("should have the expected Age header") {
       forAll(Gen.choose(1, 1000)) { age =>
-        request("header/Age").POST.apply(age.toString).age should be(Some(age))
+        response.copy(headers = response.headers.set("Age", age)).age should be(Some(age))
       }
     }
 
-    // TODO: this is a bit tricky, as the presence of these headers have an impact on response parsing.
-    /*
-    it("should have the expected wwwAuthenticate header") {
-    }
+    it("should not have an Age header when not set") { response.age should be(None) }
 
     it("should have the expected Content-Encoding header") {
+      forAll(encoding) { encoding =>
+        response.copy(headers = response.headers.set("Content-Encoding", encoding)).contentEncoding should be(Some(List(encoding)))
+      }
+    }
+
+    it("should not have a Content-Encoding header when not set") { response.contentEncoding should be(None) }
+
+
+    // TODO: implement
+    /*
+    it("should have the expected wwwAuthenticate header") {
     }
     */
   }

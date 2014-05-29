@@ -5,10 +5,10 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 
 object ETagSpec {
-  def weakETag = for(tag <- Gen.identifier.suchThat(!_.isEmpty)) yield ETag.Weak(tag)
-  def strongETag = for(tag <- Gen.identifier.suchThat(!_.isEmpty)) yield ETag.Strong(tag)
+  def weakETag: Gen[ETag] = for(tag <- Gen.identifier.suchThat(!_.isEmpty)) yield ETag.Weak(tag)
+  def strongETag: Gen[ETag] = for(tag <- Gen.identifier.suchThat(!_.isEmpty)) yield ETag.Strong(tag)
 
-  def etag = Gen.oneOf(weakETag, strongETag)
+  def etag: Gen[ETag] = Gen.oneOf(weakETag, strongETag)
 
   def etags = HeadersSpec.headers(etag)
 
