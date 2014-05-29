@@ -128,6 +128,8 @@ trait Request[A] {
     */
   def acceptEncoding(encodings: Conneg[Encoding]*): Request[A] = header("Accept-Encoding", encodings)
 
+  def acceptEncoding: Option[Seq[Conneg[Encoding]]] = header[Seq[Conneg[Encoding]]]("Accept-Encoding")
+
   /** Notifies the remote server that we expect GZIPed responses. */
   def acceptGzip: Request[A] = acceptEncoding(Encoding.Gzip)
 
@@ -144,6 +146,8 @@ trait Request[A] {
     */
   def accept(mimeTypes: Conneg[MimeType]*): Request[A] = header("Accept", mimeTypes.map(_.map(_.clearParams)))
 
+  def accept: Option[Seq[Conneg[MimeType]]] = header[Seq[Conneg[MimeType]]]("Accept")
+
   /** Notifies the remote server about response charset preferences.
     *
     * This maps to the [[http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.2 Accept-Charset]] header.
@@ -152,6 +156,8 @@ trait Request[A] {
     */
   def acceptCharset(charsets: Conneg[Charset]*): Request[A] = header("Accept-Charset", charsets)
 
+  def acceptCharset: Option[Seq[Conneg[Charset]]] = header[Seq[Conneg[Charset]]]("Accept-Charset")
+
   /** Notifies the remote server about response language preferences.
     *
     * This maps to the [[http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4 Accept-Language]] header.
@@ -159,6 +165,8 @@ trait Request[A] {
     * @param languages list of languages to declare.
     */
   def acceptLanguage(languages: Conneg[Locale]*): Request[A] = header("Accept-Language", languages)
+
+  def acceptLanguage: Option[Seq[Conneg[Locale]]] = header[Seq[Conneg[Locale]]]("Accept-Language")
 
 
 
@@ -171,6 +179,8 @@ trait Request[A] {
     */
   def header[T: ValueWriter](name: String, value: T): Request[A] = headers(headers.set(name, value))
 
+  def header[T: ValueReader](name: String): Option[T] = headers.getOpt[T](name)
+
 
 
 
@@ -178,11 +188,19 @@ trait Request[A] {
   // -------------------------------------------------------------------------------------------------------------------
   def ifModifiedSince(date: Date): Request[A] = header("If-Modified-Since", date)
 
+  def ifModifiedSince: Option[Date] = header[Date]("If-Modified-Since")
+
   def ifUnmodifiedSince(date: Date): Request[A] = header("If-Unmodified-Since", date)
+
+  def ifUnmodifiedSince: Option[Date] = header[Date]("If-Unmodified-Since")
 
   def ifNoneMatch(tags: ETag*): Request[A] = header("If-None-Match", tags)
 
+  def ifNoneMatch: Option[Seq[ETag]] = header[Seq[ETag]]("If-None-Match")
+
   def ifMatch(tags: ETag*): Request[A] = header("If-Match", tags)
+
+  def ifMatch: Option[Seq[ETag]] = header[Seq[ETag]]("If-Match")
 
   def ifRange(tag: ETag): Request[A] = header("If-Range", tag)
 
@@ -196,11 +214,19 @@ trait Request[A] {
     if(ranges.isEmpty) this
     else               header("Range", ranges)
 
+  def range: Option[Seq[ByteRange]] = header[Seq[ByteRange]]("Range")
+
   def date(date: Date = new Date()): Request[A] = header("Date", date)
+
+  def date: Option[Date] = header[Date]("Date")
 
   def userAgent(name: String): Request[A] = header("User-Agent", name)
 
+  def userAgent: Option[String] = header[String]("User-Agent")
+
   def maxForwards(value: Int): Request[A] = header("Max-Forwards", value)
+
+  def maxForwards: Option[Int] = header[Int]("Max-Forwards")
 
   // TODO: do we want to wrap user & pwd in an Authorization case class?
   def auth(user: String, pwd: String): Request[A] =

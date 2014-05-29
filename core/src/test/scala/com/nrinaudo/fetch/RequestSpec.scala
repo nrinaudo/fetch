@@ -20,6 +20,12 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
   import MethodSpec._
   import UrlSpec._
   import QueryStringSpec._
+  import HeadersSpec._
+  import ByteRangeSpec._
+  import ETagSpec._
+  import ConnegSpec._
+  import EncodingSpec._
+  import MimeTypeSpec._
 
   implicit val engine = UrlEngine()
 
@@ -69,6 +75,123 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
       forAll(url, identifier, arbitrary[String]) { (url, name, value) =>
         (Request(url) & (name, value)).url should be(url & (name -> value))
       }
+    }
+
+
+
+    // - Headers tests -------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
+    it("should return its Max-Forwards header when set") {
+      forAll(url, posNum[Int]) { (url, max) => Request(url).maxForwards(max).maxForwards should be(Some(max)) }
+    }
+
+    it("should not return a Max-Forwards when the header is not set") {
+      forAll(url) { url => Request(url).maxForwards should be(None) }
+    }
+
+    it("should return its Date header when set") {
+      forAll(url, date) { (url, date) => Request(url).date(date).date should be(Some(date)) }
+    }
+
+    it("should not return a Date when the header is not set") {
+      forAll(url) { url => Request(url).date should be(None) }
+    }
+
+    it("should return its Range header when set") {
+      forAll(url, byteRanges) { (url, ranges) => Request(url).range(ranges: _*).range should be(Some(ranges)) }
+    }
+
+    it("should not return a Range when the header is not set") {
+      forAll(url) { url => Request(url).range should be(None) }
+    }
+
+    it("should return its User-Agent header when set") {
+      forAll(url, identifier) { (url, id) => Request(url).userAgent(id).userAgent should be(Some(id)) }
+    }
+
+    it("should not return a User-Agent when the header is not set") {
+      forAll(url) { url => Request(url).userAgent should be(None) }
+    }
+
+    it("should return its If-Modified-Since header when set") {
+      forAll(url, date) { (url, date) => Request(url).ifModifiedSince(date).ifModifiedSince should be(Some(date)) }
+    }
+
+    it("should not return a If-Modified-Since when the header is not set") {
+      forAll(url) { url => Request(url).ifModifiedSince should be(None) }
+    }
+
+    it("should return its If-Unmodified-Since header when set") {
+      forAll(url, date) { (url, date) => Request(url).ifUnmodifiedSince(date).ifUnmodifiedSince should be(Some(date)) }
+    }
+
+    it("should not return a If-Unmodified-Since when the header is not set") {
+      forAll(url) { url => Request(url).ifUnmodifiedSince should be(None) }
+    }
+
+    it("should return its If-None-Match header when set") {
+      forAll(url, etags) { (url, etags) => Request(url).ifNoneMatch(etags: _*).ifNoneMatch should be(Some(etags)) }
+    }
+
+    it("should not return a If-None-Match when the header is not set") {
+      forAll(url) { url => Request(url).ifNoneMatch should be(None) }
+    }
+
+    it("should return its If-Match header when set") {
+      forAll(url, etags) { (url, etags) => Request(url).ifMatch(etags: _*).ifMatch should be(Some(etags)) }
+    }
+
+    it("should not return a If-Match when the header is not set") {
+      forAll(url) { url => Request(url).ifMatch should be(None) }
+    }
+
+    it("should return its Accept-Encoding header when set") {
+      forAll(url, connegs(encoding)) { (url, encodings) =>
+        Request(url).acceptEncoding(encodings: _*).acceptEncoding should be(Some(encodings))
+      }
+    }
+
+    it("should have working acceptEncoding helpers") {
+      forAll(url) { url =>
+        Request(url).acceptGzip.acceptEncoding should be(Some(List(Conneg(Encoding.Gzip))))
+        Request(url).acceptDeflate.acceptEncoding should be(Some(List(Conneg(Encoding.Deflate))))
+      }
+    }
+
+    it("should not return a Accept-Encoding when the header is not set") {
+      forAll(url) { url => Request(url).acceptEncoding should be(None) }
+    }
+
+    it("should return its Accept header when set") {
+      forAll(url, connegs(mimeType)) { (url, types) =>
+        // We need to clear the params when comparing with the request's Mime Type because of issue #6
+        // https://github.com/nrinaudo/fetch/issues/6
+        Request(url).accept(types: _*).accept should be(Some(types.map(_.map(_.clearParams))))
+      }
+    }
+
+    it("should not return a Accept when the header is not set") {
+      forAll(url) { url => Request(url).accept should be(None) }
+    }
+
+    it("should return its Accept-Charset header when set") {
+      forAll(url, connegs(charset)) { (url, charsets) =>
+        Request(url).acceptCharset(charsets: _*).acceptCharset should be(Some(charsets))
+      }
+    }
+
+    it("should not return a Accept-Charset when the header is not set") {
+      forAll(url) { url => Request(url).acceptCharset should be(None) }
+    }
+
+    it("should return its Accept-Language header when set") {
+      forAll(url, connegs(language)) { (url, languages) =>
+        Request(url).acceptLanguage(languages: _*).acceptLanguage should be(Some(languages))
+      }
+    }
+
+    it("should not return a Accept-Language when the header is not set") {
+      forAll(url) { url => Request(url).acceptLanguage should be(None) }
     }
   }
 }
