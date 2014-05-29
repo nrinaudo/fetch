@@ -3,11 +3,19 @@ package com.nrinaudo.fetch
 import scala.util.{Failure, Success, Try}
 import java.nio.charset.Charset
 
+
+// - Value reading -----------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 object ValueReader {
+  /** Transforms the specified function into an instance of [[ValueReader]]. */
   def apply[T](f: String => Try[T]): ValueReader[T] = new ValueReader[T] {
     override def read(value: String): Try[T] = f(value)
   }
 
+  /** Acts as a [[ValueReader]] for sequences of the specified type.
+    *
+    * This method will yield an instance of `Failure` if at least one of the specified list's values is not legal.
+    */
   def sequence[T: ValueReader](values: Seq[String]): Try[List[T]] =
     values.map(implicitly[ValueReader[T]].read).foldRight(Success(Nil): Try[List[T]]) {
       case (Success(v), Success(list)) => Success(v :: list)
@@ -16,15 +24,23 @@ object ValueReader {
     }
 }
 
+/** Used to read parameter values from an instance of [[Parameters]]. */
 trait ValueReader[T] {
+  /** Extract an instance of `T` from the specified value. */
   def read(value: String): Try[T]
 }
 
+
+
+// - Value Writing -----------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 object ValueWriter {
+  /** Transforms the specified function into an instance of [[ValueWriter]]. */
   def apply[T](f: T => Option[String]): ValueWriter[T] = new ValueWriter[T] {
     override def write(value: T): Option[String] = f(value)
   }
 
+  /** Acts as a [[ValueWriter]] for sequences of the specified type. */
   def sequence[T: ValueWriter](values: Seq[T]): Option[Seq[String]] =
     values.map(implicitly[ValueWriter[T]].write).collect {
       case Some(v) => v
@@ -34,10 +50,18 @@ object ValueWriter {
     }
 }
 
+/** Used to write parameter values to an instance of [[Parameters]]. */
 trait ValueWriter[T] {
+  /** Writes the specified `T` to a `String`. A return value of `None` means that the specified value serialises to
+    * nothing (the empty string, `Nil`, ...).
+    */
   def write(value: T): Option[String]
 }
 
+
+
+// - Formats -----------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 object ValueFormat {
   // - Standard formatters ---------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
@@ -55,12 +79,15 @@ object ValueFormat {
     override def read(value: String): Try[Charset] = Try {Charset.forName(value)}
   }
 
+  /** Transforms the specified functions into an instance of [[ValueFormat]]. */
   def apply[T](f: String => Try[T], g: T => Option[String]): ValueFormat[T] = apply(ValueReader(f), ValueWriter(g))
 
+  /** Transforms the specified [[ValueReader]] and [[ValueWriter]] into an instance of [[ValueFormat]]. */
   def apply[T](reader: ValueReader[T], writer: ValueWriter[T]): ValueFormat[T] = new ValueFormat[T] {
     override def write(value: T): Option[String] = writer.write(value)
     override def read(value: String): Try[T] = reader.read(value)
   }
 }
 
+/** Compounds a [[ValueReader]] and [[ValueWriter]]. */
 trait ValueFormat[T] extends ValueReader[T] with ValueWriter[T]
