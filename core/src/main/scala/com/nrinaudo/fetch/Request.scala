@@ -17,7 +17,7 @@ object Request {
   /** Decodes the specified response according to whatever is specified in the `Content-Encoding` header and the list
     * of encodings we actually support.
     *
-    * Unsupported encodings result in IOExceptions.
+    * Unsupported encodings result in `IOExceptions`.
     */
   private def decode(response: Response[ResponseEntity]): Response[ResponseEntity] =
     response.contentEncoding.fold(response) { values =>
@@ -43,6 +43,14 @@ object Request {
     decode(f(url, method, body, h))
   }
 
+  /**
+   * Creates a new instance of [[Request]].
+   *
+   * The newly created instance will default to [[Method.GET]].
+   *
+   * @param url    url on which the request will be performed.
+   * @param engine HTTP engine to use when performing the request.
+   */
   def apply(url: Url)(implicit engine: HttpEngine): Request[Response[ResponseEntity]] =
     new RequestImpl[Response[ResponseEntity]](url, Method.GET, new Headers(), http(engine))
 
@@ -50,11 +58,15 @@ object Request {
   val UserAgent = "Fetch/0.2"
 }
 
+/** Represents an HTTP request. */
 trait Request[A] {
   // - Fields ----------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
+  /** URL on which the request will be performed. */
   val url: Url
+  /** HTTP method of the request. */
   val method: Method
+  /** List of HTTP headers of the request. */
   val headers: Headers
 
 
@@ -128,6 +140,7 @@ trait Request[A] {
     */
   def acceptEncoding(encodings: Conneg[Encoding]*): Request[A] = header("Accept-Encoding", encodings)
 
+  /** Returns the value of this instance's `Accept-Encoding` header. */
   def acceptEncoding: Option[Seq[Conneg[Encoding]]] = header[Seq[Conneg[Encoding]]]("Accept-Encoding")
 
   /** Notifies the remote server that we expect GZIPed responses. */
