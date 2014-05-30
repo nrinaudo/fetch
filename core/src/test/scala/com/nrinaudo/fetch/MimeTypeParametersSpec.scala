@@ -5,9 +5,11 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 
 object MimeTypeParametersSpec {
+  import HttpGrammarSpec._
+
   def param: Gen[(String, String)] = for {
-      name  <- Gen.identifier
-      value <- Gen.identifier
+      name  <- token
+      value <- content
     } yield (name, value)
 
   def params: Gen[MimeTypeParameters] = for {
