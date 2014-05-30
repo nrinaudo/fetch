@@ -4,15 +4,9 @@ import java.nio.charset.Charset
 import MimeTypeParameters._
 
 object MimeType {
-  private val TSpecials= Set('(', ')', '<', '>', '@', ',', ';', ':', '\\', ',', '[', ']', '?', '=')
-
   /** Used to split a MIME type string into a main, sub and params strings. */
   private val MimePattern  = """([\w+-]+)/([\w+-]+)\s*(?:;(.*))?""".r
 
-
-  private def paramValue(value: String) =
-    if(value.exists(TSpecials)) '\"' + value + '\"'
-    else                        value
 
   val TextPlain             = MimeType("text", "plain")
   val ApplicationOctetSteam = MimeType("application", "octet-stream")
