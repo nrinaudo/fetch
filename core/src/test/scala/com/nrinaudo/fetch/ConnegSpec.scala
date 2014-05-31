@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import scala.util.Success
-import com.nrinaudo.fetch.Conneg.{MimeTypeConneg, EncodingConneg}
+import com.nrinaudo.fetch.Conneg.{Encodings, MimeTypes}
 
 object ConnegSpec {
   private lazy val charsets = Charset.availableCharsets().values().asScala.toList
@@ -46,17 +46,17 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     }
 
     it("should accept legal values of q") {
-      forAll(Gen.choose(0f, 1f)) {q =>
-        Conneg("value", q)
-      }
+      forAll(Gen.choose(0f, 1f)) {q => Conneg("value", q) }
     }
 
     it("should not serialize q when it's equal to 1") {
-      Conneg.ConnegCharset.write(Conneg(Charset.forName("UTF-8"), 1)) should be(Some("UTF-8"))
+      forAll(charset) { charset => Conneg.Charsets.write(Seq(Conneg(charset, 1))) should be(Some(charset.name())) }
     }
 
     it("should assume an absent q defaults to 1.0") {
-      Conneg.ConnegCharset.read("UTF-8") should be(Success(Conneg(Charset.forName("UTF-8"), 1.0f)))
+      forAll(charset) { charset =>
+        Conneg.Charsets.read(charset.name()) should be(Success(List(Conneg(charset, 1.0f))))
+      }
     }
 
     it("should correctly serialize and parse languages") {
@@ -67,7 +67,7 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
 
     it("should correctly serialize and parse charsets") {
       forAll(connegs(charset)) { headers =>
-        cycle(Headers.compositeFormat[Conneg[Charset]], headers) should be(Success(headers))
+        cycle(Conneg.Charsets, headers) should be(Success(headers))
       }
     }
 
@@ -75,13 +75,13 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
       forAll(connegs(mimeType)) { headers =>
       // TODO: we're not perfectly RFC compliant when it comes to parsing Accept: parameters break the parser.
         val fixed = headers.map(_.map(_.clearParams))
-        cycle(Headers.compositeFormat[Conneg[MimeType]], fixed) should be(Success(fixed))
+        cycle(MimeTypes, fixed) should be(Success(fixed))
       }
     }
 
     it("should correctly serialize and parse content encodings") {
       forAll(connegs(encoding)) { headers =>
-        cycle(Headers.compositeFormat[Conneg[Encoding]], headers) should be(Success(headers))
+        cycle(Encodings, headers) should be(Success(headers))
       }
     }
 

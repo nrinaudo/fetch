@@ -87,10 +87,14 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
       Headers.compositeFormat[T].read(response.body.as[String]).get should be(values)
     }
 
+    def checkConnegs[T](response: Response[ResponseEntity], values: Seq[Conneg[T]], reader: ValueReader[Seq[Conneg[T]]]) {
+      reader.read(response.body.as[String]).get should be(values)
+    }
+
     it("should use the specified Accept header(s)") {
       forAll(connegs(MimeTypeSpec.mimeType)) { mimeTypes =>
         val fixed = mimeTypes.map(_.map(_.clearParams))
-        checkConneg(request("header/Accept").accept(fixed:_*).GET.apply(), fixed)
+        checkConnegs(request("header/Accept").accept(fixed:_*).GET.apply(), fixed, Conneg.MimeTypes)
       }
     }
 
@@ -101,7 +105,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     it("should use the specified Accept-Charset header") {
       forAll(connegs(charset)) { charsets =>
-        checkConneg(request("header/Accept-Charset").acceptCharset(charsets :_*).GET.apply(), charsets)
+        checkConnegs(request("header/Accept-Charset").acceptCharset(charsets:_*).GET.apply(), charsets, Conneg.Charsets)
       }
     }
 
@@ -123,7 +127,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     it("should use the specified Accept-Encoding header") {
       forAll(connegs(encoding)) { encodings =>
-        checkConneg(request("header/Accept-Encoding").acceptEncoding(encodings :_*).GET.apply(), encodings)
+        checkConnegs(request("header/Accept-Encoding").acceptEncoding(encodings:_*).GET.apply(), encodings, Conneg.Encodings)
       }
     }
 

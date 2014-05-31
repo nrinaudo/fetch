@@ -9,59 +9,61 @@ import scala.util.Failure
 
 /** Collection of implicit header formats for known content negotiation headers. */
 object Conneg {
-  /*
-  implicit object MimeTypesConneg extends ValueFormat[Seq[Conneg[MimeType]]] with MimeType.Grammar {
-    def connegs: Parser[List[Conneg[MimeType]]] = repsep(mimeType, ",") ^^ { list =>
+  trait Grammar[T] extends HttpGrammar with ValueFormat[Seq[Conneg[T]]] {
+    private val qFormat = new DecimalFormat("0.###")
+
+    def entry: Parser[T]
+
+    def conneg: Parser[Conneg[T]] = entry ~ opt(paramSep ~> qValue) ^^ {
+      case entry ~ Some(q) => new Conneg(entry, q)
+      case entry ~ _       => new Conneg(entry, 1.0f)
+    }
+
+    def connegs: Parser[List[Conneg[T]]] = repsep(conneg, ",")
+
+    def qValue: Parser[Float] = ("q" ~ valueSep) ~> """[0-1](\.[0-9]{1,3})?""".r ^^ (_.toFloat)
+
+    def qValue(value: Float): String = "q=%s".format(qFormat.format(value))
+
+    private def writeEntry(entry: Conneg[T]): String =
+      if(entry.q == 1) entry.value.toString
+      else             entry.value.toString + ";" + qValue(entry.q)
+
+    // TODO: this currently relies on toString, change that.
+    override def write(value: Seq[Conneg[T]]): Option[String] = {
+      if(value.isEmpty) None
+      else              Some(value.map(writeEntry).mkString(","))
+    }
+
+    override def read(value: String): Try[Seq[Conneg[T]]] = parseAll(connegs, value) match {
+      case Success(a, _)   => scala.util.Success(a)
+      case Failure(msg, _) => scala.util.Failure(new IllegalArgumentException(msg))
+      case Error(msg, _)   => scala.util.Failure(new IllegalArgumentException(msg))
+    }
+  }
+
+  implicit object MimeTypes extends MimeType.Grammar with Grammar[MimeType] {
+    override def entry: Parser[MimeType] = mimeType
+
+    override def connegs: Parser[List[Conneg[MimeType]]] = repsep(mimeType, ",") ^^ { list =>
       list.map { mime => Conneg(mime.removeParam("q"), mime.param[Float]("q").getOrElse(1f)) }
     }
-
-    override def write(value: Seq[Conneg[MimeType]]): Option[String] =
-      Some(value.map(c => c.value.toString + ";" + qValue(c.q)).mkString(","))
-
-    override def read(value: String): Try[List[Conneg[MimeType]]] =
-      parseAll(connegs, value) match {
-        case Success(a, _) => scala.util.Success(a)
-        case Failure(msg, _) => scala.util.Failure(new IllegalArgumentException(msg))
-        case Error(msg, _) => scala.util.Failure(new IllegalArgumentException(msg))
-      }
-  }
-  */
-
-
-  /** Used to parse and serialize instances of `Conneg[MimeType]`. */
-  implicit object MimeTypeConneg extends ValueFormat[Conneg[MimeType]] {
-    override def write(value: Conneg[MimeType]): Option[String] = Some(value.value.param("q", value.q).toString)
-    override def read(value: String): Try[Conneg[MimeType]] = Try {MimeType(value)} map { mime =>
-      Conneg(mime.removeParam("q"), mime.param[Float]("q").getOrElse(1f))
-    }
   }
 
-  /** Used to parse and serialize instances of `Conneg[Encoding]`. */
-  implicit object EncodingConneg extends ValueFormat[Conneg[Encoding]] with HttpGrammar {
-    def encoding: Parser[Encoding] = (Encoding.Gzip.name | Encoding.Deflate.name | Encoding.Identity.name) ^^ {
+  implicit object Encodings extends Grammar[Encoding] {
+    override def entry: Parser[Encoding] = (Encoding.Gzip.name | Encoding.Deflate.name | Encoding.Identity.name) ^^ {
       case Encoding.Gzip.name     => Encoding.Gzip
       case Encoding.Deflate.name  => Encoding.Deflate
       case Encoding.Identity.name => Encoding.Identity
     }
-
-    def conneg: Parser[Conneg[Encoding]] = encoding ~ (paramSep ~> qValue) ^^ {
-      case encoding ~ q => new Conneg(encoding, q)
-    }
-
-    override def write(value: Conneg[Encoding]): Option[String] = Some(value.value.name + ";" + qValue(value.q))
-    override def read(value: String): Try[Conneg[Encoding]] =
-      parseAll(conneg, value) match {
-        case Success(a, _)   => scala.util.Success(a)
-        case Failure(msg, _) => scala.util.Failure(new IllegalArgumentException(msg))
-        case Error(msg, _)   => scala.util.Failure(new IllegalArgumentException(msg))
-      }
   }
 
-  // token
-  implicit val ConnegCharset: ValueFormat[Conneg[Charset]]   = new ConnegFormat[Charset]
+  implicit object Charsets extends Grammar[Charset] {
+    override def entry: Parser[Charset] = token ^^ Charset.forName
+  }
 
   // char 1-8 - char 1-8
-  implicit val ConnegLanguage: ValueFormat[Conneg[Locale]]   = new ConnegFormat[Locale]
+  implicit val ConnegLanguage: ValueFormat[Conneg[Locale]] = new ConnegFormat[Locale]
 }
 
 /** Represents an acceptable value for content negotiation headers (`Accept*`).

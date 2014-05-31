@@ -29,9 +29,6 @@ trait HttpGrammar extends RegexParsers {
   def valueSep: Parser[Any] = """\s*=\s*""".r
   def paramSep: Parser[Any] = """\s*;\s*""".r
 
-  def qValue: Parser[Float] = ("q" ~ valueSep) ~> """[0-1](\.[0-9]{1,3})?""".r ^^ (_.toFloat)
-  def qValue(value: Float): String = "q=%.3f".format(value)
-
 
   def parameter: Parser[(String, String)] = (token ~ (valueSep ~> (token | quotedString))) ^^ {
     case token ~ value => (token, value)
