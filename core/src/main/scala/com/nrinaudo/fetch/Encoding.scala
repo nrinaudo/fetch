@@ -37,7 +37,7 @@ object Encoding {
 /** Handles HTTP [[http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.11 content encoding]]. */
 trait Encoding {
   /** Name of the encoding, as recognised by HTTP clients and servers. */
-  def name: String
+  val name: String
 
   /** Wraps the specified stream in an encoded one. */
   def encode(out: OutputStream): OutputStream

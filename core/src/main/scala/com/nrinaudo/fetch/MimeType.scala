@@ -4,7 +4,7 @@ import java.nio.charset.Charset
 import MimeTypeParameters._
 
 object MimeType {
-  private object Format extends HttpGrammar {
+  trait Grammar extends HttpGrammar {
     def component: Parser[String] = "*" | token
     def rawType: Parser[(String, String)] = (component <~ "/") ~ component ^^ { case (main ~ sub) => (main, sub) }
 
@@ -12,7 +12,9 @@ object MimeType {
       case (main, sub) ~ None         => MimeType(main, sub)
       case (main, sub) ~ Some(params) => MimeType(main, sub, new MimeTypeParameters(params))
     }
+  }
 
+  private object Format extends Grammar {
     def apply(string: String): Option[MimeType] =
       parseAll(mimeType, string).map(Some(_)).getOrElse(None)
   }
