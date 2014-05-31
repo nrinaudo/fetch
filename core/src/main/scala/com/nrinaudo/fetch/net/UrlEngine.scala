@@ -67,7 +67,10 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
     // Entity body configuration.
     body.foreach {b =>
       con.setDoOutput(true)
-      b.contentLength.fold(con.setChunkedStreamingMode(chunkSize))(con.setFixedLengthStreamingMode)
+      // Note: this is currently somewhat broken because of Java 1.6 that does not support fixed-length streaming mode
+      // as longs. If the entity's content length is larger than an int, we have an issue.
+      // TODO: check against maxint and used chunked encoding if larger?
+      b.contentLength.fold(con.setChunkedStreamingMode(chunkSize)) { length => con.setFixedLengthStreamingMode(length.toInt) }
     }
 
     // Headers.
