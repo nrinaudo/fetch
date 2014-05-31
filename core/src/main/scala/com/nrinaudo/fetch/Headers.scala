@@ -28,6 +28,7 @@ object Headers {
   }
 
   implicit val IntFormat: ValueFormat[Int] = ValueFormat.Ints
+  implicit val FloatFormat: ValueFormat[Float] = ValueFormat.Floats
   implicit val CharsetFormat = ValueFormat.Charsets
 
 

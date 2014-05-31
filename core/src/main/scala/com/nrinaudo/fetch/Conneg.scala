@@ -5,11 +5,18 @@ import scala.util.{Failure, Try}
 import java.nio.charset.Charset
 import java.util.Locale
 import com.nrinaudo.fetch.Headers._
+import sun.net.www.content.image.png
 
 /** Collection of implicit header formats for known content negotiation headers. */
 object Conneg {
+  implicit object MimeTypeConneg extends ValueFormat[Conneg[MimeType]] {
+    override def write(value: Conneg[MimeType]): Option[String] = Some(value.value.param("q", value.q).toString)
+    override def read(value: String): Try[Conneg[MimeType]] = Try {MimeType(value)} map { mime =>
+      Conneg(mime.removeParam("q"), mime.param[Float]("q").getOrElse(1f))
+    }
+  }
+
   implicit val ConnegEncoding: ValueFormat[Conneg[Encoding]] = new ConnegFormat[Encoding]
-  implicit val ConnegMimeType: ValueFormat[Conneg[MimeType]] = new ConnegFormat[MimeType]
   implicit val ConnegCharset: ValueFormat[Conneg[Charset]]   = new ConnegFormat[Charset]
   implicit val ConnegLanguage: ValueFormat[Conneg[Locale]]   = new ConnegFormat[Locale]
 }

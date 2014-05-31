@@ -10,12 +10,7 @@ import com.nrinaudo.fetch.Request._
 import scala.Some
 import scala.util.Success
 
-object EngineSpec {
-  private val connegValue = "([^;]+)(?:;q=(.*))?".r
-}
-
 trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
-  import EngineSpec._
   import RequestSpec._
   import ByteRangeSpec._
   import RequestEntitySpec._
@@ -88,19 +83,14 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     // - Header helpers ------------------------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
-    def checkConneg[T](response: Response[ResponseEntity], values: List[Conneg[T]])(f: T => String) =
-      response.body.as[String].split(",").zip(values).foreach {
-        case (connegValue(param, q), header) =>
-          param should be(f(header.value))
-          if(q == null) header.q should be(1)
-          else          (math.round(header.q * 1000) / 1000f) should be(q.toFloat)
-      }
+    def checkConneg[T: ValueReader : ValueWriter](response: Response[ResponseEntity], values: List[T]) {
+      Headers.compositeFormat[T].read(response.body.as[String]).get should be(values)
+    }
 
-    it("should use the specified Accept header(s), discarding parameters if any is present") {
+    it("should use the specified Accept header(s)") {
       forAll(connegs(MimeTypeSpec.mimeType)) { mimeTypes =>
-        checkConneg(request("header/Accept").accept(mimeTypes :_*).GET.apply(), mimeTypes) { mimeType =>
-          mimeType.main + "/" + mimeType.sub
-        }
+        val fixed = mimeTypes.map(_.map(_.clearParams))
+        checkConneg(request("header/Accept").accept(fixed:_*).GET.apply(), fixed)
       }
     }
 
@@ -111,7 +101,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     it("should use the specified Accept-Charset header") {
       forAll(connegs(charset)) { charsets =>
-        checkConneg(request("header/Accept-Charset").acceptCharset(charsets :_*).GET.apply(), charsets)(_.name())
+        checkConneg(request("header/Accept-Charset").acceptCharset(charsets :_*).GET.apply(), charsets)
       }
     }
 
@@ -122,9 +112,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     it("should use the specified Accept-Language header") {
       forAll(connegs(language)) { languages =>
-        checkConneg(request("header/Accept-Language").acceptLanguage(languages :_*).GET.apply(), languages) { lang =>
-          lang.getLanguage + (if(lang.getCountry.isEmpty) "" else "-" + lang.getCountry)
-        }
+        checkConneg(request("header/Accept-Language").acceptLanguage(languages :_*).GET.apply(), languages)
       }
     }
 
@@ -135,7 +123,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     it("should use the specified Accept-Encoding header") {
       forAll(connegs(encoding)) { encodings =>
-        checkConneg(request("header/Accept-Encoding").acceptEncoding(encodings :_*).GET.apply(), encodings)(_.name)
+        checkConneg(request("header/Accept-Encoding").acceptEncoding(encodings :_*).GET.apply(), encodings)
       }
     }
 
@@ -150,7 +138,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     it("should send the correct User-Agent header when specified") {
       // This suchThat statement looks odd, but it's not half as odd as unfiltered's behaviour: when it encounters a
-      // User-Agent whose value is "te", it'll silently transform it to "TE", failing this test.
+      // User-Agent whose value is "te", it'll silently transform it to "TE", failing this checkConneg.
       forAll(Gen.identifier.suchThat(!_.equalsIgnoreCase("te"))) { userAgent =>
         request("header/User-Agent").userAgent(userAgent).GET.apply().body.as[String] should be(userAgent)
       }

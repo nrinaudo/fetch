@@ -19,7 +19,7 @@ trait HttpGrammar extends RegexParsers {
   def quotedString: Parser[String] = "\"" ~> (rep(quotedPair | qdtext) ^^ (_.mkString)) <~ "\""
   def content: Parser[String]      = quotedString | token
   def content(value: String): String =
-    if(value.exists(mustEscape)) "\"%s\"" format value.replaceAll("\"", "\\\"")
+    if(value.exists(mustEscape)) "\"%s\"" format value.replaceAllLiterally("\\", "\\\\").replaceAllLiterally("\"", "\\\"")
     else                         value
 
   private def mustEscape(c: Char) = c < '\u0020' || c > '\u007E' || Separators.contains(c)
@@ -29,8 +29,8 @@ trait HttpGrammar extends RegexParsers {
   def valueSep: Parser[Any] = """\s*=\s*""".r
   def paramSep: Parser[Any] = """\s*;\s*""".r
 
-  def parameter: Parser[(String, String)] = (token ~ valueSep ~ (token | quotedString)) ^^ {
-    case token ~ _ ~ value => (token, value)
+  def parameter: Parser[(String, String)] = (token ~ (valueSep ~> (token | quotedString))) ^^ {
+    case token ~ value => (token, value)
   }
 
   def parameters: Parser[Map[String, String]] = repsep(parameter, paramSep) ^^ {_.foldLeft(Map[String, String]()) {
@@ -46,6 +46,5 @@ trait HttpGrammar extends RegexParsers {
       builder.append(name).append('=').append(content(value)) }
     builder
   }
-
   def parameters(params: Map[String, String]): String = writeParametersTo(new StringBuilder(), params).result()
 }

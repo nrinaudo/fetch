@@ -4,14 +4,13 @@ import java.nio.charset.Charset
 import MimeTypeParameters._
 
 object MimeType {
-
   private object Format extends HttpGrammar {
     def component: Parser[String] = "*" | token
-    def rawType: Parser[(String, String)] = component ~ "/" ~ component ^^ { case (main ~ _ ~ sub) => (main, sub) }
+    def rawType: Parser[(String, String)] = (component <~ "/") ~ component ^^ { case (main ~ sub) => (main, sub) }
 
-    def mimeType: Parser[MimeType] = rawType ~ opt(paramSep ~ parameters) ^^ {
-      case (main, sub) ~ None            => MimeType(main, sub)
-      case (main, sub) ~ Some(_ ~ params) => MimeType(main, sub, new MimeTypeParameters(params))
+    def mimeType: Parser[MimeType] = rawType ~ opt(paramSep ~> parameters) ^^ {
+      case (main, sub) ~ None         => MimeType(main, sub)
+      case (main, sub) ~ Some(params) => MimeType(main, sub, new MimeTypeParameters(params))
     }
 
     def apply(string: String): Option[MimeType] =
@@ -33,6 +32,8 @@ case class MimeType(main: String, sub: String, params: MimeTypeParameters = new 
   def clearParams: MimeType = params(new MimeTypeParameters())
 
   def params(values: MimeTypeParameters): MimeType = copy(params = values)
+
+  def removeParam(name: String): MimeType = copy(params = params.remove(name))
 
   def param[T: ValueWriter](name: String, value: T): MimeType = params(params.set(name, value))
 

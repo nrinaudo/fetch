@@ -5,19 +5,9 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 
 object MimeTypeParametersSpec {
-  import HttpGrammarSpec._
-
-  def param: Gen[(String, String)] = for {
-      name  <- token
-      value <- content
-    } yield (name, value)
-
-  def params: Gen[MimeTypeParameters] = for {
-    n    <- Gen.choose(0, 10)
-    list <- Gen.listOfN(n, param)
-  } yield list.foldLeft(new MimeTypeParameters()) {case (params, (name, value)) => params.set(name, value)}
-
-    def illegalParams = Arbitrary.arbitrary[String].suchThat(str => !str.contains('=') && !str.isEmpty)
+  // Note: q is not considered a valid MIME type parameter, as it would conflict with the Accept header's q parameter.
+  def params: Gen[MimeTypeParameters] = HttpGrammarSpec.params.map(map => new MimeTypeParameters(map - "q"))
+  def illegalParams = Arbitrary.arbitrary[String].suchThat(str => !str.contains('=') && !str.isEmpty)
 }
 
 class MimeTypeParametersSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
