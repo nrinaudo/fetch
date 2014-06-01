@@ -72,11 +72,7 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     }
 
     it("should correctly serialize and parse MIME types") {
-      forAll(connegs(mimeType)) { headers =>
-      // TODO: we're not perfectly RFC compliant when it comes to parsing Accept: parameters break the parser.
-        val fixed = headers.map(_.map(_.clearParams))
-        cycle(MimeTypes, fixed) should be(Success(fixed))
-      }
+      forAll(connegs(mimeType)) { headers => cycle(MimeTypes, headers) should be(Success(headers)) }
     }
 
     it("should correctly serialize and parse content encodings") {

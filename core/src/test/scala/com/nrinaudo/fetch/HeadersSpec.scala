@@ -10,7 +10,7 @@ object HeadersSpec {
   def illegalDate = Arbitrary.arbitrary[String].suchThat(_.matches(".*[^0-9a-zA-Z,: ].*"))
 
   def headers[T](gen: Gen[T]) = for {
-    size <- Gen.choose(1, 10)
+    size <- Gen.choose(1, 5)
     list <- Gen.listOfN(size, gen)
   } yield list
 }

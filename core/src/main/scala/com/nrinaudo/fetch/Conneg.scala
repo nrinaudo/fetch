@@ -62,6 +62,7 @@ object Conneg {
     override def entry: Parser[Charset] = token ^^ Charset.forName
   }
 
+  // TODO: implement this properly.
   // char 1-8 - char 1-8
   implicit val ConnegLanguage: ValueFormat[Conneg[Locale]] = new ConnegFormat[Locale]
 }

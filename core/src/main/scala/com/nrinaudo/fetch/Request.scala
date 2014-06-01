@@ -157,7 +157,7 @@ trait Request[A] {
     *
     * @param mimeTypes list of MIME types to declare.
     */
-  def accept(mimeTypes: Conneg[MimeType]*): Request[A] = header("Accept", mimeTypes.map(_.map(_.clearParams)))
+  def accept(mimeTypes: Conneg[MimeType]*): Request[A] = header("Accept", mimeTypes)
 
   def accept: Option[Seq[Conneg[MimeType]]] = header[Seq[Conneg[MimeType]]]("Accept")
 

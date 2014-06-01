@@ -93,8 +93,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     it("should use the specified Accept header(s)") {
       forAll(connegs(MimeTypeSpec.mimeType)) { mimeTypes =>
-        val fixed = mimeTypes.map(_.map(_.clearParams))
-        checkConnegs(request("header/Accept").accept(fixed:_*).GET.apply(), fixed, Conneg.MimeTypes)
+        checkConnegs(request("header/Accept").accept(mimeTypes: _*).GET.apply(), mimeTypes, Conneg.MimeTypes)
       }
     }
 
