@@ -48,21 +48,9 @@ object Headers {
     override def write(date: Date): Option[String] = Some(HttpDateFormat.synchronized {HttpDateFormat.format(date)})
   }
 
-  private val LanguagePattern = """(\p{Alpha}\p{Alpha})(?:-(\p{Alpha}\p{Alpha}))?""".r
-  implicit object LanguageFormat extends ValueFormat[Locale] {
-    override def read (value: String): Try[Locale] = value match {
-      case LanguagePattern(lang, null)    => Success(new Locale(lang))
-      case LanguagePattern(lang, country) => Success(new Locale(lang, country))
-      case _                              => Failure(new IllegalArgumentException("Not a valid locale: " + value))
-    }
-
-    override def write(value: Locale): Option[String] = {
-      var v = value.getLanguage
-
-      if(!value.getCountry.isEmpty) v += "-" + value.getCountry
-
-      Some(v)
-    }
+  implicit object LanguageFormat extends ValueFormat[Language] {
+    override def read (value: String): Try[Language] = Try {Language(value)}
+    override def write(value: Language): Option[String] = Some(value.toString)
   }
 
   implicit object EncodingFormat extends ValueFormat[Encoding] {

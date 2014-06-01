@@ -1,7 +1,7 @@
 package com.nrinaudo.fetch
 
 import org.apache.commons.codec.binary.Base64
-import java.util.{Locale, Date}
+import java.util.Date
 import Headers._
 import java.nio.charset.Charset
 
@@ -177,9 +177,9 @@ trait Request[A] {
     *
     * @param languages list of languages to declare.
     */
-  def acceptLanguage(languages: Conneg[Locale]*): Request[A] = header("Accept-Language", languages)
+  def acceptLanguage(languages: Conneg[Language]*): Request[A] = header("Accept-Language", languages)
 
-  def acceptLanguage: Option[Seq[Conneg[Locale]]] = header[Seq[Conneg[Locale]]]("Accept-Language")
+  def acceptLanguage: Option[Seq[Conneg[Language]]] = header[Seq[Conneg[Language]]]("Accept-Language")
 
 
 

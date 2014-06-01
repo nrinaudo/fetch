@@ -83,10 +83,6 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     // - Header helpers ------------------------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
-    def checkConneg[T: ValueReader : ValueWriter](response: Response[ResponseEntity], values: List[T]) {
-      Headers.compositeFormat[T].read(response.body.as[String]).get should be(values)
-    }
-
     def checkConnegs[T](response: Response[ResponseEntity], values: Seq[Conneg[T]], reader: ValueReader[Seq[Conneg[T]]]) {
       reader.read(response.body.as[String]).get should be(values)
     }
@@ -115,7 +111,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     it("should use the specified Accept-Language header") {
       forAll(connegs(language)) { languages =>
-        checkConneg(request("header/Accept-Language").acceptLanguage(languages :_*).GET.apply(), languages)
+        checkConnegs(request("header/Accept-Language").acceptLanguage(languages :_*).GET.apply(), languages, Conneg.Languages)
       }
     }
 

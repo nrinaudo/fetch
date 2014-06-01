@@ -16,10 +16,12 @@ object ConnegSpec {
 
   def illegalCharset = Arbitrary.arbitrary[String].suchThat(!Charset.availableCharsets().containsKey(_))
 
-  def language: Gen[Locale] = Gen.oneOf(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN, Locale.ITALIAN, Locale.JAPANESE,
+  def locale: Gen[Locale] = Gen.oneOf(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN, Locale.ITALIAN, Locale.JAPANESE,
     Locale.KOREAN, Locale.CHINESE, Locale.SIMPLIFIED_CHINESE, Locale.TRADITIONAL_CHINESE, Locale.FRANCE, Locale.GERMANY,
     Locale.ITALY, Locale.JAPAN, Locale.KOREA, Locale.CHINA, Locale.PRC, Locale.TAIWAN, Locale.UK, Locale.US,
     Locale.CANADA, Locale.CANADA_FRENCH)
+
+  def language: Gen[Language] = locale.map(Language.apply)
 
   def illegalLanguage = Arbitrary.arbitrary[String].suchThat {_.matches(".*[^a-zA-Z_-].*")}
 
@@ -61,7 +63,7 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
 
     it("should correctly serialize and parse languages") {
       forAll(connegs(language)) { headers =>
-        cycle(Headers.compositeFormat[Conneg[Locale]], headers) should be(Success(headers))
+        cycle(Conneg.Languages, headers) should be(Success(headers))
       }
     }
 
@@ -77,7 +79,7 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
 
     it("should correctly serialize and parse content encodings") {
       forAll(connegs(encoding)) { headers =>
-        cycle(Encodings, headers) should be(Success(headers))
+        cycle(Conneg.Encodings, headers) should be(Success(headers))
       }
     }
 

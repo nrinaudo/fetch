@@ -3,26 +3,34 @@ package com.nrinaudo.fetch
 import java.text.DecimalFormat
 import scala.util.Try
 import java.nio.charset.Charset
-import java.util.Locale
 import com.nrinaudo.fetch.Headers._
-import scala.util.Failure
 
 /** Collection of implicit header formats for known content negotiation headers. */
 object Conneg {
-  trait Grammar[T] extends HttpGrammar with ValueFormat[Seq[Conneg[T]]] {
+  /** Used to parse / serialize conneg header values.
+    *
+    * In order to implement a format for a specific type, application developers only need to provide a `Parser`
+    * instance for that type by implementing the [[Conneg.Format.entry]] method.
+    */
+  trait Format[T] extends HttpGrammar with ValueFormat[Seq[Conneg[T]]] {
     private val qFormat = new DecimalFormat("0.###")
 
+    /** Parser for the underlying type. */
     def entry: Parser[T]
 
+    /** Parser for a single conneg value. */
     def conneg: Parser[Conneg[T]] = entry ~ opt(paramSep ~> qValue) ^^ {
       case entry ~ Some(q) => new Conneg(entry, q)
       case entry ~ _       => new Conneg(entry, 1.0f)
     }
 
+    /** Parser for a list of conneg values. */
     def connegs: Parser[List[Conneg[T]]] = repsep(conneg, ",")
 
+    /** Parser for the content-negotiation `q` parameter. */
     def qValue: Parser[Float] = ("q" ~ valueSep) ~> """[0-1](\.[0-9]{1,3})?""".r ^^ (_.toFloat)
 
+    /** Formats the content-negotiation `q` parameter. */
     def qValue(value: Float): String = "q=%s".format(qFormat.format(value))
 
     private def writeEntry(entry: Conneg[T]): String =
@@ -42,7 +50,7 @@ object Conneg {
     }
   }
 
-  implicit object MimeTypes extends MimeType.Grammar with Grammar[MimeType] {
+  implicit object MimeTypes extends MimeType.Grammar with Format[MimeType] {
     override def entry: Parser[MimeType] = mimeType
 
     override def connegs: Parser[List[Conneg[MimeType]]] = repsep(mimeType, ",") ^^ { list =>
@@ -50,7 +58,7 @@ object Conneg {
     }
   }
 
-  implicit object Encodings extends Grammar[Encoding] {
+  implicit object Encodings extends Format[Encoding] {
     override def entry: Parser[Encoding] = (Encoding.Gzip.name | Encoding.Deflate.name | Encoding.Identity.name) ^^ {
       case Encoding.Gzip.name     => Encoding.Gzip
       case Encoding.Deflate.name  => Encoding.Deflate
@@ -58,13 +66,13 @@ object Conneg {
     }
   }
 
-  implicit object Charsets extends Grammar[Charset] {
+  implicit object Charsets extends Format[Charset] {
     override def entry: Parser[Charset] = token ^^ Charset.forName
   }
 
-  // TODO: implement this properly.
-  // char 1-8 - char 1-8
-  implicit val ConnegLanguage: ValueFormat[Conneg[Locale]] = new ConnegFormat[Locale]
+  implicit object Languages extends Format[Language] with Language.Grammar {
+    override def entry: Parser[Language] = language
+  }
 }
 
 /** Represents an acceptable value for content negotiation headers (`Accept*`).
@@ -78,33 +86,5 @@ case class Conneg[T](value: T, q: Float = 1) {
 
   def map[S](f: T => S): Conneg[S] = Conneg(f(value), q)
   def flatMap[S](f: T => Conneg[S]): Conneg[S] = f(value).copy(q = q)
-}
-
-private object ConnegFormat {
-  /** Format for the `q` content-negotiation header. */
-  val qFormat = new DecimalFormat("0.###")
-
-  val ConnegPattern = """([^;]+)(?:;\s*q\s*=\s*([0-9.]+))?""".r
-
-  object qPattern {
-    def unapply(str: String): Option[Float] =
-      if(str == null) Some(1.0f)
-      else            Try {str.toFloat}.toOption.filter {q => q >= 0 && q <= 1}
-  }
-}
-
-private class ConnegFormat[T: ValueFormat] extends ValueFormat[Conneg[T]] {
-  import ConnegFormat._
-
-  override def read(value: String): Try[Conneg[T]] = value match {
-    case ConnegPattern(data, qPattern(q)) => implicitly[ValueFormat[T]].read(data).map(Conneg(_, q))
-    case _                                => Failure(new IllegalArgumentException("Illegal content negotiation header: " + value))
-  }
-
-  override def write(value: Conneg[T]): Option[String] = {
-    val raw = implicitly[ValueFormat[T]].write(value.value)
-    if(value.q == 1)  raw
-    else              raw map(_ + ";q=" + qFormat.format(value.q))
-  }
 }
 

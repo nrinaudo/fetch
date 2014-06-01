@@ -19,7 +19,7 @@ case class Response[A](status: Status, headers: Headers, body: A) {
   // -------------------------------------------------------------------------------------------------------------------
   def date: Option[Date] = headers.getOpt[Date]("Date")
   def contentEncoding: Option[Seq[Encoding]] = headers.getOpt[Seq[Encoding]]("Content-Encoding")
-  def contentLanguage: Option[Seq[Locale]] = headers.getOpt[Seq[Locale]]("Content-Language")
+  def contentLanguage: Option[Seq[Language]] = headers.getOpt[Seq[Language]]("Content-Language")
   def lastModified: Option[Date] = headers.getOpt[Date]("Last-Modified")
   def expires: Option[Date] = headers.getOpt[Date]("Expires")
   def etag: Option[ETag] = headers.getOpt[ETag]("ETag")

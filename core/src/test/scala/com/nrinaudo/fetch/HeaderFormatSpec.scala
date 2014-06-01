@@ -7,7 +7,6 @@ import com.nrinaudo.fetch.Headers._
 import scala.util.Success
 import java.util.Locale
 import java.nio.charset.Charset
-import org.scalacheck.Arbitrary
 
 object HeaderFormatSpec {
   def cycle[T](format: ValueFormat[T], value: T) = format.read(format.write(value).get)
@@ -40,7 +39,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
 
     it("should correctly serialize and parse lists of languages") {
-      forAll(nonEmptyListOf(language)) { langs => validate(compositeFormat[Locale], langs)}
+      forAll(nonEmptyListOf(language)) { langs => validate(compositeFormat[Language], langs)}
     }
 
     it("should refuse illegal languages") {
