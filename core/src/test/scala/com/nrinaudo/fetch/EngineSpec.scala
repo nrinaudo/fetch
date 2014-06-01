@@ -15,6 +15,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
   import ByteRangeSpec._
   import RequestEntitySpec._
   import ConnegSpec._
+  import LanguageSpec._
   import EncodingSpec._
   import HeadersSpec._
   import ETagSpec._

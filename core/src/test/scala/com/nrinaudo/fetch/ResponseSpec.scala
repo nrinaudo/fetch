@@ -9,7 +9,7 @@ class ResponseSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gen
   import Headers._
   import ETagSpec._
   import MethodSpec._
-  import ConnegSpec._
+  import LanguageSpec._
   import EncodingSpec._
 
 

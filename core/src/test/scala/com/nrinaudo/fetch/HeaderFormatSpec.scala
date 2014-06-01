@@ -5,7 +5,6 @@ import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import com.nrinaudo.fetch.Headers._
 import scala.util.Success
-import java.util.Locale
 import java.nio.charset.Charset
 
 object HeaderFormatSpec {
@@ -17,6 +16,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
   import HeaderFormatSpec._
   import MethodSpec._
   import ConnegSpec._
+  import LanguageSpec._
   import MimeTypeSpec._
   import EncodingSpec._
   import ByteRangeSpec._

@@ -16,16 +16,6 @@ object ConnegSpec {
 
   def illegalCharset = Arbitrary.arbitrary[String].suchThat(!Charset.availableCharsets().containsKey(_))
 
-  def locale: Gen[Locale] = Gen.oneOf(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN, Locale.ITALIAN, Locale.JAPANESE,
-    Locale.KOREAN, Locale.CHINESE, Locale.SIMPLIFIED_CHINESE, Locale.TRADITIONAL_CHINESE, Locale.FRANCE, Locale.GERMANY,
-    Locale.ITALY, Locale.JAPAN, Locale.KOREA, Locale.CHINA, Locale.PRC, Locale.TAIWAN, Locale.UK, Locale.US,
-    Locale.CANADA, Locale.CANADA_FRENCH)
-
-  def language: Gen[Language] = locale.map(Language.apply)
-
-  def illegalLanguage = Arbitrary.arbitrary[String].suchThat {_.matches(".*[^a-zA-Z_-].*")}
-
-
   def conneg[T](gen: Gen[T]): Gen[Conneg[T]] = for {
     value <- gen
     q     <- Gen.choose(0, 1000)
@@ -39,6 +29,7 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
   import MimeTypeSpec._
   import EncodingSpec._
   import HeaderFormatSpec._
+  import LanguageSpec._
 
   describe("Content negotiation headers") {
     it("should refuse illegal value of q") {

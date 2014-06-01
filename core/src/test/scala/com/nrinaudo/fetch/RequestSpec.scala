@@ -24,6 +24,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
   import ByteRangeSpec._
   import ETagSpec._
   import ConnegSpec._
+  import LanguageSpec._
   import EncodingSpec._
   import MimeTypeSpec._
 
