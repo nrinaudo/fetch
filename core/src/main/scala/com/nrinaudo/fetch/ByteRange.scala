@@ -17,19 +17,19 @@ object ByteRange {
 
 sealed trait ByteRange
 
-case class SuffixRange(to: Int) extends ByteRange {
+final case class SuffixRange(to: Int) extends ByteRange {
   require(to >= 0)
 
   override def toString = "-%d" format to
 }
 
-case class PrefixRange(from: Int) extends ByteRange {
+final case class PrefixRange(from: Int) extends ByteRange {
   require(from >= 0)
 
   override def toString = "%d-" format from
 }
 
-case class FullRange(from: Int, to: Int) extends ByteRange {
+final case class FullRange(from: Int, to: Int) extends ByteRange {
   require(from >= 0 && to >= from)
 
   override def toString = "%d-%d" format(from, to)

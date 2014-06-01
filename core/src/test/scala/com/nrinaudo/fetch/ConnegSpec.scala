@@ -2,12 +2,11 @@ package com.nrinaudo.fetch
 
 import org.scalacheck.{Arbitrary, Gen}
 import java.nio.charset.Charset
-import java.util.Locale
 import scala.collection.JavaConverters._
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import scala.util.Success
-import com.nrinaudo.fetch.Conneg.{Encodings, MimeTypes}
+import com.nrinaudo.fetch.Conneg.MimeTypes
 
 object ConnegSpec {
   private lazy val charsets = Charset.availableCharsets().values().asScala.toList
@@ -71,23 +70,6 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     it("should correctly serialize and parse content encodings") {
       forAll(connegs(encoding)) { headers =>
         cycle(Conneg.Encodings, headers) should be(Success(headers))
-      }
-    }
-
-    it("should have a working map implementation") {
-      forAll(conneg(Arbitrary.arbitrary[Int])) { header =>
-        header.map(_.toString).map(_.toInt) should be(header)
-      }
-    }
-
-    it("should have a working flatMap implementation") {
-      forAll(conneg(Arbitrary.arbitrary[Int]), conneg(Arbitrary.arbitrary[Int])) { (a, b) =>
-        val result = for {
-          va <- a
-          vb <- b
-        } yield va + vb
-
-        result.value should be(a.value + b.value)
       }
     }
   }

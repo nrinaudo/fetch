@@ -140,13 +140,13 @@ trait Request[A] {
     */
   def acceptEncoding(encodings: Conneg[Encoding]*): Request[A] = header("Accept-Encoding", encodings)
 
-  /** Returns the value of this instance's `Accept-Encoding` header. */
+  /** Returns the value of this instance's encoding header. */
   def acceptEncoding: Option[Seq[Conneg[Encoding]]] = header[Seq[Conneg[Encoding]]]("Accept-Encoding")
 
-  /** Notifies the remote server that we expect GZIPed responses. */
+  /** Notifies the remote server that we accept GZIPed responses. */
   def acceptGzip: Request[A] = acceptEncoding(Encoding.Gzip)
 
-  /** Notifies the remote server that we expect deflated responses. */
+  /** Notifies the remote server that we accept deflated responses. */
   def acceptDeflate: Request[A] = acceptEncoding(Encoding.Deflate)
 
   /** Notifies the remote server about response content type preferences.
@@ -159,6 +159,7 @@ trait Request[A] {
     */
   def accept(mimeTypes: Conneg[MimeType]*): Request[A] = header("Accept", mimeTypes)
 
+  /** Returns the value of this instance's content type preferences. */
   def accept: Option[Seq[Conneg[MimeType]]] = header[Seq[Conneg[MimeType]]]("Accept")
 
   /** Notifies the remote server about response charset preferences.
@@ -169,6 +170,7 @@ trait Request[A] {
     */
   def acceptCharset(charsets: Conneg[Charset]*): Request[A] = header("Accept-Charset", charsets)
 
+  /** Returns the value of this instance's charset preferences. */
   def acceptCharset: Option[Seq[Conneg[Charset]]] = header[Seq[Conneg[Charset]]]("Accept-Charset")
 
   /** Notifies the remote server about response language preferences.
@@ -179,6 +181,7 @@ trait Request[A] {
     */
   def acceptLanguage(languages: Conneg[Language]*): Request[A] = header("Accept-Language", languages)
 
+  /** Returns the value of this instance's language preferences. */
   def acceptLanguage: Option[Seq[Conneg[Language]]] = header[Seq[Conneg[Language]]]("Accept-Language")
 
 
@@ -192,6 +195,7 @@ trait Request[A] {
     */
   def header[T: ValueWriter](name: String, value: T): Request[A] = headers(headers.set(name, value))
 
+  /** Returns the value of the specified header. */
   def header[T: ValueReader](name: String): Option[T] = headers.getOpt[T](name)
 
 
