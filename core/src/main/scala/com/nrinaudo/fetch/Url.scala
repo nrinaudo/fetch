@@ -6,21 +6,22 @@ import scala.util.Try
 object Url {
   // - URI-based construction ------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def unapply(url: URI): Option[Url] = Some(apply(url))
+  def fromUri(uri: URI): Option[Url] = for {
+    protocolStr <- Option(uri.getScheme)
+    protocol    <- Protocol.parse(protocolStr)
+    host        <- Option(uri.getHost)
 
-  def apply(uri: URI): Url = {
-    val protocol = Protocol(uri.getScheme)
-    Url(protocol, uri.getHost, if(uri.getPort == -1) protocol.defaultPort else uri.getPort,
+  } yield Url(protocol, host, if(uri.getPort == -1) protocol.defaultPort else uri.getPort,
       splitPath(uri.getRawPath), QueryString(uri.getRawQuery), Option(uri.getFragment))
-  }
 
-  private def splitPath(path: String) = path.split("/").toList.filter(!_.isEmpty).map(UrlEncoder.decode)
+  private def splitPath(path: String) =
+    if(path == null) Nil
+    else             path.split("/").toList.filter(!_.isEmpty).map(UrlEncoder.decode)
 
 
   // - String-based construction ---------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def unapply(url: String): Option[Url] = Try {apply(url)}.toOption
-  def apply(url: String): Url = Url(new URI(url))
+  def parse(url: String): Option[Url] = fromUri(new URI(url))
 }
 
 case class Url(protocol: Protocol, host: String, port: Int, path: List[String] = List(),

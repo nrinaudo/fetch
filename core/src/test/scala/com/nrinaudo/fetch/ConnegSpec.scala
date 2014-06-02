@@ -47,29 +47,29 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
 
     it("should assume an absent q defaults to 1.0") {
       forAll(charset) { charset =>
-        Conneg.Charsets.read(charset.name()) should be(Success(List(Conneg(charset, 1.0f))))
+        Conneg.Charsets.read(charset.name()) should be(Some(List(Conneg(charset, 1.0f))))
       }
     }
 
     it("should correctly serialize and parse languages") {
       forAll(connegs(language)) { headers =>
-        cycle(Conneg.Languages, headers) should be(Success(headers))
+        cycle(Conneg.Languages, headers) should be(Some(headers))
       }
     }
 
     it("should correctly serialize and parse charsets") {
       forAll(connegs(charset)) { headers =>
-        cycle(Conneg.Charsets, headers) should be(Success(headers))
+        cycle(Conneg.Charsets, headers) should be(Some(headers))
       }
     }
 
     it("should correctly serialize and parse MIME types") {
-      forAll(connegs(mimeType)) { headers => cycle(MimeTypes, headers) should be(Success(headers)) }
+      forAll(connegs(mimeType)) { headers => cycle(MimeTypes, headers) should be(Some(headers)) }
     }
 
     it("should correctly serialize and parse content encodings") {
       forAll(connegs(encoding)) { headers =>
-        cycle(Conneg.Encodings, headers) should be(Success(headers))
+        cycle(Conneg.Encodings, headers) should be(Some(headers))
       }
     }
   }

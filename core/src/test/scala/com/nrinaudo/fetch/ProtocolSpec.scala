@@ -16,26 +16,18 @@ class ProtocolSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChe
   import ProtocolSpec._
 
   describe("The Protocol singleton object") {
-    it("should unapply on valid names") {
-      forAll(protocol) { protocol => Protocol.unapply(protocol.name) should be(Some(protocol)) }
+    it("should parse valid names") {
+      forAll(protocol) { protocol => Protocol.parse(protocol.name) should be(Some(protocol)) }
     }
 
-    it("should apply on valid names") {
-      forAll(protocol) { protocol => Protocol(protocol.name) should be(protocol) }
-    }
-
-    it("should refuse to unapply on invalid protocol names") {
-      forAll(invalidProtocol) { str => Protocol.unapply(str) should be(None) }
-    }
-
-    it("should fail to apply on invalid protocol names") {
-      forAll(invalidProtocol) { str => intercept[IllegalArgumentException] {Protocol(str)} }
+    it("should not parse invalid protocol names") {
+      forAll(invalidProtocol) { str => Protocol.parse(str) should be(None) }
     }
   }
 
   describe("A Protocol instance") {
     it("should serialize to itself") {
-      forAll(protocol) { protocol => Protocol(protocol.toString) should be(protocol) }
+      forAll(protocol) { protocol => Protocol.parse(protocol.toString) should be(Some(protocol)) }
     }
 
     it("should generate URLs correctly") {

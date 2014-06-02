@@ -3,13 +3,11 @@ package com.nrinaudo.fetch
 object ETag {
   private val TagPattern = """(W/)?"([^"]*)"""".r
 
-  def unapply(str: String): Option[ETag] = str match {
+  def parse(str: String): Option[ETag] = str match {
     case TagPattern(null, tag) => Some(StrongTag(tag))
     case TagPattern(_, tag)    => Some(WeakTag(tag))
     case _                     => None
   }
-
-  def apply(str: String): ETag = unapply(str) getOrElse {throw new IllegalArgumentException("Illegal ETag: " + str)}
 }
 
 final case class StrongTag(value: String) extends ETag {

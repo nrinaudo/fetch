@@ -4,7 +4,6 @@ import org.scalacheck.Gen._
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import com.nrinaudo.fetch.Headers._
-import scala.util.Success
 import java.nio.charset.Charset
 
 object HeaderFormatSpec {
@@ -21,7 +20,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
   import EncodingSpec._
   import ByteRangeSpec._
 
-  def validate[T](format: ValueFormat[T], value: T) = cycle(format, value) should be(Success(value))
+  def validate[T](format: ValueFormat[T], value: T) = cycle(format, value) should be(Some(value))
 
   describe("DateFormat") {
     it("should correctly serialize and parse dates") {
@@ -29,7 +28,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
 
     it("should refuse illegal dates") {
-      forAll(illegalDate) { str => DateFormat.read(str).isFailure should be(true)}
+      forAll(illegalDate) { str => DateFormat.read(str).isEmpty should be(true)}
     }
   }
 
@@ -43,7 +42,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
 
     it("should refuse illegal languages") {
-      forAll(illegalLanguage) { str => LanguageFormat.read(str).isFailure should be(true)}
+      forAll(illegalLanguage) { str => LanguageFormat.read(str).isEmpty should be(true)}
     }
   }
 
@@ -57,7 +56,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
 
     it("should refuse illegal charsets") {
-      forAll(illegalCharset) { str => CharsetFormat.read(str).isFailure should be(true) }
+      forAll(illegalCharset) { str => CharsetFormat.read(str).isEmpty should be(true) }
     }
   }
 
@@ -67,7 +66,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
 
     it("should refuse illegal MIME types") {
-      forAll(illegalMimeType) { str => MimeTypeFormat.read(str).isFailure should be(true) }
+      forAll(illegalMimeType) { str => MimeTypeFormat.read(str).isEmpty should be(true) }
     }
   }
 
@@ -82,7 +81,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
 
     it("should refuse illegal encodings") {
       forAll(illegalEncoding) { str =>
-        EncodingFormat.read(str).isFailure should be(true)
+        EncodingFormat.read(str).isEmpty should be(true)
       }
     }
   }
@@ -93,7 +92,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
 
     it("should refuse illegal byte ranges") {
-      forAll(illegalRange) { str => ByteRangeFormat.read(str).isFailure should be(true) }
+      forAll(illegalRange) { str => ByteRangeFormat.read(str).isEmpty should be(true) }
     }
   }
 
@@ -103,7 +102,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
 
     it("should refuse illegal lists of byte ranges") {
-      forAll(illegalRanges) { str => ByteRangesFormat.read(str).isFailure should be(true) }
+      forAll(illegalRanges) { str => ByteRangesFormat.read(str).isEmpty should be(true) }
     }
   }
 
@@ -118,7 +117,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
 
     it("should refuse illegal methods") {
       forAll(illegalMethod) { method =>
-        MethodFormat.read(method).isFailure should be(true)
+        MethodFormat.read(method).isEmpty should be(true)
       }
     }
   }

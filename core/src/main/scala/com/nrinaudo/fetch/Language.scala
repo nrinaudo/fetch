@@ -18,21 +18,12 @@ object Language {
     def apply(value: String): Option[Language] = parseAll(language, value).map(Some(_)).getOrElse(None)
   }
 
-  /** `String`-based extractor. */
-  def unapply(str: String): Option[Language] = Format(str)
-
-  /** `Locale`-based extractor. */
-  def unapply(locale: Locale): Option[Language] = Some(apply(locale))
+  def parse(str: String): Option[Language] = Format(str)
 
   /** Returns the instance of [[Language]] that matches the specified locale. */
   def apply(locale: Locale): Language =
     if(locale.getCountry.isEmpty) GlobalLanguage(locale.getLanguage)
     else                          CountryLanguage(locale.getLanguage, locale.getCountry)
-
-  /** Attempts to extract a valid instance from the specified string. */
-  def apply(str: String): Language = unapply(str) getOrElse {
-    throw new IllegalArgumentException("Illegal language: " + str)
-  }
 }
 
 /** Represents a global language, regardless of regional versions.

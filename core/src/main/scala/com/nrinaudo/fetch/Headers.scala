@@ -24,7 +24,7 @@ object Headers {
     if(value.isEmpty) None
     else Some(value)
 
-    override def read(value: String): Try[String] = Success(value)
+    override def read(value: String): Option[String] = Some(value)
   }
 
   implicit val IntFormat: ValueFormat[Int] = ValueFormat.Ints
@@ -44,41 +44,38 @@ object Headers {
       format
     }
 
-    override def read(str: String): Try[Date]      = HttpDateFormat.synchronized {Try {HttpDateFormat.parse(str)}}
+    override def read(str: String): Option[Date] = HttpDateFormat.synchronized {Try(HttpDateFormat.parse(str)).toOption}
     override def write(date: Date): Option[String] = Some(HttpDateFormat.synchronized {HttpDateFormat.format(date)})
   }
 
   implicit object LanguageFormat extends ValueFormat[Language] {
-    override def read (value: String): Try[Language] = Try {Language(value)}
+    override def read (value: String): Option[Language] = Language.parse(value)
     override def write(value: Language): Option[String] = Some(value.toString)
   }
 
   implicit object EncodingFormat extends ValueFormat[Encoding] {
-    override def read(value: String): Try[Encoding] =
-      Encoding.DefaultEncodings.get(value) map {Success(_)} getOrElse Failure(new IllegalArgumentException("Unsupported encoding: " + value))
+    override def read(value: String): Option[Encoding] = Encoding.DefaultEncodings.get(value)
     override def write(value: Encoding): Option[String] = Some(value.name)
   }
 
   implicit object MimeTypeFormat extends ValueFormat[MimeType] {
-    override def read(str: String): Try[MimeType]   = Try {MimeType(str)}
-    override def write(t: MimeType): Option[String] = Some(t.toString)
+    override def read(str: String): Option[MimeType] = MimeType.parse(str)
+    override def write(t: MimeType): Option[String]  = Some(t.toString)
   }
 
   implicit object MethodFormat extends ValueFormat[Method] {
-    override def read(value: String): Try[Method] = Method.unapply(value) map {Success(_)} getOrElse {
-      Failure(new IllegalArgumentException("Unsupported method: " + value))
-    }
+    override def read(value: String): Option[Method] = Method.unapply(value)
 
     override def write(value: Method): Option[String] = Some(value.name)
   }
 
   implicit object ETagFormat extends ValueFormat[ETag] {
-    override def read(value: String): Try[ETag]     = Try {ETag(value)}
+    override def read(value: String): Option[ETag]  = ETag.parse(value)
     override def write(value: ETag): Option[String] = Some(value.toString)
   }
 
   implicit object ByteRangeFormat extends ValueFormat[ByteRange] {
-    override def read(value: String): Try[ByteRange]     = Try {ByteRange(value)}
+    override def read(value: String): Option[ByteRange]  = ByteRange.parse(value)
     override def write(value: ByteRange): Option[String] = Some(value.toString)
   }
 
@@ -86,9 +83,9 @@ object Headers {
     private val reader = compositeReader[ByteRange]
     private val writer = compositeWriter[ByteRange]
 
-    override def read(value: String): Try[Seq[ByteRange]] =
+    override def read(value: String): Option[Seq[ByteRange]] =
       if(value.startsWith("bytes=")) reader.read(value.substring(6))
-      else                           Failure(new IllegalArgumentException("Illegal byte ranges: " + value))
+      else                           None
 
     override def write(value: Seq[ByteRange]): Option[String] = writer.write(value) map {"bytes=" + _ }
   }

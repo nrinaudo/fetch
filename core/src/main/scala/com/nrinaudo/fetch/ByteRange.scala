@@ -1,17 +1,22 @@
 package com.nrinaudo.fetch
 
+// TODO: constructors are probably not ok - throwing exceptions in constructors is frowned upon.
+
+import scala.util.Try
+
 object ByteRange {
   private val Extractor = """([0-9]+)?-([0-9]+)?""".r
 
-  def unapply(str: String): Option[ByteRange] = str match {
-    case Extractor(prefix, null)   => Some(PrefixRange(prefix.toInt))
-    case Extractor(null,   suffix) => Some(SuffixRange(suffix.toInt))
-    case Extractor(prefix, suffix) => Some(FullRange(prefix.toInt, suffix.toInt))
-    case _                         => None
+  private object PositiveInt {
+    def unapply(value: String): Option[Int] = Try(value.toInt).toOption.filter(_ >= 0)
   }
 
-  def apply(str: String): ByteRange = unapply(str) getOrElse {
-    throw new IllegalArgumentException("Illegal byte range: " + str)
+  def parse(str: String): Option[ByteRange] = str match {
+    case Extractor(PositiveInt(prefix), null)   => Some(PrefixRange(prefix.toInt))
+    case Extractor(null,   PositiveInt(suffix)) => Some(SuffixRange(suffix.toInt))
+    case Extractor(PositiveInt(prefix), PositiveInt(suffix)) if suffix >= prefix =>
+      Some(FullRange(prefix.toInt, suffix.toInt))
+    case _ => None
   }
 }
 

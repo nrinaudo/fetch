@@ -21,20 +21,12 @@ class ETagSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks 
   import ETagSpec._
 
   describe("The ETag companion object") {
-    it("should unapply on valid etags") {
-      forAll(etag) { etag => ETag.unapply(etag.toString) should be(Some(etag)) }
+    it("should parse valid etags") {
+      forAll(etag) { etag => ETag.parse(etag.toString) should be(Some(etag)) }
     }
 
-    it("should not unapply on invalid etags") {
-      forAll(invalidEtag) { str => ETag.unapply(str) should be(None) }
-    }
-
-    it("should apply on valid etags") {
-      forAll(etag) { etag => ETag(etag.toString) should be(etag) }
-    }
-
-    it("should fail to apply on invalid etags") {
-      forAll(invalidEtag) { str => intercept[IllegalArgumentException] {ETag(str)} }
+    it("should not parse invalid etags") {
+      forAll(invalidEtag) { str => ETag.parse(str) should be(None) }
     }
   }
 

@@ -22,7 +22,7 @@ class MimeTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChe
 
   describe("A MIME type") {
     it("should serialize to itself") {
-      forAll(mimeType) { mime => MimeType(mime.toString) should be(mime) }
+      forAll(mimeType) { mime => MimeType.parse(mime.toString) should be(Some(mime)) }
     }
   }
 }

@@ -14,16 +14,12 @@ class MimeTypeParametersSpec extends FunSpec with Matchers with GeneratorDrivenP
   import MimeTypeParametersSpec._
 
   describe("MimeTypeParameters") {
-    it("should not unapply on illegal values") {
-      forAll(illegalParams) { params => MimeTypeParameters.unapply(params).isDefined should be(false) }
-    }
-
-    it("should fail to apply on illegal values") {
-      forAll(illegalParams) { params => intercept[IllegalArgumentException] {MimeTypeParameters(params)} }
+    it("should not parse illegal values") {
+      forAll(illegalParams) { params => MimeTypeParameters.parse(params).isDefined should be(false) }
     }
 
     it("should serialize to itself") {
-      forAll(params) { params => MimeTypeParameters(params.toString) should be(params) }
+      forAll(params) { params => MimeTypeParameters.parse(params.toString) should be(Some(params)) }
     }
   }
 }

@@ -7,7 +7,7 @@ import scala.Some
 
 class ValueFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
   def cycle[A](value: A, format: ValueFormat[A]) {
-    format.write(value).flatMap(format.read(_).toOption) should be(Some(value))
+    format.write(value).flatMap(format.read) should be(Some(value))
   }
 
   describe("ValueFormat") {

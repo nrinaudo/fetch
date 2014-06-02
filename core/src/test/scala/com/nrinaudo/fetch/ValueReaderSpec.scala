@@ -2,7 +2,6 @@ package com.nrinaudo.fetch
 
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import scala.util.Success
 import org.scalacheck.{Arbitrary, Gen}
 
 class ValueReaderSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
@@ -10,12 +9,12 @@ class ValueReaderSpec extends FunSpec with Matchers with GeneratorDrivenProperty
 
   describe("ValueReader") {
     it("should sequence empty lists properly") {
-      ValueReader.sequence[Int](Nil) should be(Success(Nil))
+      ValueReader.sequence[Int](Nil) should be(Some(Nil))
     }
 
     it("should sequence successes properly") {
       forAll(Gen.listOf(Arbitrary.arbitrary[Int])) { values =>
-        ValueReader.sequence[Int](values.map(_.toString)) should be(Success(values))
+        ValueReader.sequence[Int](values.map(_.toString)) should be(Some(values))
       }
     }
 
@@ -28,12 +27,7 @@ class ValueReaderSpec extends FunSpec with Matchers with GeneratorDrivenProperty
     }
 
     it("should sequence failures properly") {
-      forAll(brokenSequence) { values =>
-        val failure = ValueReader.sequence[Int](values)
-
-        failure.isFailure should be(true)
-        intercept[NumberFormatException](failure.get)
-      }
+      forAll(brokenSequence) { values => ValueReader.sequence[Int](values).isEmpty should be(true) }
     }
   }
 }

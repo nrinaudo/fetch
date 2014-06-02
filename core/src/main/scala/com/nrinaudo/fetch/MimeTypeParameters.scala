@@ -8,13 +8,9 @@ object MimeTypeParameters {
       parseAll(parameters, string).map { params => Some(new MimeTypeParameters(params)) }.getOrElse(None)
   }
 
-  def unapply(str: String): Option[MimeTypeParameters] = {
+  def parse(str: String): Option[MimeTypeParameters] = {
     if(str == null) Some(new MimeTypeParameters())
     else            Format(str)
-  }
-
-  def apply(str: String): MimeTypeParameters = unapply(str).getOrElse {
-    throw new IllegalArgumentException("Not a valid MIME type parameter list: " + str)
   }
 }
 

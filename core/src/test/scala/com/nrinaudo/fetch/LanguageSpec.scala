@@ -20,28 +20,16 @@ class LanguageSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChe
   import LanguageSpec._
 
   describe("Language") {
-    it("should unapply on valid languages") {
-      forAll(language) { lang => Language.unapply(lang.toString) should be(Some(lang))}
-    }
-
-    it("should unapply on valid locales") {
-      forAll(locale) { locale => Language.unapply(locale).map(_.toLocale) should be(Some(locale))}
-    }
-
-    it("should apply on valid languages") {
-      forAll(language) { lang => Language(lang.toString) should be(lang)}
+    it("should parse valid languages") {
+      forAll(language) { lang => Language.parse(lang.toString) should be(Some(lang))}
     }
 
     it("should apply on valid locales") {
       forAll(locale) { locale => Language(locale).toLocale should be(locale)}
     }
 
-    it("should not unapply on invalid languages") {
-      forAll(illegalLanguage) { lang => Language.unapply(lang) should be(None)}
-    }
-
-    it("should fail to apply on invalid languages") {
-      forAll(illegalLanguage) { lang => intercept[IllegalArgumentException] { Language(lang) }}
+    it("should not parse invalid languages") {
+      forAll(illegalLanguage) { lang => Language.parse(lang) should be(None)}
     }
   }
 }

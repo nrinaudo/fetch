@@ -11,10 +11,10 @@ import scala.util.Success
 object QueryStringSpec {
   /** Returns a single query parameter. */
   def queryParam: Gen[(String, List[String])] = for {
-      name   <- arbitrary[String].suchThat(!_.isEmpty)
-      count  <- choose(1, 5)
-      values <- listOfN(count, arbitrary[String].suchThat(!_.isEmpty))
-    } yield (name, values)
+    name   <- arbitrary[String].suchThat(!_.isEmpty)
+    count  <- choose(1, 5)
+    values <- listOfN(count, arbitrary[String].suchThat(!_.isEmpty))
+  } yield (name, values)
 
   def queryParams: Gen[Map[String, List[String]]] = for {
     count  <- choose(1, 10)
@@ -76,13 +76,13 @@ class QueryStringSpec extends FunSpec with Matchers with GeneratorDrivenProperty
           val trimmed = QueryString(params - name)
           trimmed.get[String](name) should be(None)
           trimmed.getOpt[String](name) should be(None)
-          intercept[NoSuchElementException] {trimmed[String](name)}
+          intercept[NoSuchElementException] { trimmed[String](name) }
 
           // Incorrect type.
           val modified = QueryString(params + (name -> List("abc")))
           modified.get[Int](name).get.isFailure should be(true)
           modified.getOpt[Int](name) should be(None)
-          intercept[NumberFormatException] {modified[Int](name)}
+          intercept[IllegalArgumentException] { modified[Int](name) }
         }
       }
     }

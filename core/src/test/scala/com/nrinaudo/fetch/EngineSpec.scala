@@ -8,7 +8,6 @@ import Headers._
 import unfiltered.jetty.Server
 import com.nrinaudo.fetch.Request._
 import scala.Some
-import scala.util.Success
 
 trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
   import RequestSpec._
@@ -150,7 +149,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     it("should send the correct Date header when specified") {
       forAll(date) { date =>
-        DateFormat.read(request("header/Date").date(date).GET.apply().body.as[String]) should be(Success(date))
+        DateFormat.read(request("header/Date").date(date).GET.apply().body.as[String]) should be(Some(date))
       }
     }
 
@@ -170,7 +169,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     it("should send the correct If-Modified-Since header when specified") {
       forAll(date) { date =>
-        DateFormat.read(request("header/If-Modified-Since").ifModifiedSince(date).GET.apply().body.as[String]) should be(Success(date))
+        DateFormat.read(request("header/If-Modified-Since").ifModifiedSince(date).GET.apply().body.as[String]) should be(Some(date))
       }
     }
 
@@ -180,7 +179,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     it("should send the correct If-Unmodified-Since header when specified") {
       forAll(date) { date =>
-        DateFormat.read(request("header/If-Unmodified-Since").ifUnmodifiedSince(date).GET.apply().body.as[String]) should be(Success(date))
+        DateFormat.read(request("header/If-Unmodified-Since").ifUnmodifiedSince(date).GET.apply().body.as[String]) should be(Some(date))
       }
     }
 
@@ -219,11 +218,11 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     it("should send the correct If-Range header when specified") {
       forAll(etag) { tag =>
-        ETag(request("header/If-Range").ifRange(tag).GET.apply().body.as[String]) should be(tag)
+        ETag.parse(request("header/If-Range").ifRange(tag).GET.apply().body.as[String]) should be(Some(tag))
       }
 
       forAll(date) { date =>
-        DateFormat.read(request("header/If-Range").ifRange(date).GET.apply().body.as[String]) should be(Success(date))
+        DateFormat.read(request("header/If-Range").ifRange(date).GET.apply().body.as[String]) should be(Some(date))
       }
     }
 

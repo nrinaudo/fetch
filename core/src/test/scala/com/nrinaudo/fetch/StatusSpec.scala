@@ -19,16 +19,8 @@ class StatusSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
   import StatusSpec._
 
   describe("The Status companion object") {
-    it("should unapply on legal statuses") {
-      forAll(status) { status => Status.unapply(status.code) should be(Some(status)) }
-    }
-
     it("should apply on legal statuses") {
       forAll(status) { status => Status(status.code) should be(status) }
-    }
-
-    it("should not unapply on illegal statuses") {
-      forAll(invalidStatus) { status => Status.unapply(status) should be(None) }
     }
 
     it("should fail to apply on illegal statuses") {

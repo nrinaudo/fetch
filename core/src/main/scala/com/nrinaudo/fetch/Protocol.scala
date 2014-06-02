@@ -14,18 +14,10 @@ object Protocol {
   /** The HTTPs protocol. */
   val Https: Protocol = new ProtocolImpl("https", 443)
 
-  def unapply(str: String): Option[Protocol] = str.toLowerCase(Locale.ENGLISH) match {
+  def parse(str: String): Option[Protocol] = str.toLowerCase(Locale.ENGLISH) match {
     case Http.name  => Some(Http)
     case Https.name => Some(Https)
     case _          => None
-  }
-
-  /** Extracts a protocol from the specified string.
-    *
-    * Note that this method is unsafe and will throw an `IllegalArgumentException` if `str` isn't a valid protocol name.
-    */
-  def apply(str: String): Protocol = unapply(str) getOrElse {
-    throw new IllegalArgumentException("Illegal protocol: " + str)
   }
 }
 

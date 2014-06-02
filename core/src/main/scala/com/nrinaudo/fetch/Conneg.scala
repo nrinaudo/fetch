@@ -78,10 +78,9 @@ trait ConnegFormat[T] extends HttpGrammar with ValueFormat[Seq[Conneg[T]]] {
     else              Some(value.map(writeEntry).mkString(","))
   }
 
-  override def read(value: String): Try[Seq[Conneg[T]]] = parseAll(connegs, value) match {
-    case Success(a, _)   => scala.util.Success(a)
-    case Failure(msg, _) => scala.util.Failure(new IllegalArgumentException(msg))
-    case Error(msg, _)   => scala.util.Failure(new IllegalArgumentException(msg))
+  override def read(value: String): Option[Seq[Conneg[T]]] = parseAll(connegs, value) match {
+    case Success(a, _) => Some(a)
+    case _             => None
   }
 }
 

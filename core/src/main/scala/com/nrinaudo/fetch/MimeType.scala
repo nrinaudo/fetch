@@ -23,11 +23,7 @@ object MimeType {
   val ApplicationOctetSteam = MimeType("application", "octet-stream")
   val Json                  = MimeType("application", "json")
 
-  def unapply(str: String): Option[MimeType] = Format(str)
-
-  def apply(str: String): MimeType = unapply(str) getOrElse {
-    throw new IllegalArgumentException("Illegal MIME Type: " + str)
-  }
+  def parse(str: String): Option[MimeType] = Format(str)
 }
 
 case class MimeType(main: String, sub: String, params: MimeTypeParameters = new MimeTypeParameters()) {

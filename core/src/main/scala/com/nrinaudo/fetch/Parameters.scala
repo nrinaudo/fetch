@@ -1,6 +1,6 @@
 package com.nrinaudo.fetch
 
-import scala.util.Try
+import scala.util.{Success, Try, Failure}
 
 /**
  * Stores a list of name / value pairs.
@@ -50,7 +50,7 @@ trait Parameters[Self <: Parameters[Self]] {
     */
   def getOpt[T: ValueReader](name: String): Option[T] = for {
     raw    <- values.get(name)
-    parsed <- implicitly[ValueReader[T]].read(raw).toOption
+    parsed <- implicitly[ValueReader[T]].read(raw)
   } yield parsed
 
   /** Returns the value of the requested parameter.
@@ -63,7 +63,12 @@ trait Parameters[Self <: Parameters[Self]] {
     *             to be in scope.
     * @return
     */
-  def get[T: ValueReader](name: String): Option[Try[T]] = values.get(name) map implicitly[ValueReader[T]].read
+  def get[T: ValueReader](name: String): Option[Try[T]] = values.get(name).map { v =>
+    implicitly[ValueReader[T]].read(v) match {
+      case Some(t) => Success(t)
+      case None    => Failure(new IllegalArgumentException("Illegal value: " + name))
+    }
+  }
 
   /** Checks whether the current instance contains a parameter with the specified name. */
   def contains(name: String): Boolean = values.contains(name)

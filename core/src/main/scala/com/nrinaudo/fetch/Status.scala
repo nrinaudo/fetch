@@ -45,13 +45,10 @@ object Status {
 
   private case class StatusImpl(code: Int) extends Status
 
-  def apply(value: Int): Status = unapply(value) getOrElse {
-    throw new IllegalArgumentException("Illegal status: " + value)
-  }
-
-  def unapply(value: Int): Option[Status] =
-    if(value > 0 && value < 600) Some(StatusImpl(value))
-    else                         None
+  // TODO: this is not a good apply method, it throws.
+  def apply(value: Int): Status =
+    if(value > 0 && value < 600) StatusImpl(value)
+    else                         throw new IllegalArgumentException("Illegal status: " + value)
 }
 
 sealed trait Status {

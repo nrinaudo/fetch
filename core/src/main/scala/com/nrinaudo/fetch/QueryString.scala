@@ -1,6 +1,6 @@
 package com.nrinaudo.fetch
 
-import scala.util.Try
+import scala.util.{Success, Failure, Try}
 
 
 object QueryString {
@@ -86,17 +86,22 @@ class QueryString private (content: Map[String, List[String]]) {
   def getFirst[T: ValueReader](name: String): Option[Try[T]] =  get[T](name) map (_ map (_(0)))
 
   def get[T: ValueReader](name: String): Option[Try[List[T]]] = values.get(name).map { list =>
-    ValueReader.sequence(list)(implicitly[ValueReader[T]])
+    ValueReader.sequence(list) match {
+      case Some(l) => Success(l)
+      case None    => Failure(new IllegalArgumentException("Illegal value: " + list))
+    }
   }
 
   def getFirstOpt[T: ValueReader](name: String): Option[T] = getOpt[T](name) map(_(0))
 
   def getOpt[T: ValueReader](name: String): Option[List[T]] = for {
     v1 <- values.get(name)
-    v2 <- ValueReader.sequence(v1)(implicitly[ValueReader[T]]).toOption
+    v2 <- ValueReader.sequence(v1)(implicitly[ValueReader[T]])
   } yield v2
 
-  def apply[T: ValueReader](name: String): List[T] = values(name) map {implicitly[ValueReader[T]].read(_).get}
+  def apply[T: ValueReader](name: String): List[T] = values(name) map { v =>
+    implicitly[ValueReader[T]].read(v).getOrElse(throw new IllegalArgumentException("Illegal value: " + v))
+  }
 
   def first[T: ValueReader](name: String): T = apply[T](name).apply(0)
 

@@ -114,29 +114,25 @@ class UrlSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
       }
     }
 
-    it("should correctly apply and unapply instances of URI") {
+    it("should correctly parse instances of URI") {
       forAll(url) { url =>
-        Url(url.toURI) should be(url)
-        Url.unapply(url.toURI) should be(Some(url))
+        Url.fromUri(url.toURI) should be(Some(url))
 
         // Makes sure that we test URLs with the default port, as while the generator will not generate this often,
         // it's the default case in real life.
         val url2 = url.port(url.protocol.defaultPort)
-        Url(url2.toURI) should be(url2)
-        Url.unapply(url2.toURI) should be(Some(url2))
+        Url.fromUri(url2.toURI) should be(Some(url2))
       }
     }
 
-    it("should correctly apply and unapply valid instances of String") {
+    it("should correctly parse valid instances of String") {
       forAll(url) { url =>
-        Url(url.toString) should be(url)
-        Url.unapply(url.toString) should be(Some(url))
+        Url.parse(url.toString) should be(Some(url))
 
         // Makes sure that we test URLs with the default port, as while the generator will not generate this often,
         // it's the default case in real life.
         val url2 = url.port(url.protocol.defaultPort)
-        Url(url2.toString) should be(url2)
-        Url.unapply(url2.toString) should be(Some(url2))
+        Url.parse(url2.toString) should be(Some(url2))
       }
     }
   }

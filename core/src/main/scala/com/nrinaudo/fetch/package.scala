@@ -55,14 +55,16 @@ package object fetch {
   implicit def urlToRequest(url: Url)(implicit engine: HttpEngine): Request[Response[ResponseEntity]] = Request(url)(engine)
 
   // Request entities.
-  implicit def stringToEntity(str: String)          = RequestEntity(str)
-  implicit def readerToEntity(reader: Reader)       = RequestEntity(reader)
-  implicit def streamToEntity(in: InputStream)      = RequestEntity(in)
-  implicit def fileToEntity(file: File)             = RequestEntity(file)
+  implicit def stringToEntity(str: String)     = RequestEntity(str)
+  implicit def readerToEntity(reader: Reader)  = RequestEntity(reader)
+  implicit def streamToEntity(in: InputStream) = RequestEntity(in)
+  implicit def fileToEntity(file: File)        = RequestEntity(file)
 
   // URLs.
-  implicit def stringToURL(str: String)             = Url(str)
-  implicit def uriToURL(url: URI)                   = Url(url)
+  implicit def stringToURL(str: String) =
+    Url.parse(str).getOrElse(throw new IllegalArgumentException("Not a valid URI: " + str))
+  implicit def uriToURL(uri: URI) =
+    Url.fromUri(uri).getOrElse(throw new IllegalArgumentException("Not a valid URI: " + uri))
 
   // Content negotiation headers.
   implicit def mimeToConneg(mime: MimeType)         = Conneg(mime)

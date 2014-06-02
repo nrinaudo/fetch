@@ -91,16 +91,12 @@ class ByteRangeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
   }
 
   describe("A ByteRange") {
-    it("should not unapply for illegal strings") {
-      forAll(illegalRange) { range => ByteRange.unapply(range).isDefined should be(false) }
-    }
-
-    it("should fail to apply for illegal strings") {
-      forAll(illegalRange) { range => intercept[IllegalArgumentException] { ByteRange(range)} }
+    it("should fail to parse illegal strings") {
+      forAll(illegalRange) { range => ByteRange.parse(range).isEmpty should be(true) }
     }
 
     it("should serialize to itself") {
-      forAll(byteRange) { range => ByteRange(range.toString) should be(range) }
+      forAll(byteRange) { range => ByteRange.parse(range.toString) should be(Some(range)) }
     }
   }
 }
