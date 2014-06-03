@@ -24,6 +24,8 @@ object Language {
   def apply(locale: Locale): Language =
     if(locale.getCountry.isEmpty) GlobalLanguage(locale.getLanguage)
     else                          CountryLanguage(locale.getLanguage, locale.getCountry)
+
+  def unapply(language: Language): Some[Locale] = Some(language.toLocale)
 }
 
 /** Represents a global language, regardless of regional versions.

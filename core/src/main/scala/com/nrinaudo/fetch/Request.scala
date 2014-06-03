@@ -44,10 +44,10 @@ object Request {
     decode(f(url, method, body, h))
   }
 
-  def apply(uri: URI)(implicit engine: HttpEngine): Option[Request[Response[ResponseEntity]]] =
+  def from(uri: URI)(implicit engine: HttpEngine): Option[Request[Response[ResponseEntity]]] =
     Url.fromUri(uri).map(apply)
 
-  def apply(url: String)(implicit engine: HttpEngine): Option[Request[Response[ResponseEntity]]] =
+  def from(url: String)(implicit engine: HttpEngine): Option[Request[Response[ResponseEntity]]] =
     Url.parse(url).map(apply)
 
   /**

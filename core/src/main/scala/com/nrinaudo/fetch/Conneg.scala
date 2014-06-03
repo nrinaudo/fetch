@@ -1,7 +1,6 @@
 package com.nrinaudo.fetch
 
 import java.text.DecimalFormat
-import scala.util.Try
 import java.nio.charset.Charset
 import com.nrinaudo.fetch.Headers._
 
@@ -42,7 +41,7 @@ object Conneg {
   }
 }
 
-/** Used to parse / serialize conneg header values.
+/** Used to parse / serialize content negotiation header values.
   *
   * In order to implement a format for a specific type, application developers only need to provide a `Parser`
   * instance for that type by implementing the [[entry]] method.

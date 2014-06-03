@@ -25,7 +25,7 @@ class MethodSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
       forAll(httpMethod) { method => Method.parse(method.name) should be(Some(method)) }
     }
 
-    it("should apply on known mehods") {
+    it("should apply on known methods") {
       forAll(httpMethod) { method => Method(method.name) should be(method) }
     }
 
@@ -39,6 +39,12 @@ class MethodSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
 
     it("should fail to apply on illegal HTTP methods") {
       forAll(illegalMethod) { method => intercept[IllegalArgumentException](Method(method)) }
+    }
+
+    it("should have a working unapply method") {
+      forAll(httpMethod) {
+        case method @ Method(name) => name should be(method.name)
+      }
     }
   }
 

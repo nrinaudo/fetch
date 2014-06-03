@@ -27,8 +27,6 @@ object MimeType {
 }
 
 case class MimeType(main: String, sub: String, params: MimeTypeParameters = new MimeTypeParameters()) {
-  def clearParams: MimeType = params(new MimeTypeParameters())
-
   def params(values: MimeTypeParameters): MimeType = copy(params = values)
 
   def removeParam(name: String): MimeType = copy(params = params.remove(name))
