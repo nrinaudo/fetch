@@ -21,20 +21,20 @@ class MethodSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
   import MethodSpec._
 
   describe("The Method companion object") {
-    it("should unapply on known methods") {
-      forAll(httpMethod) { method => Method.unapply(method.name) should be(Some(method)) }
+    it("should parse known methods") {
+      forAll(httpMethod) { method => Method.parse(method.name) should be(Some(method)) }
     }
 
     it("should apply on known mehods") {
       forAll(httpMethod) { method => Method(method.name) should be(method) }
     }
 
-    it("should unapply on unknown but legal HTTP methods") {
-      forAll(Gen.alphaStr.suchThat(!_.isEmpty)) { method => Method.unapply(method) should be(Some(Method(method))) }
+    it("should parse unknown but legal HTTP methods") {
+      forAll(Gen.alphaStr.suchThat(!_.isEmpty)) { method => Method.parse(method) should be(Some(Method(method))) }
     }
 
-    it("should not unapply on illegal HTTP methods") {
-      forAll(illegalMethod) { method => Method.unapply(method) should be(None) }
+    it("should not parse illegal HTTP methods") {
+      forAll(illegalMethod) { method => Method.parse(method) should be(None) }
     }
 
     it("should fail to apply on illegal HTTP methods") {

@@ -64,7 +64,7 @@ object Headers {
   }
 
   implicit object MethodFormat extends ValueFormat[Method] {
-    override def read(value: String): Option[Method] = Method.unapply(value)
+    override def read(value: String): Option[Method] = Method.parse(value)
 
     override def write(value: Method): Option[String] = Some(value.name)
   }

@@ -37,7 +37,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     TestPlan.stop
   }
 
-  def request(path: String) = Request(server.url + path)(httpEngine)
+  def request(path: String) = Request(server.url + path)(httpEngine).get
 
 
 

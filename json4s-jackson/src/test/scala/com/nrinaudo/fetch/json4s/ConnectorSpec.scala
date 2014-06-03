@@ -45,7 +45,7 @@ class ConnectorSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
     server.stop()
   }
 
-  val request: Request[JValue] = Request(server.url + "echo").map(_.body.as[JValue])
+  val request: Request[JValue] = Request(server.url + "echo").get.map(_.body.as[JValue])
 
   def json = for {
     str <- Arbitrary.arbitrary[String]

@@ -19,9 +19,11 @@ object Method {
 
   private val MethodPattern = """(\p{Alpha}+)""".r
 
-  def apply(value: String): Method = unapply(value) getOrElse {throw new IllegalArgumentException("Not a valid method: " + value)}
+  def apply(value: String): Method = parse(value) getOrElse {throw new IllegalArgumentException("Not a valid method: " + value)}
 
-  def unapply(value: String): Option[Method] = value match {
+  def unapply(value: Method): Option[String] = Some(value.name)
+
+  def parse(value: String): Option[Method] = value match {
     case MethodPattern(m) => Some(MethodImpl(m.toUpperCase(Locale.ENGLISH)))
     case _                => None
   }

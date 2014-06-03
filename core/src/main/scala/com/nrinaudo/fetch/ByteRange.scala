@@ -1,7 +1,5 @@
 package com.nrinaudo.fetch
 
-// TODO: constructors are probably not ok - throwing exceptions in constructors is frowned upon.
-
 import scala.util.Try
 
 object ByteRange {

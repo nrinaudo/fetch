@@ -4,6 +4,7 @@ import org.apache.commons.codec.binary.Base64
 import java.util.Date
 import Headers._
 import java.nio.charset.Charset
+import java.net.URI
 
 object Request {
   /** Type for underlying HTTP engines.
@@ -42,6 +43,12 @@ object Request {
     // Executes the query and decodes the response.
     decode(f(url, method, body, h))
   }
+
+  def apply(uri: URI)(implicit engine: HttpEngine): Option[Request[Response[ResponseEntity]]] =
+    Url.fromUri(uri).map(apply)
+
+  def apply(url: String)(implicit engine: HttpEngine): Option[Request[Response[ResponseEntity]]] =
+    Url.parse(url).map(apply)
 
   /**
    * Creates a new instance of [[Request]].
