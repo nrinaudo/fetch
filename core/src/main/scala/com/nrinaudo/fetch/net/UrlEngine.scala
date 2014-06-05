@@ -27,8 +27,8 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
                       chunkSize: Int = UrlEngine.DefaultChunkSize) extends HttpEngine {
   /** Configures the specified connection to this client's preferences. */
   private def configure(con: HttpURLConnection) {
-    con.setConnectTimeout(connectTimeout)
-    con.setReadTimeout(connectTimeout)
+    if(connectTimeout > 0) con.setConnectTimeout(connectTimeout)
+    if(readTimeout > 0)    con.setReadTimeout(readTimeout)
     con.setInstanceFollowRedirects(followsRedirect)
   }
 
