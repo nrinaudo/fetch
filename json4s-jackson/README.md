@@ -19,7 +19,7 @@ libraryDependencies += "com.nrinaudo" %% "fetch-json4s-jackson" % "0.2.0"
 ```scala
 import com.nrinaudo.fetch.json4s._
 
-// Http client, http request and JSON object.
+// Request and JSON object.
 val req:  Request    = ???
 val json: JValue     = ???
 
