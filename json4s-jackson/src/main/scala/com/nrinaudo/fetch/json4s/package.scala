@@ -6,9 +6,6 @@ import scala.language.implicitConversions
 import org.json4s.jackson.JsonMethods
 import com.fasterxml.jackson.core.JsonGenerator
 
-/**
- * @author Nicolas Rinaudo
- */
 package object json4s {
   /** Polite mapper that does not close streams it does not own. */
   lazy val mapper = {

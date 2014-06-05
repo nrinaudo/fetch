@@ -45,7 +45,6 @@ object Status {
 
   private case class StatusImpl(code: Int) extends Status
 
-  // TODO: this is not a good apply method, it throws.
   def apply(value: Int): Status =
     if(value > 0 && value < 600) StatusImpl(value)
     else                         throw new IllegalArgumentException("Illegal status: " + value)

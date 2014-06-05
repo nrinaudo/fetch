@@ -9,15 +9,14 @@ Sample usage:
 import com.nrinaudo.fetch.json4s._
 
 // Http client, http request and JSON object.
-val http: HttpClient = ???
 val req:  Request    = ???
 val json: JValue     = ???
 
 // Brings an implicit Format instance in scope.
 implicit val formats = org.json4s.DefaultFormats
 
-// Automatically serializes json upon submission.
-val response = http(request.body(json))
+// Automatically serializes JSON upon submission.
+val response = request(json)
 
 // Automatically de-serializes the response into a JSON object.
 response.body.as[JValue]

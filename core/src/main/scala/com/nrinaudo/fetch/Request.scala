@@ -65,7 +65,12 @@ object Request {
   val UserAgent = "Fetch/0.2"
 }
 
-/** Represents an HTTP request. */
+/** Represents an HTTP request.
+  *
+  * Instances are created through the [[Request$ companion object]]. Once an instance is obtained, the request can be
+  * configured through "raw" modification methods ([[method]], [[headers]]...) as well as specialised helpers such
+  * as [[GET]], [[acceptGzip]] or [[/]].
+  */
 trait Request[A] {
   // - Fields ----------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
@@ -80,7 +85,7 @@ trait Request[A] {
 
   // - Abstract methods ------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def copy(url: Url, method: Method, headers: Headers): Request[A]
+  protected def copy(url: Url, method: Method, headers: Headers): Request[A]
   def apply(body: Option[RequestEntity]): A
   def map[B](f: A => B): Request[B]
 

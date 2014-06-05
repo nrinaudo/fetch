@@ -1,7 +1,6 @@
 package com.nrinaudo.fetch
 
 import java.net.URI
-import scala.util.Try
 
 object Url {
   // - URI-based construction ------------------------------------------------------------------------------------------
