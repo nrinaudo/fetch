@@ -4,7 +4,16 @@ Adds support for [json4s](https://github.com/json4s/json4s) request and response
 
 Serialization / de-serialization is achieved through the native json4s library.
 
-Sample usage:
+
+## Getting the module
+The current version is 0.2.0, which can be added to your project with the following line in your SBT build file:
+
+```scala
+libraryDependencies += "com.nrinaudo" %% "fetch-json4s-native" % "0.2.0"
+```
+
+
+## Sample usage
 ```scala
 import com.nrinaudo.fetch.json4s._
 
