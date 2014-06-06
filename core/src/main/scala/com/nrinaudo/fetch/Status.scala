@@ -1,57 +1,51 @@
 package com.nrinaudo.fetch
 
 object Status {
-  val Ok: Status = StatusImpl(200)
-  val Created: Status = StatusImpl(201)
-  val Accepted: Status = StatusImpl(202)
-  val NonAuthoritativeInformation: Status = StatusImpl(203)
-  val NoContent: Status = StatusImpl(204)
-  val ResetContent: Status = StatusImpl(205)
-  val PartialContent: Status = StatusImpl(206)
+  val Ok = Status(200)
+  val Created = Status(201)
+  val Accepted = Status(202)
+  val NonAuthoritativeInformation = Status(203)
+  val NoContent = Status(204)
+  val ResetContent = Status(205)
+  val PartialContent = Status(206)
 
-  val MultipleChoices: Status = StatusImpl(300)
-  val MovedPermanently: Status = StatusImpl(301)
-  val Found: Status = StatusImpl(302)
-  val SeeOther: Status = StatusImpl(303)
-  val NotModified: Status = StatusImpl(304)
-  val UseProxy: Status = StatusImpl(305)
-  val TemporaryRedirect: Status = StatusImpl(307)
+  val MultipleChoices = Status(300)
+  val MovedPermanently = Status(301)
+  val Found = Status(302)
+  val SeeOther = Status(303)
+  val NotModified = Status(304)
+  val UseProxy = Status(305)
+  val TemporaryRedirect = Status(307)
 
-  val BadRequest: Status = StatusImpl(400)
-  val Unauthorized: Status = StatusImpl(401)
-  val PaymentRequired: Status = StatusImpl(402)
-  val Forbidden: Status = StatusImpl(403)
-  val NotFound: Status = StatusImpl(404)
-  val MethodNotAllowed: Status = StatusImpl(405)
-  val NotAcceptable: Status = StatusImpl(406)
-  val ProxyAuthenticationRequired: Status = StatusImpl(407)
-  val RequestTimeout: Status = StatusImpl(408)
-  val Conflict: Status = StatusImpl(409)
-  val Gone: Status = StatusImpl(410)
-  val LengthRequired: Status = StatusImpl(411)
-  val PreconditionFailed: Status = StatusImpl(412)
-  val RequestEntityTooLarge: Status = StatusImpl(413)
-  val RequestUriTooLong: Status = StatusImpl(414)
-  val UnsupportedMediaType: Status = StatusImpl(415)
-  val RequestRangeNotSatisfiable: Status = StatusImpl(416)
-  val ExpectationFailed: Status = StatusImpl(417)
+  val BadRequest = Status(400)
+  val Unauthorized = Status(401)
+  val PaymentRequired = Status(402)
+  val Forbidden = Status(403)
+  val NotFound = Status(404)
+  val MethodNotAllowed = Status(405)
+  val NotAcceptable = Status(406)
+  val ProxyAuthenticationRequired = Status(407)
+  val RequestTimeout = Status(408)
+  val Conflict = Status(409)
+  val Gone = Status(410)
+  val LengthRequired = Status(411)
+  val PreconditionFailed = Status(412)
+  val RequestEntityTooLarge = Status(413)
+  val RequestUriTooLong = Status(414)
+  val UnsupportedMediaType = Status(415)
+  val RequestRangeNotSatisfiable = Status(416)
+  val ExpectationFailed = Status(417)
 
-  val InternalServerError: Status = StatusImpl(500)
-  val NotImplemented: Status = StatusImpl(501)
-  val BadGateway: Status = StatusImpl(502)
-  val ServiceUnavailable: Status = StatusImpl(503)
-  val GatewayTimeout: Status = StatusImpl(504)
-  val HttpVersionNotSupported: Status = StatusImpl(505)
-
-  private case class StatusImpl(code: Int) extends Status
-
-  def apply(value: Int): Status =
-    if(value > 0 && value < 600) StatusImpl(value)
-    else                         throw new IllegalArgumentException("Illegal status: " + value)
+  val InternalServerError = Status(500)
+  val NotImplemented = Status(501)
+  val BadGateway = Status(502)
+  val ServiceUnavailable = Status(503)
+  val GatewayTimeout = Status(504)
+  val HttpVersionNotSupported = Status(505)
 }
 
-sealed trait Status {
-  val code: Int
+case class Status(code: Int) {
+  require(code > 0 && code < 600)
 
   override def toString = code.toString
 
