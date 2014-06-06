@@ -17,6 +17,13 @@ The current version is 0.2.0, which can be added to your project with the follow
 libraryDependencies += "com.nrinaudo" %% "fetch" % "0.2.0"
 ```
 
+It's also possible to use 0.2.1 snapshots from the Sonatype repository with:
+```scala
+resolvers += "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
+
+libraryDependencies += "com.nrinaudo" %% "fetch" % "0.2.1-SNAPSHOT"
+```
+
 
 ## Querying
 
