@@ -42,10 +42,41 @@ object Status {
   val ServiceUnavailable = Status(503)
   val GatewayTimeout = Status(504)
   val HttpVersionNotSupported = Status(505)
+
+  class Extractor(val f: Status => Boolean) {
+    def unapply(status: Status): Option[Status] =
+      if(f(status)) Some(status)
+      else          None
+
+    def unapply[T](res: Response[T]): Option[Response[T]] =
+      if(f(res.status)) Some(res)
+      else              None
+  }
+
+  object Success extends Extractor(_.isSuccess)
+  object Error extends Extractor(_.isError)
+  object ClientError extends Extractor(_.isClientError)
+  object ServerError extends Extractor(_.isServerError)
+  object Redirection extends Extractor(_.isRedirection)
 }
 
 case class Status(code: Int) {
   require(code > 0 && code < 600)
+
+  /** Allows instances of [[Status]] to be used as extractors for [[Response]].
+    *
+    * For example: {{{
+    *  val req: Request[Response[ResponseEntity]] = ???
+    *
+    *  req.map {
+    *    case Status.Ok(res) => res.body.as[String]
+    *    case res            => throw new Exception(res.toString)
+    *  }
+    * }}}
+    */
+  def unapply[T](res: Response[T]): Option[Response[T]] =
+    if(res.status == this) Some(res)
+    else                   None
 
   override def toString = code.toString
 

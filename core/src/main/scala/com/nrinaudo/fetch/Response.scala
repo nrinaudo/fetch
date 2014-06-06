@@ -1,6 +1,6 @@
 package com.nrinaudo.fetch
 
-import java.util.{Locale, Date}
+import java.util.Date
 import Headers._
 
 /**

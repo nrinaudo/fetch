@@ -13,10 +13,12 @@ object StatusSpec {
   def status = Gen.oneOf(success, redirection, clientError, serverError)
 
   def invalidStatus: Gen[Int] = Arbitrary.arbitrary[Int].suchThat(i => i < 0 || i > 600)
+  private def response(status: Status) = new Response(status, new Headers(), status.code)
 }
 
 class StatusSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
   import StatusSpec._
+
 
   describe("The Status companion object") {
     it("should apply on legal statuses") {
@@ -26,7 +28,57 @@ class StatusSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     it("should fail to apply on illegal statuses") {
       forAll(invalidStatus) { status => intercept[IllegalArgumentException](Status(status)) }
     }
+
+    def expected[T](t: T, pass: Boolean) =
+      if(pass) Some(t)
+      else None
+
+    def validate(status: Status, extractor: Status.Extractor, pass: Boolean) {
+      extractor.unapply(status) should be(expected(status, pass))
+      extractor.unapply(response(status)) should be(expected(response(status), pass))
+    }
+
+    it("should extract success statuses") {
+      forAll(success) { status =>
+        validate(status, Status.Success, true)
+        validate(status, Status.Redirection, false)
+        validate(status, Status.ClientError, false)
+        validate(status, Status.ServerError, false)
+        validate(status, Status.Error, false)
+      }
+    }
+
+    it("should extract redirection statuses") {
+      forAll(redirection) { status =>
+        validate(status, Status.Success, false)
+        validate(status, Status.Redirection, true)
+        validate(status, Status.ClientError, false)
+        validate(status, Status.ServerError, false)
+        validate(status, Status.Error, false)
+      }
+    }
+
+    it("should extract client error statuses") {
+      forAll(clientError) { status =>
+        validate(status, Status.Success, false)
+        validate(status, Status.Redirection, false)
+        validate(status, Status.ClientError, true)
+        validate(status, Status.ServerError, false)
+        validate(status, Status.Error, true)
+      }
+    }
+
+    it("should extract server error statuses") {
+      forAll(serverError) { status =>
+        validate(status, Status.Success, false)
+        validate(status, Status.Redirection, false)
+        validate(status, Status.ClientError, false)
+        validate(status, Status.ServerError, true)
+        validate(status, Status.Error, true)
+      }
+    }
   }
+
   describe("An instance of Status") {
     it("should detect success statuses correctly") {
       forAll(success) { status =>
@@ -61,6 +113,21 @@ class StatusSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
         status.isRedirection should be(false)
         status.isClientError should be(false)
         status.isServerError should be(true)
+      }
+    }
+
+    it("should unapply responses with the same status") {
+      forAll(status) { status => status.unapply(response(status)) should be (Some(response(status))) }
+    }
+
+    def diffStatuses = for {
+      s1 <- status
+      s2 <- status if s1 != s2
+    } yield (s1, s2)
+
+    it("should not unapply responses with a different status") {
+      forAll(diffStatuses) { case (s1, s2) =>
+        s1.unapply(response(s2)) should be(None)
       }
     }
 
