@@ -76,8 +76,8 @@ object Status {
       else          None
 
     /** Pattern matches against [[Response responses]]. */
-    def unapply[T](res: Response[T]): Option[Response[T]] =
-      if(f(res.status)) Some(res)
+    def unapply[T](res: Response[T]): Option[Status] =
+      if(f(res.status)) Some(res.status)
       else              None
   }
 
@@ -112,7 +112,7 @@ object Status {
   *
   *   res map {
   *     // Match on the 2xx group
-  *     case Status.Success(res)           => println("Success: " + res.body.as[String])
+  *     case res @ Status.Success(_)       => println("Success: " + res.body.as[String])
   *     // Match on HTTP 500
   *     case Status.InternalServerError(_) => println("Internal server error")
   *     // Match on everything else

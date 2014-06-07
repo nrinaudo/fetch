@@ -35,7 +35,7 @@ class StatusSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
 
     def validate(status: Status, extractor: Status.Extractor, pass: Boolean) {
       extractor.unapply(status) should be(expected(status, pass))
-      extractor.unapply(response(status)) should be(expected(response(status), pass))
+      extractor.unapply(response(status)) should be(expected(status, pass))
     }
 
     it("should extract success statuses") {
