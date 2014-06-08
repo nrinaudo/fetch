@@ -45,7 +45,7 @@ object RequestEntitySpec {
       case 4 => RequestEntity(content)
       case 5 => RequestEntity(tmpFile(content))
       case e => throw new AssertionError("Unexpected rand(0, 5) value: " + e)
-    }).mediaType(MediaType.TextPlain.charset(DefaultCharset)))
+    }).mediaType(MediaType.PlainText.charset(DefaultCharset)))
 
   def entity: Gen[RequestEntity] = knownEntity.map(_.entity)
 }
@@ -62,12 +62,12 @@ class RequestEntitySpec extends FunSpec with Matchers with GeneratorDrivenProper
   }
 
   describe("A FileEntity instance") {
-      // This does not look terribly useful, but I've been known to mess my string patterns in toString methods and
-      // discover it much too late.
-      it("should have a working toString method") {
-        forAll(arbitrary[String]) { s => RequestEntity(tmpFile(s)).toString }
-      }
+    // This does not look terribly useful, but I've been known to mess my string patterns in toString methods and
+    // discover it much too late.
+    it("should have a working toString method") {
+      forAll(arbitrary[String]) { s => RequestEntity(tmpFile(s)).toString }
     }
+  }
 
   describe("A RequestEntity instance") {
     it("should have a working gzip method") {

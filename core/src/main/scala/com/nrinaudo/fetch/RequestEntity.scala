@@ -77,7 +77,7 @@ object RequestEntity {
   // - Writer helpers --------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   private class WriterRequestEntity(private val f: Writer => Unit,
-                                    override val mediaType: MediaType = MediaType.TextPlain,
+                                    override val mediaType: MediaType = MediaType.PlainText,
                                     override val encoding: Encoding = Encoding.Identity) extends TextRequestEntity {
     override def length: Option[Long] = None
 
@@ -104,7 +104,7 @@ object RequestEntity {
   }
 
   def apply(str: String): TextRequestEntity =
-    new StringEntity(str, MediaType.TextPlain, Encoding.Identity)
+    new StringEntity(str, MediaType.PlainText, Encoding.Identity)
 
 
 
