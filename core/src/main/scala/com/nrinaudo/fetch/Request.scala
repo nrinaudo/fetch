@@ -30,7 +30,7 @@ object Request {
 
     // Sets body specific HTTP headers (or unsets them if necessary).
     body foreach {b =>
-      h = h.set("Content-Type", b.mimeType)
+      h = h.set("Content-Type", b.mediaType)
       if(b.encoding == Encoding.Identity) h = h.remove("Content-Encoding")
       else                                h = h.set("Content-Encoding", b.encoding)
     }
@@ -163,16 +163,14 @@ trait Request[A] {
 
   /** Notifies the remote server about response content type preferences.
     *
-    * Note that MIME type parameters are removed here. This is not RFC compliant and is an acknowledged issue.
-    *
     * This maps to the [[http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1 Accept]] header.
     *
-    * @param mimeTypes list of MIME types to declare.
+    * @param types list of media types to declare.
     */
-  def accept(mimeTypes: Conneg[MimeType]*): Request[A] = header("Accept", mimeTypes)
+  def accept(types: Conneg[MediaType]*): Request[A] = header("Accept", types)
 
   /** Returns the value of this instance's content type preferences. */
-  def accept: Option[Seq[Conneg[MimeType]]] = header[Seq[Conneg[MimeType]]]("Accept")
+  def accept: Option[Seq[Conneg[MediaType]]] = header[Seq[Conneg[MediaType]]]("Accept")
 
   /** Notifies the remote server about response charset preferences.
     *

@@ -83,7 +83,7 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
     val status = Status(con.getResponseCode)
     new Response(status,
       new Headers(con.getHeaderFields.asScala.mapValues(_.asScala.mkString(", ")).toMap),
-      new ResponseEntity(Option(con.getContentType) flatMap MimeType.parse, responseStream(status, con)))
+      new ResponseEntity(Option(con.getContentType) flatMap MediaType.parse, responseStream(status, con)))
   }
 
   def apply(url: Url, method: Method, body: Option[RequestEntity], headers: Headers): Response[ResponseEntity] =

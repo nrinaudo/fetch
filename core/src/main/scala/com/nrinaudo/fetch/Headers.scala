@@ -58,9 +58,9 @@ object Headers {
     override def write(value: Encoding): Option[String] = Some(value.name)
   }
 
-  implicit object MimeTypeFormat extends ValueFormat[MimeType] {
-    override def read(str: String): Option[MimeType] = MimeType.parse(str)
-    override def write(t: MimeType): Option[String]  = Some(t.toString)
+  implicit object MediaTypeFormat extends ValueFormat[MediaType] {
+    override def read(str: String): Option[MediaType] = MediaType.parse(str)
+    override def write(t: MediaType): Option[String]  = Some(t.toString)
   }
 
   implicit object MethodFormat extends ValueFormat[Method] {

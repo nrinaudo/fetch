@@ -131,13 +131,13 @@ case class Status(code: Int) {
     *  val req: Request[Response[ResponseEntity]] = ???
     *
     *  req.map {
-    *    case Status.Ok(res) => res.body.as[String]
-    *    case res            => throw new Exception(res.toString)
+    *    case res @ Status.Ok(_) => res.body.as[String]
+    *    case res                => throw new Exception(res.toString)
     *  }
     * }}}
     */
-  def unapply[T](res: Response[T]): Option[Response[T]] =
-    if(res.status == this) Some(res)
+  def unapply[T](res: Response[T]): Option[Status] =
+    if(res.status == this) Some(this)
     else                   None
 
   override def toString = code.toString

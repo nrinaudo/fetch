@@ -10,10 +10,10 @@ object ResponseEntity {
 
 /**
  * Represents a raw response entity.
- * @param mime   MIME type of the entity.
- * @param stream stream from which to read the content of the entity.
+ * @param mediaType media type of the entity.
+ * @param stream    stream from which to read the content of the entity.
  */
-class ResponseEntity(val mime: Option[MimeType], stream: InputStream) {
+class ResponseEntity(val mediaType: Option[MediaType], stream: InputStream) {
   require(stream != null, "Response stream should never be null")
 
   // It appears that some stream implementation (decompressing ones, for instance, such as GZipInputStream) stop reading
@@ -27,13 +27,13 @@ class ResponseEntity(val mime: Option[MimeType], stream: InputStream) {
   }
 
 
-  def decode(encoding: Encoding): ResponseEntity = new ResponseEntity(mime, encoding.decode(content))
+  def decode(encoding: Encoding): ResponseEntity = new ResponseEntity(mediaType, encoding.decode(content))
 
   def as[T: EntityParser]: T = implicitly[EntityParser[T]].apply(this)
 
   /** Charset in which the entity is written, if any. */
   def charset: Option[Charset] = for {
-    m       <- mime
+    m       <- mediaType
     charset <- m.charset
   } yield charset
 

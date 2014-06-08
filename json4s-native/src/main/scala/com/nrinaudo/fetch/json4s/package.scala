@@ -11,7 +11,7 @@ import org.json4s.native.JsonMethods
  */
 package object json4s {
   implicit def jsonToEntity(json: JValue)(implicit formats: Formats) = RequestEntity.chars {out => write(json, out)}
-      .mimeType(MimeType.Json.charset(DefaultCharset))
+      .mediaType(MediaType.Json.charset(DefaultCharset))
 
   implicit val Parser: EntityParser[JValue] = (entity: ResponseEntity) =>
     entity.withReader {in => JsonMethods.parse(ReaderInput(in))}

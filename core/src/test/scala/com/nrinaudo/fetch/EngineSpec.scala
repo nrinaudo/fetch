@@ -88,8 +88,8 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     }
 
     it("should use the specified Accept header(s)") {
-      forAll(connegs(MimeTypeSpec.mimeType)) { mimeTypes =>
-        checkConnegs(request("header/Accept").accept(mimeTypes: _*).GET.apply(), mimeTypes, Conneg.MimeTypes)
+      forAll(connegs(MediaTypeSpec.mediaType)) { mediaTypes =>
+        checkConnegs(request("header/Accept").accept(mediaTypes: _*).GET.apply(), mediaTypes, Conneg.MediaTypes)
       }
     }
 

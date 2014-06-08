@@ -16,7 +16,7 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
   import MethodSpec._
   import ConnegSpec._
   import LanguageSpec._
-  import MimeTypeSpec._
+  import MediaTypeSpec._
   import EncodingSpec._
   import ByteRangeSpec._
 
@@ -60,13 +60,13 @@ class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropert
     }
   }
 
-  describe("MimeTypeFormat") {
-    it("should correctly serialize and parse MIME types") {
-      forAll(mimeType) { mime => validate(MimeTypeFormat, mime)}
+  describe("MediaTypeFormat") {
+    it("should correctly serialize and parse media types") {
+      forAll(mediaType) { mediaType => validate(MediaTypeFormat, mediaType)}
     }
 
-    it("should refuse illegal MIME types") {
-      forAll(illegalMimeType) { str => MimeTypeFormat.read(str).isEmpty should be(true) }
+    it("should refuse illegal media types") {
+      forAll(illegalMediaType) { str => MediaTypeFormat.read(str).isEmpty should be(true) }
     }
   }
 

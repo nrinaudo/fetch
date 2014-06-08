@@ -16,7 +16,7 @@ package object json4s {
 
   implicit def jsonToEntity(json: JValue)(implicit formats: Formats) = RequestEntity.chars {out =>
     mapper.writeValue(out, Extraction.decompose(json)(formats))
-  }.mimeType(MimeType.Json.charset(DefaultCharset))
+  }.mediaType(MediaType.Json.charset(DefaultCharset))
 
   implicit val Parser: EntityParser[JValue] = (entity: ResponseEntity) =>
     entity.withReader {in => JsonMethods.parse(ReaderInput(in))}

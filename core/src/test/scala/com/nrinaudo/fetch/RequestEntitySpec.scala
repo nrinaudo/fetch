@@ -45,7 +45,7 @@ object RequestEntitySpec {
       case 4 => RequestEntity(content)
       case 5 => RequestEntity(tmpFile(content))
       case e => throw new AssertionError("Unexpected rand(0, 5) value: " + e)
-    }).mimeType(MimeType.TextPlain.charset(DefaultCharset)))
+    }).mediaType(MediaType.TextPlain.charset(DefaultCharset)))
 
   def entity: Gen[RequestEntity] = knownEntity.map(_.entity)
 }
@@ -84,9 +84,9 @@ class RequestEntitySpec extends FunSpec with Matchers with GeneratorDrivenProper
       }
     }
 
-    it("should have a working mimeType method") {
-      forAll(entity, MimeTypeSpec.mimeType) { (entity, mimeType) =>
-        entity.mimeType(mimeType).mimeType should be(mimeType)
+    it("should have a working mediaType method") {
+      forAll(entity, MediaTypeSpec.mediaType) { (entity, mediaType) =>
+        entity.mediaType(mediaType).mediaType should be(mediaType)
       }
     }
 

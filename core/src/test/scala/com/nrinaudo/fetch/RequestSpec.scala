@@ -26,7 +26,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
   import ConnegSpec._
   import LanguageSpec._
   import EncodingSpec._
-  import MimeTypeSpec._
+  import MediaTypeSpec._
 
   implicit val engine = UrlEngine()
 
@@ -164,7 +164,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     }
 
     it("should return its Accept header when set") {
-      forAll(url, connegs(mimeType)) { (url, types) => Request(url).accept(types: _*).accept should be(Some(types)) }
+      forAll(url, connegs(mediaType)) { (url, types) => Request(url).accept(types: _*).accept should be(Some(types)) }
     }
 
     it("should not return a Accept when the header is not set") {

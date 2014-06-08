@@ -7,13 +7,13 @@ import com.nrinaudo.fetch.Headers._
 /** Collection of implicit header formats for known content negotiation headers. */
 object Conneg {
   /** Implicit format for the `Accept` content negotiation header. */
-  implicit object MimeTypes extends MimeType.Grammar with ConnegFormat[MimeType] {
-    override def entry: Parser[MimeType] = mimeType
+  implicit object MediaTypes extends MediaType.Grammar with ConnegFormat[MediaType] {
+    override def entry: Parser[MediaType] = mediaType
 
-    // This is slightly different from other formats: mime types accept parameter in the exact same syntax as the q
+    // This is slightly different from other formats: media types accept parameter in the exact same syntax as the q
     // parameter.
-    override def connegs: Parser[List[Conneg[MimeType]]] = repsep(mimeType, ",") ^^ { list =>
-      list.map { mime => Conneg(mime.removeParam("q"), mime.param[Float]("q").getOrElse(1f)) }
+    override def connegs: Parser[List[Conneg[MediaType]]] = repsep(mediaType, ",") ^^ { list =>
+      list.map { mediaType => Conneg(mediaType.removeParam("q"), mediaType.param[Float]("q").getOrElse(1f)) }
     }
   }
 

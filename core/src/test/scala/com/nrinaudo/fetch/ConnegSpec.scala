@@ -5,8 +5,7 @@ import java.nio.charset.Charset
 import scala.collection.JavaConverters._
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import scala.util.Success
-import com.nrinaudo.fetch.Conneg.MimeTypes
+import com.nrinaudo.fetch.Conneg.MediaTypes
 
 object ConnegSpec {
   private lazy val charsets = Charset.availableCharsets().values().asScala.toList
@@ -25,7 +24,7 @@ object ConnegSpec {
 
 class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
   import ConnegSpec._
-  import MimeTypeSpec._
+  import MediaTypeSpec._
   import EncodingSpec._
   import HeaderFormatSpec._
   import LanguageSpec._
@@ -63,8 +62,8 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
       }
     }
 
-    it("should correctly serialize and parse MIME types") {
-      forAll(connegs(mimeType)) { headers => cycle(MimeTypes, headers) should be(Some(headers)) }
+    it("should correctly serialize and parse media types") {
+      forAll(connegs(mediaType)) { headers => cycle(MediaTypes, headers) should be(Some(headers)) }
     }
 
     it("should correctly serialize and parse content encodings") {

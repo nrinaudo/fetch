@@ -61,10 +61,10 @@ package object fetch {
   implicit def fileToEntity(file: File)        = RequestEntity(file)
 
   // Content negotiation headers.
-  implicit def mimeToConneg(mime: MimeType)         = Conneg(mime)
-  implicit def encodingToConneg(encoding: Encoding) = Conneg(encoding)
-  implicit def charsetToConneg(charset: Charset)    = Conneg(charset)
-  implicit def localeToConneg(locale: Locale)       = Conneg(locale)
+  implicit def mediaTypeToConneg(mediaType: MediaType) = Conneg(mediaType)
+  implicit def encodingToConneg(encoding: Encoding)    = Conneg(encoding)
+  implicit def charsetToConneg(charset: Charset)       = Conneg(charset)
+  implicit def localeToConneg(locale: Locale)          = Conneg(locale)
 
   // Response entities.
   implicit val TextEntityParser: EntityParser[String] = (entity: ResponseEntity) => {
