@@ -117,7 +117,7 @@ class StatusSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     }
 
     it("should unapply responses with the same status") {
-      forAll(status) { status => status.unapply(response(status)) should be (Some(status)) }
+      forAll(status) { status => status.unapply(response(status)) should be (Some(response(status))) }
     }
 
     def diffStatuses = for {
