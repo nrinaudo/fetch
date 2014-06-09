@@ -5,8 +5,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 
 object ETagSpec {
-  def weakTag: Gen[ETag] = for(tag <- Gen.identifier.suchThat(!_.isEmpty)) yield WeakTag(tag)
-  def strongTag: Gen[ETag] = for(tag <- Gen.identifier.suchThat(!_.isEmpty)) yield StrongTag(tag)
+  def weakTag: Gen[ETag] = for(tag <- Gen.identifier.suchThat(!_.isEmpty)) yield ETag.Weak(tag)
+  def strongTag: Gen[ETag] = for(tag <- Gen.identifier.suchThat(!_.isEmpty)) yield ETag.Strong(tag)
 
   def etag: Gen[ETag] = Gen.oneOf(weakTag, strongTag)
 
@@ -33,8 +33,8 @@ class ETagSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks 
   describe("An ETag instance") {
     it("should have the correct weak flag") {
       forAll(etag) {
-        case etag @ WeakTag(_)   => etag.isWeak should be(true)
-        case etag @ StrongTag(_) => etag.isWeak should be(false)
+        case etag @ ETag.Weak(_)   => etag.isWeak should be(true)
+        case etag @ ETag.Strong(_) => etag.isWeak should be(false)
       }
     }
   }
