@@ -19,7 +19,5 @@ class MediaTypeParameters(override val values: Map[String, String] = Map()) exte
 
   override def build(values: Map[String, String]): MediaTypeParameters = new MediaTypeParameters(values)
 
-  def writeTo(builder: StringBuilder): StringBuilder = Format.writeParametersTo(builder, values)
-
   override lazy val toString = Format.parameters(values)
 }

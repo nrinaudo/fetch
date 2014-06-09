@@ -12,12 +12,47 @@ object MediaType {
     extends MediaType {
     override def rawType: String = "%s/%s" format (main, sub)
     override def params(values: MediaTypeParameters): MediaType = copy(params = values)
+
+    /** Allows specific media types to be used in pattern matching.
+      *
+      * Note that this method ignores media type parameters. For example, the following expression will match regardless
+      * of media type parameters: {{{
+      *  val req: Request[Response[ResponseEntity]] = ???
+      *
+      *  req.map {
+      *    case MediaType.Json(res) => println("JSON: " + res.body.as[String])
+      *    case _                   => println("Unsupported media type")
+      *  }
+      * }}}
+      */
+    override def unapply[T](res: Response[T]): Option[Response[T]] = res.contentType flatMap {
+      case Specific(m, s, _) if main == m && sub == s => Some(res)
+      case _                                          => None
+    }
   }
 
   /** Media range, with a main-type only (such as `text/ *`, for example). */
   final case class Range(main: String, params: MediaTypeParameters = new MediaTypeParameters()) extends MediaType {
     override def rawType: String = "%s/*" format main
     override def params(values: MediaTypeParameters): MediaType = copy(params = values)
+
+    /** Allows media ranges to be used in pattern matching.
+      *
+      * Note that this method ignores media type parameters. For example, the following expression will match regardless
+      * of media type parameters: {{{
+      *  val req: Request[Response[ResponseEntity]] = ???
+      *
+      *  req.map {
+      *    case MediaType.Text(res) => println("Text: " + res.body.as[String])
+      *    case _                   => println("Unsupported media type")
+      *  }
+      * }}}
+      */
+    override def unapply[T](res: Response[T]): Option[Response[T]] = res.contentType flatMap {
+      case Specific(m, s, _) if m == main => Some(res)
+      case Range(m, _) if m == main       => Some(res)
+      case _                              => None
+    }
 
     def sub(value: String): MediaType = Specific(main, value, params)
     def /(value: String): MediaType = sub(value)
@@ -27,6 +62,22 @@ object MediaType {
   final case class All(params: MediaTypeParameters = new MediaTypeParameters()) extends MediaType {
     override def rawType: String = "*/*"
     override def params(values: MediaTypeParameters): MediaType = copy(params = values)
+
+    /** Allows the "any" media type to be used to in pattern matching.
+      *
+      * Note that this method ignores media type parameters. For example, the following expression will match regardless
+      * of media type parameters: {{{
+      *  val req: Request[Response[ResponseEntity]] = ???
+      *
+      *  req.map {
+      *    case MediaType.All(res) => println("Has media type: " + res.body.as[String])
+      *    case _                  => println("No media type")
+      *  }
+      * }}}
+      *
+      * The only way for a response not to be matched is for it not to have a media type at all.
+      */
+    override def unapply[T](res: Response[T]): Option[Response[T]] = res.contentType.map(c => res)
   }
 
 
@@ -120,20 +171,7 @@ sealed trait MediaType {
     if(params.values.isEmpty) rawType
     else                      rawType + ";" + params.toString
 
-  /** Allows instances of [[MediaType]] to be used as extractors for instances of [[Response]].
-    *
-    * This method ignores media type parameters entirely. For example, the following code will match regardless
-    * of parameters: {{{
-    *  val req: Request[Response[ResponseEntity]] = ???
-    *
-    *  req.map {
-    *    case MediaType.Text(_)        => println("Text entity")
-    *    case MediaType.Application(_) => println("Application entity")
-    *    case _                        => println("Unsupported entity")
-    *  }
-    * }}}
-    */
-  def unapply[T](res: Response[T]): Option[Response[T]] = res.contentType.filter(_.rawType == rawType).map(m => res)
+  def unapply[T](res: Response[T]): Option[Response[T]]
 
   /** Removes the specified parameter. */
   def removeParam(name: String): MediaType =
