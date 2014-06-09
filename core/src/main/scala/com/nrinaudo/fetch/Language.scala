@@ -53,7 +53,7 @@ final case class CountryLanguage(lang: String, country: String) extends Language
 
 /** Represents an entity's language.
   *
-  * These can be used for [[com.nrinaudo.fetch.Request.acceptLanguage content negotiation]] or
+  * These can be used for [[Request.acceptLanguage content negotiation]] or
   * to describe the language in which a [[com.nrinaudo.fetch.Response.contentLanguage response]] is written.
   *
   * A language can either be [[GlobalLanguage global]] or [[CountryLanguage country-specific]].

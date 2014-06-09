@@ -71,25 +71,36 @@ class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
     }
   }
 
+  def validate(matcher: MediaType, matched: MediaType, expected: Boolean) {
+    if(expected) {
+      matcher.unapply(matched) should be(Some(matched))
+      matcher.unapply(response(matched)) should be(Some(response(matched)))
+    }
+    else {
+      matcher.unapply(matched) should be(None)
+      matcher.unapply(response(matched)) should be(None)
+    }
+  }
+
   describe("A MediaType.Specific instance") {
     it("should unapply for other specific media type with the same raw type") {
       forAll(specific, params) { (mediaType, params) =>
         val full = mediaType.params(new MediaTypeParameters(params))
-        mediaType.unapply(response(full)) should be(Some(response(full)))
-        full.unapply(response(mediaType)) should be(Some(response(mediaType)))
+        validate(mediaType, full, true)
+        validate(full, mediaType, true)
       }
     }
 
     it("should not unapply on media ranges") {
-      forAll(specific, range) { (mediaType, range) => mediaType.unapply(response(range)) should be(None) }
+      forAll(specific, range) { (mediaType, range) => validate(mediaType, range, false) }
     }
 
     it("should not unapply on * / *") {
-      forAll(specific, allType) { (mediaType, all) => mediaType.unapply(response(all)) should be(None) }
+      forAll(specific, allType) { (mediaType, all) => validate(mediaType, all, false) }
     }
 
     it("should not unapply for other specific media types with a different raw type") {
-      forAll(diffTypes(specific)) { case (t1, t2) => t1.unapply(response(t2)) should be(None) }
+      forAll(diffTypes(specific)) { case (t1, t2) => validate(t1, t2, false) }
     }
   }
 
@@ -97,34 +108,31 @@ class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
     it("should unapply for other media ranges with the same main type") {
       forAll(range, params) { (mediaType, params) =>
         val full = mediaType.params(new MediaTypeParameters(params))
-        mediaType.unapply(response(full)) should be(Some(response(full)))
-        full.unapply(response(mediaType)) should be(Some(response(mediaType)))
+        validate(mediaType, full, true)
+        validate(full, mediaType, true)
       }
     }
 
     it("should unapply on media types with the same main type") {
-      forAll(range, sub) { (range, sub) =>
-        val specific = range / sub
-        range.unapply(response(specific)) should be(Some(response(specific)))
-      }
+      forAll(range, sub) { (range, sub) => validate(range, range / sub, true) }
     }
 
     it("should not unapply on media types with different main types") {
-      forAll(diffTypes(range), sub) { case ((r1, r2), sub) => r1.unapply(response(r2 / sub)) should be(None) }
+      forAll(diffTypes(range), sub) { case ((r1, r2), sub) => validate(r1, r2 / sub, false) }
     }
 
     it("should not unapply on * / *") {
-      forAll(range, allType) { (mediaType, all) => mediaType.unapply(response(all)) should be(None) }
+      forAll(range, allType) { (mediaType, all) => validate(mediaType, all, false) }
     }
 
     it("should not unapply for other media ranges with a different raw type") {
-      forAll(diffTypes(range)) { case (t1, t2) => t1.unapply(response(t2)) should be(None) }
+      forAll(diffTypes(range)) { case (t1, t2) => validate(t1, t2, false) }
     }
   }
 
   describe("A MediaType.All instance") {
     it("should unapply for any other instance of MediaType") {
-      forAll(allType, mediaType) { (t1, t2) => t1.unapply(response(t2)) should be(Some(response(t2))) }
+      forAll(allType, mediaType) { (t1, t2) => validate(t1, t2, true) }
     }
 
     it("should not unapply for responses without a media type") {

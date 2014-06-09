@@ -13,20 +13,9 @@ object MediaType {
     override def rawType: String = "%s/%s" format (main, sub)
     override def params(values: MediaTypeParameters): MediaType = copy(params = values)
 
-    /** Allows specific media types to be used in pattern matching.
-      *
-      * Note that this method ignores media type parameters. For example, the following expression will match regardless
-      * of media type parameters: {{{
-      *  val req: Request[Response[ResponseEntity]] = ???
-      *
-      *  req.map {
-      *    case MediaType.Json(res) => println("JSON: " + res.body.as[String])
-      *    case _                   => println("Unsupported media type")
-      *  }
-      * }}}
-      */
-    override def unapply[T](res: Response[T]): Option[Response[T]] = res.contentType flatMap {
-      case Specific(m, s, _) if main == m && sub == s => Some(res)
+    /** Matches any instance of [[Specific]] with the same main- and sub-type. */
+    override def unapply(mediaType:  MediaType): Option[MediaType] = mediaType match {
+      case Specific(m, s, _) if main == m && sub == s => Some(mediaType)
       case _                                          => None
     }
   }
@@ -36,21 +25,10 @@ object MediaType {
     override def rawType: String = "%s/*" format main
     override def params(values: MediaTypeParameters): MediaType = copy(params = values)
 
-    /** Allows media ranges to be used in pattern matching.
-      *
-      * Note that this method ignores media type parameters. For example, the following expression will match regardless
-      * of media type parameters: {{{
-      *  val req: Request[Response[ResponseEntity]] = ???
-      *
-      *  req.map {
-      *    case MediaType.Text(res) => println("Text: " + res.body.as[String])
-      *    case _                   => println("Unsupported media type")
-      *  }
-      * }}}
-      */
-    override def unapply[T](res: Response[T]): Option[Response[T]] = res.contentType flatMap {
-      case Specific(m, s, _) if m == main => Some(res)
-      case Range(m, _) if m == main       => Some(res)
+    /** Matches any instance of either [[Specific]] or [[Range]] that have the same main type. */
+    override def unapply(mediaType: MediaType): Option[MediaType] = mediaType match {
+      case Specific(m, s, _) if m == main => Some(mediaType)
+      case Range(m, _) if m == main       => Some(mediaType)
       case _                              => None
     }
 
@@ -63,21 +41,8 @@ object MediaType {
     override def rawType: String = "*/*"
     override def params(values: MediaTypeParameters): MediaType = copy(params = values)
 
-    /** Allows the "any" media type to be used to in pattern matching.
-      *
-      * Note that this method ignores media type parameters. For example, the following expression will match regardless
-      * of media type parameters: {{{
-      *  val req: Request[Response[ResponseEntity]] = ???
-      *
-      *  req.map {
-      *    case MediaType.All(res) => println("Has media type: " + res.body.as[String])
-      *    case _                  => println("No media type")
-      *  }
-      * }}}
-      *
-      * The only way for a response not to be matched is for it not to have a media type at all.
-      */
-    override def unapply[T](res: Response[T]): Option[Response[T]] = res.contentType.map(c => res)
+    /** Matches all media types. */
+    override def unapply(mediaType: MediaType): Option[MediaType] = Some(mediaType)
   }
 
 
@@ -171,7 +136,28 @@ sealed trait MediaType {
     if(params.values.isEmpty) rawType
     else                      rawType + ";" + params.toString
 
-  def unapply[T](res: Response[T]): Option[Response[T]]
+  /** Allows instances of [[MediaType]] to be used in pattern matching.
+    *
+    * Matches depend on the [[MediaType]] implementation. Instances of [[MediaType.Specific]], for example, will only
+    * match parameters that have the same main- and sub-type, while instances of [[MediaType.Range]] will match any
+    * type that shares a main-type.
+    *
+    * This method ignores media type parameters.
+    */
+  def unapply(mediaType: MediaType): Option[MediaType]
+
+  /** Convenience method that behaves exactly as [[MediaType.unapply]] on instances of [[Response]].
+    *
+    * This is meant to make mapping on instances [[Request]] more convenient: {{{
+    *  val req: Request[Response[ResponseEntity]] = ???
+    *
+    *  req.map {
+    *    case MediaType.Text(res) => println("Text content: " + res.body.as[String])
+    *    case _                   => println("Unsupported media type")
+    *  }
+    * }}}
+    */
+  def unapply[T](res: Response[T]): Option[Response[T]] = res.contentType.flatMap(unapply).map(t => res)
 
   /** Removes the specified parameter. */
   def removeParam(name: String): MediaType =
