@@ -8,11 +8,10 @@ object ResponseEntity {
   type EntityParser[T] = ResponseEntity => T
 }
 
-/**
- * Represents a raw response entity.
- * @param mediaType media type of the entity.
- * @param stream    stream from which to read the content of the entity.
- */
+/** Represents a raw response entity.
+  * @param mediaType media type of the entity.
+  * @param stream    stream from which to read the content of the entity.
+  */
 class ResponseEntity(val mediaType: Option[MediaType], stream: InputStream) {
   require(stream != null, "Response stream should never be null")
 
@@ -25,7 +24,6 @@ class ResponseEntity(val mediaType: Option[MediaType], stream: InputStream) {
       super.close()
     }
   }
-
 
   def decode(encoding: Encoding): ResponseEntity = new ResponseEntity(mediaType, encoding.decode(content))
 

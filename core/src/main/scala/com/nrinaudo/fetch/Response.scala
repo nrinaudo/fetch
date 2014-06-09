@@ -2,10 +2,18 @@ package com.nrinaudo.fetch
 
 import java.util.Date
 import Headers._
+import java.io.InputStream
 
-/**
- * Represents an HTTP response.
- */
+object Response {
+  def fromStream(status: Status, headers: Headers, stream: InputStream): Response[ResponseEntity] =
+    Response(status, headers,
+      new ResponseEntity(headers.getOpt[MediaType]("Content-Type"),
+        headers.getOpt[Seq[Encoding]]("Content-Encoding").fold(stream) { values =>
+          values.foldRight(stream) { _ decode _ }
+        }))
+}
+
+/** Represents an HTTP response. */
 case class Response[A](status: Status, headers: Headers, body: A) {
   // - Monadic operations ----------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------

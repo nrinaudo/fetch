@@ -13,10 +13,9 @@ class GraphApi(val req: Request[JValue]) {
 object GraphApi {
   val RootUri = Protocol.Https :/ "graph.facebook.com"
 
-  private def filterErrors(res: Response[ResponseEntity]): JValue =
-    if(res.status.isSuccess) res.body.as[JValue]
-    else                     throw new FacebookException(res.body.as[JValue] \ "error")
-
   def apply(token: String)(implicit engine: HttpEngine) =
-    new GraphApi(RootUri.accept(MediaType.Json).map(filterErrors) & "access_token" -> token)
+    new GraphApi(RootUri.accept(MediaType.Json).map {
+      case res @ Status.Success(_) => res.body.as[JValue]
+      case res                     => throw new FacebookException(res.body.as[JValue] \ "error")
+    } & "access_token" -> token)
 }

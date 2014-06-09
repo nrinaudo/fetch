@@ -81,9 +81,9 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
     body.foreach {_(con.getOutputStream)}
 
     val status = Status(con.getResponseCode)
-    new Response(status,
+    Response.fromStream(status,
       new Headers(con.getHeaderFields.asScala.mapValues(_.asScala.mkString(", ")).toMap),
-      new ResponseEntity(Option(con.getContentType) flatMap MediaType.parse, responseStream(status, con)))
+      responseStream(status, con))
   }
 
   def apply(url: Url, method: Method, body: Option[RequestEntity], headers: Headers): Response[ResponseEntity] =

@@ -15,16 +15,6 @@ object Request {
     */
   type HttpEngine = (Url, Method, Option[RequestEntity], Headers) => Response[ResponseEntity]
 
-  /** Decodes the specified response according to whatever is specified in the `Content-Encoding` header and the list
-    * of encodings we actually support.
-    *
-    * Unsupported encodings result in `IOExceptions`.
-    */
-  private def decode(response: Response[ResponseEntity]): Response[ResponseEntity] =
-    response.contentEncoding.fold(response) { values =>
-      values.foldRight(response) { (encoding, res) => res.map(_.decode(encoding))}
-    }
-
   private def http(f: HttpEngine): HttpEngine = (url, method, body, headers) => {
     var h = headers
 
@@ -40,8 +30,7 @@ object Request {
     // and */* is curl's default behaviour - if it's good enough for curl, it's good enough for me.
     h = h.setIfEmpty("User-Agent", UserAgent).setIfEmpty("Accept", "*/*")
 
-    // Executes the query and decodes the response.
-    decode(f(url, method, body, h))
+    f(url, method, body, h)
   }
 
   def from(uri: URI)(implicit engine: HttpEngine): Option[Request[Response[ResponseEntity]]] =
