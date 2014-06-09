@@ -74,7 +74,7 @@ class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
   def validate(matcher: MediaType, matched: MediaType, expected: Boolean) {
     if(expected) {
       matcher.unapply(matched) should be(Some(matched))
-      matcher.unapply(response(matched)) should be(Some(response(matched)))
+      matcher.unapply(response(matched)) should be(Some(matched))
     }
     else {
       matcher.unapply(matched) should be(None)

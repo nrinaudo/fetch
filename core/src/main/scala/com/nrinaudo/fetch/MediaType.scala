@@ -152,12 +152,12 @@ sealed trait MediaType {
     *  val req: Request[Response[ResponseEntity]] = ???
     *
     *  req.map {
-    *    case MediaType.Text(res) => println("Text content: " + res.body.as[String])
-    *    case _                   => println("Unsupported media type")
+    *    case res @ MediaType.Text(_) => println("Text content: " + res.body.as[String])
+    *    case MediaType(m)            => println("Unsupported media type: " + m)
     *  }
     * }}}
     */
-  def unapply[T](res: Response[T]): Option[Response[T]] = res.contentType.flatMap(unapply).map(t => res)
+  def unapply[T](res: Response[T]): Option[MediaType] = res.contentType.flatMap(unapply)
 
   /** Removes the specified parameter. */
   def removeParam(name: String): MediaType =
