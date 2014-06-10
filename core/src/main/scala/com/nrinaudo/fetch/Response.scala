@@ -2,14 +2,24 @@ package com.nrinaudo.fetch
 
 import java.util.Date
 import Headers._
-import java.io.InputStream
+import java.io.{FilterInputStream, InputStream}
 
 object Response {
+  // It appears that some stream implementation (decompressing ones, for instance, such as GZipInputStream) stop reading
+  // before read returns -1 - which seems to prevent keeping connections alive.
+  // The following is a nasty workaround, but it works.
+  private def closing(stream: InputStream): InputStream = new FilterInputStream(stream) {
+    override def close(): Unit = {
+      in.read()
+      super.close()
+    }
+  }
+
   def fromStream(status: Status, headers: Headers, stream: InputStream): Response[ResponseEntity] =
     Response(status, headers,
       new ResponseEntity(headers.getOpt[MediaType]("Content-Type"),
         headers.getOpt[Seq[Encoding]]("Content-Encoding").fold(stream) { values =>
-          values.foldRight(stream) { _ decode _ }
+          values.foldRight(closing(stream)) { _ decode _ }
         }))
 }
 
