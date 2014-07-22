@@ -81,6 +81,9 @@ object Status {
       else              None
   }
 
+  def unapply[T](res: Response[T]): Option[Status] = Some(res.status)
+
+
   /** Used to pattern match [[Status statuses]] and [[Response responses]] on the `2xx` group. */
   object Success extends Extractor(_.isSuccess)
   /** Used to pattern match [[Status statuses]] and [[Response responses]] on the `4xx` and `5xx` groups. */

@@ -11,17 +11,10 @@ It's meant to be simple, fluent and functional. Suggestions and constructive cri
 
 ## Getting Fetch
 
-The current version is 0.2.0, which can be added to your project with the following line in your SBT build file:
+The current version is 0.2.1, which can be added to your project with the following line in your SBT build file:
 
 ```scala
-libraryDependencies += "com.nrinaudo" %% "fetch" % "0.2.0"
-```
-
-It's also possible to use 0.2.1 snapshots from the Sonatype repository with:
-```scala
-resolvers += "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
-
-libraryDependencies += "com.nrinaudo" %% "fetch" % "0.2.1-SNAPSHOT"
+libraryDependencies += "com.nrinaudo" %% "fetch" % "0.2.1"
 ```
 
 
@@ -66,9 +59,9 @@ however, it's usually more convenient to `map` to a better response type:
 def createRequest = ???
 
 // req is an instance of Request[String].
-val req = createRequest.map { res =>
-  if(res.status.isSuccess) res.body.as[String]
-  else                     throw new Exception("Error " + res.status.code)
+val req = createRequest.map {
+  case res @ Status.Success(_) => res.body.as[String]
+  case Status(s)               => throw new Exception("Error " + s.code)
 }
 ```
 
@@ -83,9 +76,9 @@ import com.nrinaudo.fetch.json4s._
 def createRequest = ???
 
 // req is an instance of Request[JValue].
-val req = createRequest.map { res =>
-  if(res.status.isSuccess) res.body.as[JValue]
-  else                     throw new Exception("Error " + res.status.code)
+val req = createRequest.map { 
+  case res @ Status.Success(_) => res.body.as[JValue]
+  case Status(s)               => throw new Exception("Error " + s.code)
 }
 ```
 
