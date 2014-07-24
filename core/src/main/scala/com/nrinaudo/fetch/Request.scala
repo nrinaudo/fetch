@@ -252,7 +252,7 @@ trait Request[A] {
 private class RequestImpl[A](override val url:     Url,
                              override val method:  Method  = Method.GET,
                              override val headers: Headers = new Headers(Map[String, String]()),
-                             private val engine:   (Url, Method, Option[RequestEntity], Headers) => A)
+                             private val  engine:  (Url, Method, Option[RequestEntity], Headers) => A)
   extends Request[A] {
   override def copy(url: Url, method: Method, headers: Headers): Request[A] =
     new RequestImpl[A](url, method, headers, engine)

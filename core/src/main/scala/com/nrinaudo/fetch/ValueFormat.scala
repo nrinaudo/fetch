@@ -1,7 +1,8 @@
 package com.nrinaudo.fetch
 
-import scala.util.{Failure, Success, Try}
 import java.nio.charset.Charset
+
+import scala.util.Try
 
 
 // - Value reading -----------------------------------------------------------------------------------------------------
@@ -14,7 +15,7 @@ object ValueReader {
 
   /** Acts as a [[ValueReader]] for sequences of the specified type.
     *
-    * This method will yield an instance of `Failure` if at least one of the specified list's values is not legal.
+    * This method will yield an instance of `None` if at least one of the specified list's values is not legal.
     */
   def sequence[T: ValueReader](values: Seq[String]): Option[List[T]] =
     values.map(implicitly[ValueReader[T]].read).foldRight(Some(Nil): Option[List[T]]) {
