@@ -30,10 +30,10 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
   def protocol(value: Protocol): Url = copy(protocol = value)
   def host(value: String): Url = copy(host = value)
   def port(value: Int): Url = copy(port = value)
-  def path(value: List[String]): Url = copy(path = value)
+  def path(value: String*): Url = copy(path = value.toList)
   def fragment(value: Option[String]): Url = copy(fragment = value)
   // TODO: maybe a list, with its slow appends, is not the best solution for storing paths?
-  def addSegment(value: String): Url = path(path :+ value)
+  def addSegment(value: String): Url = path(path :+ value :_*)
   def query(value: QueryString): Url = copy(query = value)
   def param[T: ValueWriter](name: String, values: T*): Url = query(query.set(name, values: _*))
 
