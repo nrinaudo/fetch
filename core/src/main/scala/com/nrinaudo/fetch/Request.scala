@@ -76,6 +76,17 @@ trait Request[A] {
   // -------------------------------------------------------------------------------------------------------------------
   protected def copy(url: Url, method: Method, headers: Headers): Request[A]
   def apply(body: Option[RequestEntity]): A
+
+  /** Applies the specified transformation to the request's eventual response.
+    *
+    * Application developers should be wary of a common pitfall: when working with responses that contain instances
+    * of [[ResponseEntity]], they should always clean these up, either by reading their content (transforming it
+    * to something else or calling [[ResponseEntity.empty()]]) or explicitly ignoring them (by calling
+    * [[ResponseEntity.ignore()]]).
+    *
+    * This is a common source of issues when mapping error statuses to exceptions: each connection will be kept
+    * alive until the remote host decides it has timed out.
+    */
   def map[B](f: A => B): Request[B]
 
 
@@ -98,9 +109,7 @@ trait Request[A] {
   // - Url manipulation ------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def /(segment: String): Request[A] = url(url / segment)
-
   def ?(value: QueryString): Request[A] = url(url ? value)
-
   def &[T: ValueWriter](param: (String, T)): Request[A] = url(url & param)
 
 
@@ -108,25 +117,15 @@ trait Request[A] {
   // - HTTP methods ----------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   def GET: Request[A] = method(Method.GET)
-
   def POST: Request[A] = method(Method.POST)
-
   def PUT: Request[A] = method(Method.PUT)
-
   def DELETE: Request[A] = method(Method.DELETE)
-
   def HEAD: Request[A] = method(Method.HEAD)
-
   def OPTIONS: Request[A] = method(Method.OPTIONS)
-
   def TRACE: Request[A] = method(Method.TRACE)
-
   def CONNECT: Request[A] = method(Method.CONNECT)
-
   def PATCH: Request[A] = method(Method.PATCH)
-
   def LINK: Request[A] = method(Method.LINK)
-
   def UNLINK: Request[A] = method(Method.UNLINK)
 
 

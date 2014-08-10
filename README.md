@@ -61,7 +61,9 @@ def createRequest = ???
 // req is an instance of Request[String].
 val req = createRequest.map {
   case res @ Status.Success(_) => res.body.as[String]
-  case Status(s)               => throw new Exception("Error " + s.code)
+  case res @ Status(s)         =>
+    res.empty()
+    throw new Exception("Error " + s.code)
 }
 ```
 
@@ -78,7 +80,9 @@ def createRequest = ???
 // req is an instance of Request[JValue].
 val req = createRequest.map { 
   case res @ Status.Success(_) => res.body.as[JValue]
-  case Status(s)               => throw new Exception("Error " + s.code)
+  case res @ Status(s)         =>
+      res.empty()
+      throw new Exception("Error " + s.code)
 }
 ```
 

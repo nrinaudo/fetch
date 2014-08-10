@@ -1,7 +1,7 @@
 package com.nrinaudo.fetch
 
 import java.nio.charset.Charset
-import java.io.{Reader, InputStreamReader, InputStream}
+import java.io.{OutputStream, Reader, InputStreamReader, InputStream}
 import com.nrinaudo.fetch.ResponseEntity.EntityParser
 
 object ResponseEntity {
@@ -22,6 +22,27 @@ class ResponseEntity(val mediaType: Option[MediaType], val content: InputStream)
     m       <- mediaType
     charset <- m.charset
   } yield charset
+
+  /** Reads the whole response and discards it.
+    *
+    * This method is useful when callers have no interest in the response's content, but want to re-use connections if
+    * possible. If keep-alive is not desirable / enabled, the [[ignore]] method might be preferred.
+    */
+  def empty(): Unit = withStream { s =>
+    writeBytes(s, new OutputStream {
+      override def write(b: Int): Unit = {}
+    })
+  }
+
+  /** Ignores this entity.
+    *
+    * This method will close the underlying stream without reading its content. This is useful when callers have no
+    * interest in the response entity and don't want to to through the trouble of reading the response.
+    *
+    * Do note, however, that calling this method will prevent the underlying connection from being re-used by
+    * keep-alive.
+    */
+  def ignore(): Unit = content.close()
 
   /** Executes the specified function on this response entity.
     *
