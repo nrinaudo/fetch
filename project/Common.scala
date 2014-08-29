@@ -27,7 +27,7 @@ object Common extends Build {
   override val settings = super.settings ++ xerial.sbt.Sonatype.sonatypeSettings ++
   Seq(organization       := "com.nrinaudo",
       version            := "0.2.2-SNAPSHOT",
-      scalaVersion       := "2.11.1",
+      scalaVersion       := "2.11.2",
       crossScalaVersions := Seq("2.11.2", "2.10.4"),
       scalacOptions      ++= Seq("-unchecked", "-deprecation", "-feature", "-target:jvm-1.6"),
       incOptions         := incOptions.value.withNameHashing(true),

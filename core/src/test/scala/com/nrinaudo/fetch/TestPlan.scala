@@ -1,19 +1,18 @@
 package com.nrinaudo.fetch
 
+import java.io._
+import java.util.zip.DeflaterOutputStream
+
+import unfiltered.Cycle
 import unfiltered.filter.Plan
 import unfiltered.filter.Plan.Intent
-import unfiltered.request._
-import unfiltered.response.{Status => SStatus, _}
-import java.util.zip.DeflaterOutputStream
-import java.io._
-import unfiltered.kit.Prepend
-import unfiltered.Cycle
-import unfiltered.response.ResponseFilter.Filtering
-import unfiltered.response.ResponseString
-import scala.io.Source
 import unfiltered.jetty.Server
-import scala.concurrent.ExecutionContext
-import com.nrinaudo.fetch.Request.HttpEngine
+import unfiltered.kit.Prepend
+import unfiltered.request._
+import unfiltered.response.ResponseFilter.Filtering
+import unfiltered.response.{ResponseString, Status => SStatus, _}
+
+import scala.io.Source
 
 /** Web server used for unit tests. */
 object TestPlan extends Plan {
@@ -55,7 +54,7 @@ object TestPlan extends Plan {
 
   // - Startup / shutdown ----------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def create: Server = unfiltered.jetty.Http.anylocal.plan(TestPlan)
+  def create: Server = unfiltered.jetty.Server.anylocal.plan(TestPlan)
   def start(implicit server: Server) = server.start()
   def stop(implicit server: Server) = server.stop()
 
