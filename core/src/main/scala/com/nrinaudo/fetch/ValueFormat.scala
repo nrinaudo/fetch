@@ -2,6 +2,7 @@ package com.nrinaudo.fetch
 
 import java.nio.charset.Charset
 
+import scala.annotation.implicitNotFound
 import scala.util.Try
 
 
@@ -25,6 +26,7 @@ object ValueReader {
 }
 
 /** Used to read parameter values from an instance of [[Parameters]]. */
+@implicitNotFound(msg = "Cannot find a ValueReader type class for ${T}")
 trait ValueReader[T] {
   /** Extract an instance of `T` from the specified value. */
   def read(value: String): Option[T]
@@ -51,6 +53,7 @@ object ValueWriter {
 }
 
 /** Used to write parameter values to an instance of [[Parameters]]. */
+@implicitNotFound(msg = "Cannot find a ValueWriter type class for ${T}")
 trait ValueWriter[T] {
   /** Writes the specified `T` to a `String`. A return value of `None` means that the specified value serialises to
     * nothing (the empty string, `Nil`, ...).

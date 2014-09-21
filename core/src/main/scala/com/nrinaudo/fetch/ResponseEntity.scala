@@ -4,7 +4,10 @@ import java.nio.charset.Charset
 import java.io.{OutputStream, Reader, InputStreamReader, InputStream}
 import com.nrinaudo.fetch.ResponseEntity.EntityParser
 
+import scala.annotation.implicitNotFound
+
 object ResponseEntity {
+  @implicitNotFound(msg = "Cannot find an EntityParser type class for ${T}")
   type EntityParser[T] = ResponseEntity => T
 }
 
