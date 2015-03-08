@@ -77,6 +77,7 @@ object ValueFormat {
   val Floats: ValueFormat[Float]     = apply(s => Try(s.toFloat).toOption,   f => Some {f.toString})
   val Booleans: ValueFormat[Boolean] = apply(s => Try(s.toBoolean).toOption, b => Some {b.toString})
   val Strings: ValueFormat[String]   = apply(Some(_),                        Some(_))
+  val Chars: ValueFormat[Char]       = apply(s => if(s.length == 1) Some(s.charAt(0)) else None, b => Some(b.toString))
   val Charsets: ValueFormat[Charset] = new ValueFormat[Charset] {
     override def write(value: Charset): Option[String] = Some(value.name())
     override def read(value: String): Option[Charset] = Try(Charset.forName(value)).toOption

@@ -55,16 +55,16 @@ package object fetch {
   implicit def urlToRequest(url: Url)(implicit engine: HttpEngine): Request[Response[ResponseEntity]] = Request(url)(engine)
 
   // Request entities.
-  implicit def stringToEntity(str: String)     = RequestEntity(str)
-  implicit def readerToEntity(reader: Reader)  = RequestEntity(reader)
-  implicit def streamToEntity(in: InputStream) = RequestEntity(in)
-  implicit def fileToEntity(file: File)        = RequestEntity(file)
+  implicit def stringToEntity(str: String): RequestEntity     = RequestEntity(str)
+  implicit def readerToEntity(reader: Reader): RequestEntity  = RequestEntity(reader)
+  implicit def streamToEntity(in: InputStream): RequestEntity = RequestEntity(in)
+  implicit def fileToEntity(file: File): RequestEntity        = RequestEntity(file)
 
   // Content negotiation headers.
-  implicit def mediaTypeToConneg(mediaType: MediaType) = Conneg(mediaType)
-  implicit def encodingToConneg(encoding: Encoding)    = Conneg(encoding)
-  implicit def charsetToConneg(charset: Charset)       = Conneg(charset)
-  implicit def localeToConneg(locale: Locale)          = Conneg(locale)
+  implicit def mediaTypeToConneg(mediaType: MediaType): Conneg[MediaType] = Conneg(mediaType)
+  implicit def encodingToConneg(encoding: Encoding): Conneg[Encoding]     = Conneg(encoding)
+  implicit def charsetToConneg(charset: Charset): Conneg[Charset]         = Conneg(charset)
+  implicit def localeToConneg(locale: Locale): Conneg[Locale]             = Conneg(locale)
 
   // Response entities.
   implicit val TextEntityParser: EntityParser[String] = (entity: ResponseEntity) => {

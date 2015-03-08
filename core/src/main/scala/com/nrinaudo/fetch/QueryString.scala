@@ -14,6 +14,7 @@ object QueryString {
   implicit val Floats: ValueFormat[Float]     = ValueFormat.Floats
   implicit val Booleans: ValueFormat[Boolean] = ValueFormat.Booleans
   implicit val Strings: ValueFormat[String]   = ValueFormat.Strings
+  implicit val Chars: ValueFormat[Char]       = ValueFormat.Chars
 
 
 

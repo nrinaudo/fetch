@@ -36,7 +36,7 @@ object MediaType {
     def /(value: String): MediaType = sub(value)
   }
 
-  /** All media types: `* / *` **/
+  /** All media types: `* / *` */
   final case class All(params: MediaTypeParameters = new MediaTypeParameters()) extends MediaType {
     override def rawType: String = "*/*"
     override def params(values: MediaTypeParameters): MediaType = copy(params = values)
