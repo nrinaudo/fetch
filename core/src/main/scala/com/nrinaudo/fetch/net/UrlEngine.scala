@@ -26,7 +26,7 @@ object UrlEngine {
 case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedirect: Boolean = false,
                       chunkSize: Int = UrlEngine.DefaultChunkSize) extends HttpEngine {
   /** Configures the specified connection to this client's preferences. */
-  private def configure(con: HttpURLConnection) {
+  private def configure(con: HttpURLConnection): Unit = {
     if(connectTimeout > 0) con.setConnectTimeout(connectTimeout)
     if(readTimeout > 0)    con.setReadTimeout(readTimeout)
     con.setInstanceFollowRedirects(followsRedirect)
@@ -35,7 +35,7 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
   /** Work around for some (all?) JREs not supporting all HTTP methods.
     * See https://java.net/jira/browse/JERSEY-639
     */
-  private def setMethod(con: HttpURLConnection, method: String) {
+  private def setMethod(con: HttpURLConnection, method: String): Unit = {
     try {con.setRequestMethod(method)}
     catch {
       case _: ProtocolException =>

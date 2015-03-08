@@ -48,7 +48,7 @@ trait RequestEntityLike[+Self <: RequestEntityLike[Self]] {
   def encoding(value: Encoding): Self = build(mediaType, value)
 
   /** Writes this request entity to the specified output stream, applying its transfer encoding if applicable. */
-  def apply(out: OutputStream) {
+  def apply(out: OutputStream): Unit = {
     val stream = encoding.encode(out)
     try {write(stream)}
     finally {stream.close()}
@@ -97,7 +97,7 @@ object RequestEntity {
   // -------------------------------------------------------------------------------------------------------------------
   private class StringEntity(val content: String, override val mediaType: MediaType, override val encoding: Encoding)
     extends TextRequestEntity with RequestEntityLike[StringEntity] {
-    override lazy val length: Option[Long] = Some(content.getBytes(charset).length)
+    override lazy val length: Option[Long] = Some(content.getBytes(charset).length.toLong)
     override protected def write(out: Writer): Unit = out.write(content)
     override protected def build(mediaType: MediaType, encoding: Encoding): StringEntity = new StringEntity(content, mediaType, encoding)
     override def toString = "String(%s)" format content
@@ -112,7 +112,7 @@ object RequestEntity {
   // -------------------------------------------------------------------------------------------------------------------
   private class FileEntity(val file: File, override val mediaType: MediaType, override val encoding: Encoding)
     extends RequestEntity with RequestEntityLike[FileEntity] {
-    override def write(out: OutputStream) {
+    override def write(out: OutputStream): Unit = {
       val in = new BufferedInputStream(new FileInputStream(file))
       try {writeBytes(in, out)}
       finally {in.close()}
@@ -133,7 +133,7 @@ trait TextRequestEntity extends RequestEntity with RequestEntityLike[TextRequest
 
   protected def write(out: Writer): Unit
 
-  override protected def write(out: OutputStream) {
+  override protected def write(out: OutputStream): Unit = {
     val writer = new OutputStreamWriter(out, charset)
     write(writer)
     writer.flush()

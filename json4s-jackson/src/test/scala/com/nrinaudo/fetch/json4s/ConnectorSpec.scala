@@ -19,7 +19,7 @@ class ReaderResponse(val reader: Reader) extends ResponseWriter {
     super.respond(res)
   }
 
-  override def write(writer: OutputStreamWriter) {
+  override def write(writer: OutputStreamWriter): Unit = {
     var c = -1
     while({c = reader.read; c >= 0}) {
       writer.write(c)
@@ -31,21 +31,23 @@ class ReaderResponse(val reader: Reader) extends ResponseWriter {
 class ConnectorSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks with BeforeAndAfterAll {
   implicit val formats = org.json4s.DefaultFormats
   implicit val engine = UrlEngine()
-  val server = unfiltered.jetty.Http.anylocal.plan(Planify {
+  val server = unfiltered.jetty.Server.anylocal.plan(Planify {
     unfiltered.kit.GZip {
       case req @ Path(Seg("echo" :: Nil)) => new ReaderResponse(req.reader)
     }
   })
 
-  override def beforeAll() {
+  override def beforeAll(): Unit = {
     server.start()
+    ()
   }
 
-  override def afterAll() {
+  override def afterAll(): Unit = {
     server.stop()
+    ()
   }
 
-  val request: Request[JValue] = Request.from(server.url + "echo").get.map(_.body.as[JValue])
+  val request: Request[JValue] = Request.from("http://localhost:" + server.ports.head + "/echo").get.map(_.body.as[JValue])
 
   def json = for {
     str <- Arbitrary.arbitrary[String]

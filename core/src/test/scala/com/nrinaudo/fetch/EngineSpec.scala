@@ -29,12 +29,14 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
   // -------------------------------------------------------------------------------------------------------------------
   implicit val server: Server = TestPlan.create
 
-  override def beforeAll() {
+  override def beforeAll(): Unit = {
     TestPlan.start
+    ()
   }
 
-  override def afterAll() {
+  override def afterAll(): Unit = {
     TestPlan.stop
+    ()
   }
 
   def request(path: String) = Request.from(server.portBindings.head.url + '/' + path)(httpEngine).get
@@ -83,7 +85,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     // - Header helpers ------------------------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
-    def checkConnegs[T](response: Response[ResponseEntity], values: Seq[Conneg[T]], reader: ValueReader[Seq[Conneg[T]]]) {
+    def checkConnegs[T](response: Response[ResponseEntity], values: Seq[Conneg[T]], reader: ValueReader[Seq[Conneg[T]]]): Unit = {
       reader.read(response.body.as[String]).get should be(values)
     }
 

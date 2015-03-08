@@ -6,11 +6,8 @@ import org.json4s.native.Serialization._
 import scala.language.implicitConversions
 import org.json4s.native.JsonMethods
 
-/**
- * @author Nicolas Rinaudo
- */
 package object json4s {
-  implicit def jsonToEntity(json: JValue)(implicit formats: Formats) = RequestEntity.chars {out => write(json, out)}
+  implicit def jsonToEntity(json: JValue)(implicit formats: Formats) = RequestEntity.chars {out => write(json, out); ()}
       .mediaType(MediaType.Json.charset(DefaultCharset))
 
   implicit val Parser: EntityParser[JValue] = (entity: ResponseEntity) =>

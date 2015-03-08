@@ -65,7 +65,7 @@ trait ConnegFormat[T] extends HttpGrammar with ValueFormat[Seq[Conneg[T]]] {
   def qValue: Parser[Float] = ("q" ~ valueSep) ~> """[0-1](\.[0-9]{1,3})?""".r ^^ (_.toFloat)
 
   /** Formats the content-negotiation `q` parameter. */
-  def qValue(value: Float): String = "q=%s".format(qFormat.format(value))
+  def qValue(value: Float): String = s"q=${qFormat.format(value.toDouble)}"
 
   private def writeEntry(entry: Conneg[T]): String =
     if(entry.q == 1) entry.value.toString

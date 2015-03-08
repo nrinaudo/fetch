@@ -74,7 +74,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     it("should have a working & method") {
       import QueryString._
       forAll(url, identifier, arbitrary[String]) { (url, name, value) =>
-        (Request(url) & (name, value)).url should be(url & (name -> value))
+        (Request(url) & name -> value).url should be(url & name -> value)
       }
     }
 

@@ -2,6 +2,7 @@ package com.nrinaudo.fetch
 
 import java.io._
 import java.util.zip.DeflaterOutputStream
+import javax.servlet.http.{HttpServletRequest, HttpServlet}
 
 import unfiltered.Cycle
 import unfiltered.filter.Plan
@@ -24,7 +25,7 @@ object TestPlan extends Plan {
       super.respond(res)
     }
 
-    override def write(writer: OutputStreamWriter) {
+    override def write(writer: OutputStreamWriter): Unit = {
       var c = -1
       while({c = reader.read; c >= 0}) {
         writer.write(c)
@@ -87,7 +88,6 @@ object TestPlan extends Plan {
     // Expects to find basic auth credentials. If found, returns them, otherwise fails.
     case req @ Path(Seg("auth" :: Nil))       => req match {
       case BasicAuth(user, pwd) => new ResponseString(user + "\n" + pwd)
-      case _                    => Unauthorized ~> WWWAuthenticate("""Basic realm="/"""")
     }
 
     // Returns the value(s) of the specified request header, separated by line breaks if the header has more than one
@@ -97,7 +97,7 @@ object TestPlan extends Plan {
         case GET(_) =>
           val value = req.headers(header)
           if(value.hasNext) ResponseString(value.map(_.trim).mkString("\n"))
-          else              NotFound
+          else NotFound
 
         case POST(_) => new HeaderResponse(header, Source.fromInputStream(req.inputStream, "UTF-8").mkString)
       }

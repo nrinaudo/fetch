@@ -14,7 +14,7 @@ object Language {
     override def toLocale: Locale = new Locale(lang)
     override def toString = lang
   }
-  
+
   /** Represents a regional version of a given language.
     *
     * Canadian French, for example, is a region specific version of the global French language.
@@ -26,8 +26,8 @@ object Language {
     override def toLocale: Locale = new Locale(lang, country)
     override def toString = "%s-%s" format (lang, country)
   }
-  
-  
+
+
   /** Describes the grammar used to read and write languages. */
   trait Grammar extends HttpGrammar {
     def tag: Parser[String] = """\p{Alpha}{1,8}""".r
@@ -54,8 +54,8 @@ object Language {
 
 /** Represents an entity's language.
   *
-  * These can be used for [[Request.acceptLanguage content negotiation]] or
-  * to describe the language in which a [[Response.contentLanguage response]] is written.
+  * These can be used for content negotiation or
+  * to describe the language in which a response is written.
   *
   * A language can either be [[com.nrinaudo.fetch.Language.Global global]] or
   * [[com.nrinaudo.fetch.Language.RegionSpecific country-specific]].

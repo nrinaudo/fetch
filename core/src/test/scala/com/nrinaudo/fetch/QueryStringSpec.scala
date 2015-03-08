@@ -118,9 +118,9 @@ class QueryStringSpec extends FunSpec with Matchers with GeneratorDrivenProperty
       forAll(queryParams, identifier) { (params, name) =>
         val query = QueryString(params)
 
-        query.set(name, "") should be(query)
-        query.add(name, "") should be(query)
-        query & (name, "") should be(query)
+        query.set(name, "")  should be(query)
+        query.add(name, "")  should be(query)
+        (query & name -> "") should be(query)
 
         QueryString().set(name, List[String](): _*) should be(QueryString())
         QueryString().add(name, List[String](): _*) should be(QueryString())

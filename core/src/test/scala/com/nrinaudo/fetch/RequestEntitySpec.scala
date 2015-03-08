@@ -57,7 +57,7 @@ class RequestEntitySpec extends FunSpec with Matchers with GeneratorDrivenProper
     // This does not look terribly useful, but I've been known to mess my string patterns in toString methods and
     // discover it much too late.
     it("should have a working toString method") {
-      forAll(arbitrary[String]) { s => RequestEntity(s).toString }
+      forAll(arbitrary[String]) { s => RequestEntity(s).toString; () }
     }
   }
 
@@ -65,7 +65,7 @@ class RequestEntitySpec extends FunSpec with Matchers with GeneratorDrivenProper
     // This does not look terribly useful, but I've been known to mess my string patterns in toString methods and
     // discover it much too late.
     it("should have a working toString method") {
-      forAll(arbitrary[String]) { s => RequestEntity(tmpFile(s)).toString }
+      forAll(arbitrary[String]) { s => RequestEntity(tmpFile(s)).toString; () }
     }
   }
 

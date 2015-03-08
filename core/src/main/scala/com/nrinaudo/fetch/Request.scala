@@ -56,9 +56,9 @@ object Request {
 
 /** Represents an HTTP request.
   *
-  * Instances are created through the [[Request$ companion object]]. Once an instance is obtained, the request can be
-  * configured through "raw" modification methods ([[method]], [[headers]]...) as well as specialised helpers such
-  * as [[GET]], [[acceptGzip]] or [[/]].
+  * Instances are created through the companion object. Once an instance is obtained, the request can be
+  * configured through "raw" modification methods ({{{method}}}, {{{headers}}}...) as well as specialised helpers such
+  * as {{{GET}}}, {{{acceptGzip}}} or {{{/}}}.
   */
 trait Request[A] {
   // - Fields ----------------------------------------------------------------------------------------------------------
@@ -81,8 +81,8 @@ trait Request[A] {
     *
     * Application developers should be wary of a common pitfall: when working with responses that contain instances
     * of [[ResponseEntity]], they should always clean these up, either by reading their content (transforming it
-    * to something else or calling [[ResponseEntity.empty()]]) or explicitly ignoring them (by calling
-    * [[ResponseEntity.ignore()]]).
+    * to something else or calling [[ResponseEntity.empty]]) or explicitly ignoring them (by calling
+    * [[ResponseEntity.ignore]]).
     *
     * This is a common source of issues when mapping error statuses to exceptions: each connection will be kept
     * alive until the remote host decides it has timed out.

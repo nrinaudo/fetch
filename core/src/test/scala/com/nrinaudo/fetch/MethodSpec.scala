@@ -38,7 +38,7 @@ class MethodSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     }
 
     it("should fail to apply on illegal HTTP methods") {
-      forAll(illegalMethod) { method => intercept[IllegalArgumentException](Method(method)) }
+      forAll(illegalMethod) { method => intercept[IllegalArgumentException](Method(method)); () }
     }
 
     it("should have a working unapply method") {

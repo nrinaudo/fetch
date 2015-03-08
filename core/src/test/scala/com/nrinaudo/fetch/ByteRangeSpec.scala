@@ -42,18 +42,21 @@ class ByteRangeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
     it("should refuse negative values for its lower boundary") {
       forAll(negBoundary, boundary) { (from, to) =>
         intercept[IllegalArgumentException] { FullRange(from, to) }
+        ()
       }
     }
 
     it("should refuse negative values for its upper boundary") {
       forAll(boundary, negBoundary) { (from, to) =>
         intercept[IllegalArgumentException] { FullRange(from, to) }
+        ()
       }
     }
 
     it("should refuse instances where the upper boundary is smaller than the lower one") {
       forAll(boundaries.suchThat {b => b._1 != b._2}) { case (from, to) =>
         intercept[IllegalArgumentException] { FullRange(math.max(from, to), math.min(from, to)) }
+        ()
       }
     }
 
@@ -68,6 +71,7 @@ class ByteRangeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
     it("should refuse negative values for its value") {
       forAll(negBoundary) { from =>
         intercept[IllegalArgumentException] { PrefixRange(from) }
+        ()
       }
     }
 
@@ -82,6 +86,7 @@ class ByteRangeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
     it("should refuse negative values for its value") {
       forAll(negBoundary) { from =>
         intercept[IllegalArgumentException] { SuffixRange(from) }
+        ()
       }
     }
 

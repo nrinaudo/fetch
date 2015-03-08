@@ -33,11 +33,12 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     it("should refuse illegal value of q") {
       forAll(Gen.oneOf(Gen.choose(1.1f, 100f), Gen.choose(-100f, -0.1f))) {q =>
         intercept[IllegalArgumentException] {Conneg("value", q)}
+        ()
       }
     }
 
     it("should accept legal values of q") {
-      forAll(Gen.choose(0f, 1f)) {q => Conneg("value", q) }
+      forAll(Gen.choose(0f, 1f)) {q => Conneg("value", q); () }
     }
 
     it("should not serialize q when it's equal to 1") {

@@ -23,7 +23,7 @@ package object fetch {
   /** Writes the content of the specified input stream to the specified output stream.
     * Note that this method does not wrap its arguments in buffered streams, nor will it close either stream.
     */
-  def writeBytes(in: InputStream, out: OutputStream) {
+  def writeBytes(in: InputStream, out: OutputStream): Unit = {
     def loop(buffer: Array[Byte]): Unit =
       in.read(buffer, 0, buffer.length) match {
         case count if count > 0 =>

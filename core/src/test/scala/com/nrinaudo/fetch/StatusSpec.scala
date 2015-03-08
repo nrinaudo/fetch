@@ -26,14 +26,14 @@ class StatusSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     }
 
     it("should fail to apply on illegal statuses") {
-      forAll(invalidStatus) { status => intercept[IllegalArgumentException](Status(status)) }
+      forAll(invalidStatus) { status => intercept[IllegalArgumentException](Status(status)); () }
     }
 
     def expected[T](t: T, pass: Boolean) =
       if(pass) Some(t)
       else None
 
-    def validate(status: Status, extractor: Status.Extractor, pass: Boolean) {
+    def validate(status: Status, extractor: Status.Extractor, pass: Boolean): Unit = {
       extractor.unapply(status) should be(expected(status, pass))
       extractor.unapply(response(status)) should be(expected(status, pass))
     }
