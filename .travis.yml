@@ -5,3 +5,5 @@ jdk:
   - openjdk6
   - openjdk7
   - oraclejdk7
+script: "sbt clean coverage test"
+after_success: "sbt coverageAggregate coveralls"

@@ -1,6 +1,7 @@
 import SonatypeKeys._
 
-lazy val root = project.in(file(".")).aggregate(core, json4sNative, json4sJackson, sample, tagsoup).settings(packagedArtifacts := Map.empty)
+lazy val root = Project(id = "fetch",
+                        base = file(".")).aggregate(core, json4sNative, json4sJackson, sample, tagsoup).settings(packagedArtifacts := Map.empty)
 
 lazy val core = project
 

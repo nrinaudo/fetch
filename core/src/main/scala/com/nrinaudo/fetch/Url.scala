@@ -68,7 +68,7 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
     builder.append(path.filter(!_.isEmpty).map(UrlEncoder.encode).mkString("/", "/", ""))
 
     // Query String.
-    if(!query.values.isEmpty) query.writeTo(builder.append('?'))
+    if(query.values.nonEmpty) query.writeTo(builder.append('?'))
 
     fragment.foreach {r => builder.append("#").append(UrlEncoder.encode(r))}
 
