@@ -1,8 +1,6 @@
 # fetch
 
-[![Build Status](https://travis-ci.org/nrinaudo/fetch.svg?branch=master)](https://travis-ci.org/nrinaudo/fetch)
-
-[![Coverage Status](https://coveralls.io/repos/nrinaudo/fetch/badge.svg)](https://coveralls.io/r/nrinaudo/fetch)
+[![Build Status](https://travis-ci.org/nrinaudo/fetch.svg?branch=master)](https://travis-ci.org/nrinaudo/fetch) [![Coverage Status](https://coveralls.io/repos/nrinaudo/fetch/badge.svg)](https://coveralls.io/r/nrinaudo/fetch)
 
 Fetch is a Scala wrapper for Java HTTP client implementations. It comes with a default `java.net.URLConnection`
 connector, with more planned in the future.
