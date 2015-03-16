@@ -2,12 +2,14 @@
 
 [![Build Status](https://travis-ci.org/nrinaudo/fetch.svg?branch=master)](https://travis-ci.org/nrinaudo/fetch)
 
+[![Coverage Status](https://coveralls.io/repos/nrinaudo/fetch/badge.svg)](https://coveralls.io/r/nrinaudo/fetch)
+
 Fetch is a Scala wrapper for Java HTTP client implementations. It comes with a default `java.net.URLConnection`
 connector, with more planned in the future.
 
 It's meant to be simple, fluent and functional. Suggestions and constructive criticisms are more than welcome.
 
- 
+
 
 ## Getting Fetch
 
@@ -71,14 +73,14 @@ We were requesting `JSON` content, however, so an instance of `String` is not te
 instances of `EntityParser` can be used to transform a `ResponseEntity` into a more immediately useful type.
 
 Using the [json4s-jackson](json4s-jackson) Fetch module, for example, one would write:
- 
+
 ```scala
 import com.nrinaudo.fetch.json4s._
 
 def createRequest = ???
 
 // req is an instance of Request[JValue].
-val req = createRequest.map { 
+val req = createRequest.map {
   case res @ Status.Success(_) => res.body.as[JValue]
   case res @ Status(s)         =>
       res.empty()
