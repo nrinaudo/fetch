@@ -258,6 +258,6 @@ private class RequestImpl[A](override val url:     Url,
 
   override def apply(body: Option[RequestEntity]): A = engine.apply(url, method, body, headers)
 
-  override def map[B](f: (A) => B): Request[B] =
+  override def map[B](f: A => B): Request[B] =
     new RequestImpl(url, method, headers, (a, b, c, d) => f(engine(a, b, c, d)))
 }

@@ -14,7 +14,7 @@ It's meant to be simple, fluent and functional. Suggestions and constructive cri
 The current version is 0.2.1, which can be added to your project with the following line in your SBT build file:
 
 ```scala
-libraryDependencies += "com.nrinaudo" %% "fetch" % "0.2.1"
+libraryDependencies += "com.nrinaudo" %% "fetch-core" % "0.2.1"
 ```
 
 
@@ -114,6 +114,3 @@ implicit def intToEntity(value: Int) = RequestEntity.chars { _.write(value.toStr
 
 An example of such a mechanism is the [json4s-jackson](json4s-jackson) Fetch module, which declares
 implicit conversion from a `JValue` to a `RequestEntity`.
-
-
-

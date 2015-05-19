@@ -8,8 +8,7 @@ import scala.xml.NodeSeq
 import scala.xml.parsing.NoBindingFactoryAdapter
 
 package object tagsoup {
-  implicit val Parser: EntityParser[NodeSeq] = (entity: ResponseEntity) =>
-    entity.withReader { in =>
-      new NoBindingFactoryAdapter().loadXML(new InputSource(in), new SAXFactoryImpl().newSAXParser)
-    }
+  implicit val Parser: EntityParser[NodeSeq] = _.withReader { in =>
+    new NoBindingFactoryAdapter().loadXML(new InputSource(in), new SAXFactoryImpl().newSAXParser)
+  }
 }
