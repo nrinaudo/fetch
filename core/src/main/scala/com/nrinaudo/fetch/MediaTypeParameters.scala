@@ -1,7 +1,7 @@
 package com.nrinaudo.fetch
 
 object MediaTypeParameters {
-  implicit val CharsetFormat = ValueFormat.charsetParam
+  implicit val charsetParam = ValueFormat.charsetParam
 
   private object Format extends HttpGrammar {
     def apply(string: String): Option[MediaTypeParameters] =
