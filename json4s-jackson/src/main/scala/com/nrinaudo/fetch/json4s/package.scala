@@ -1,6 +1,6 @@
 package com.nrinaudo.fetch
 
-import java.io.OutputStream
+import java.nio.charset.Charset
 
 import com.fasterxml.jackson.core.JsonGenerator
 import org.json4s._
@@ -16,10 +16,10 @@ package object json4s {
     m
   }
 
-  implicit def writer(implicit formats: Formats): EntityWriter[JValue] = new EntityWriter[JValue] {
-    override def mediaType: MediaType = MediaType.Json.charset(DefaultCharset)
-    override def length(a: JValue): Option[Long] = None
-    override def write(a: JValue, out: OutputStream): Unit = mapper.writeValue(out, Extraction.decompose(a))
+  implicit def writer(implicit formats: Formats): EntityWriter[JValue] = new TextEntityWriter[JValue] {
+    override def mediaType                             = MediaType.Json.charset(DefaultCharset)
+    override def write(a: JValue, out: java.io.Writer) = mapper.writeValue(out, Extraction.decompose(a))
+    override def length(a: JValue, charset: Charset)   = None
   }
 
   implicit val reader: EntityReader[JValue] = EntityReader.chars(in => JsonMethods.parse(ReaderInput(in)))
