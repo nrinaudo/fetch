@@ -11,8 +11,8 @@ object Response {
       finally { input.close() }
     }
 
-    def empty(): Unit = as(EntityReader.empty)
-    def ignore(): Unit = as(EntityReader.ignore)
+    def empty(): Unit = as(EntityReader.emptyReader)
+    def ignore(): Unit = as(EntityReader.ignoreReader)
   }
 
   // It appears that some stream implementation (decompressing ones, for instance, such as GZipInputStream) stop reading

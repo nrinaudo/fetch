@@ -10,5 +10,4 @@ package object tagsoup {
   implicit val reader: EntityReader[NodeSeq] = EntityReader.chars { in =>
       new NoBindingFactoryAdapter().loadXML(new InputSource(in), new SAXFactoryImpl().newSAXParser)
   }
-
 }
