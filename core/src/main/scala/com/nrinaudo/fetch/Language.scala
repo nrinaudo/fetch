@@ -48,8 +48,6 @@ object Language {
   def apply(locale: Locale): Language =
     if(locale.getCountry.isEmpty) Global(locale.getLanguage)
     else                          RegionSpecific(locale.getLanguage, locale.getCountry)
-
-  def unapply(language: Language): Some[Locale] = Some(language.toLocale)
 }
 
 /** Represents an entity's language.

@@ -5,8 +5,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 
 class ValueWriterSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  implicit val Ints    = ValueFormat.Ints
-  implicit val Strings = Headers.StringFormat
+  implicit val Ints    = ValueFormat.intParam
+  implicit val Strings = Headers.stringHeader
 
   describe("ValueWriter") {
     it("should sequence non-empty lists properly") {

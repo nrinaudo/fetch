@@ -2,6 +2,8 @@ package com.nrinaudo.fetch
 
 import java.net.URI
 
+import com.nrinaudo.fetch.Request.HttpEngine
+
 object Url {
   // - URI-based construction ------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
@@ -54,6 +56,8 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
   // Note: I wanted to implement this properly with the correct URI constructor and all, but it turns out this creates
   // a string and then parses it...
   def toURI: URI = new URI(toString)
+
+  def toRequest(implicit engine: HttpEngine): Request[Response[Response.Entity]] = Request(this)
 
   override lazy val toString = {
     val builder = new StringBuilder

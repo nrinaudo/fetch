@@ -7,13 +7,13 @@ object Encoding {
   // - Standard implementations ----------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Transparent, no-op encoding. */
-  val Identity = apply("identity", out => out, in => in)
+  val Identity: Encoding = apply("identity", identity, identity)
 
   /** Encoding that gzips and gunzips content. */
-  val Gzip = apply("gzip", out => new GZIPOutputStream(out), in => new GZIPInputStream(in))
+  val Gzip: Encoding = apply("gzip", out => new GZIPOutputStream(out), in => new GZIPInputStream(in))
 
   /** Encoding that inflates and deflates content. */
-  val Deflate = apply("deflate", out => new DeflaterOutputStream(out), in => new InflaterInputStream(in))
+  val Deflate: Encoding = apply("deflate", out => new DeflaterOutputStream(out), in => new InflaterInputStream(in))
 
   /** Registry of known content encodings. */
   val DefaultEncodings: Map[String, Encoding] = Map(Identity.name -> Identity) + (Gzip.name -> Gzip) +

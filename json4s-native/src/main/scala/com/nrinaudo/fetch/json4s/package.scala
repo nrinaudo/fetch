@@ -1,15 +1,18 @@
 package com.nrinaudo.fetch
 
+import java.io.OutputStream
+
 import org.json4s._
-import com.nrinaudo.fetch.ResponseEntity.EntityParser
-import org.json4s.native.Serialization._
-import scala.language.implicitConversions
 import org.json4s.native.JsonMethods
 
-package object json4s {
-  implicit def jsonToEntity(json: JValue)(implicit formats: Formats) = RequestEntity.chars {out => write(json, out); ()}
-      .mediaType(MediaType.Json.charset(DefaultCharset))
+import scala.language.implicitConversions
 
-  implicit val Parser: EntityParser[JValue] = (entity: ResponseEntity) =>
-    entity.withReader {in => JsonMethods.parse(ReaderInput(in))}
+package object json4s {
+  implicit def writer(implicit formats: Formats): EntityWriter[JValue] = new EntityWriter[JValue] {
+    override def mediaType: MediaType = MediaType.Json.charset(DefaultCharset)
+    override def length(a: JValue): Option[Long] = None
+    override def write(a: JValue, out: OutputStream): Unit = write(Extraction.decompose(a), out)
+  }
+
+  implicit val reader: EntityReader[JValue] = EntityReader.chars(in => JsonMethods.parse(ReaderInput(in)))
 }

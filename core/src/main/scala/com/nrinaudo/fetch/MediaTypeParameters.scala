@@ -1,7 +1,7 @@
 package com.nrinaudo.fetch
 
 object MediaTypeParameters {
-  implicit val CharsetFormat = ValueFormat.Charsets
+  implicit val CharsetFormat = ValueFormat.charsetParam
 
   private object Format extends HttpGrammar {
     def apply(string: String): Option[MediaTypeParameters] =
@@ -9,12 +9,14 @@ object MediaTypeParameters {
   }
 
   def parse(str: String): Option[MediaTypeParameters] = {
-    if(str == null) Some(new MediaTypeParameters())
+    if(str == null) Some(MediaTypeParameters.empty)
     else            Format(str)
   }
+
+  def empty: MediaTypeParameters = MediaTypeParameters(Map.empty)
 }
 
-class MediaTypeParameters(override val values: Map[String, String] = Map()) extends Parameters[MediaTypeParameters] {
+case class MediaTypeParameters(override val values: Map[String, String]) extends Parameters[MediaTypeParameters] {
   import MediaTypeParameters._
 
   override def build(values: Map[String, String]): MediaTypeParameters = new MediaTypeParameters(values)

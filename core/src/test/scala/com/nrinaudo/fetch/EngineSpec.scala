@@ -1,24 +1,26 @@
 package com.nrinaudo.fetch
 
-import org.scalatest.{Matchers, BeforeAndAfterAll, FunSpec}
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.{Arbitrary, Gen}
-import Arbitrary._
-import Headers._
-import unfiltered.jetty.Server
+import java.nio.charset.Charset
+import java.util.Date
+
+import com.nrinaudo.fetch.Headers._
 import com.nrinaudo.fetch.Request._
-import scala.Some
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Gen
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
+import unfiltered.jetty.Server
 
 trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
-  import RequestSpec._
   import ByteRangeSpec._
-  import RequestEntitySpec._
   import ConnegSpec._
-  import LanguageSpec._
-  import EncodingSpec._
-  import HeadersSpec._
   import ETagSpec._
+  import EncodingSpec._
+  import MediaTypeSpec._
+  import HeadersSpec._
+  import LanguageSpec._
   import MethodSpec._
+  import RequestSpec._
 
 
   def httpEngine: HttpEngine
@@ -49,7 +51,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     // - Basic tests ---------------------------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
     it("should use the specified HTTP method") {
-      forAll(httpMethod) { method =>
+      forAll { method: Method =>
         request("method").method(method).apply().body.as[String] should be(method.name)
       }
     }
@@ -71,13 +73,14 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     // - Entity submission / reception ---------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
     it("should correctly read and write entity bodies, regardless of the request and response encoding") {
-      forAll(knownEntity, encoding, encoding) { (entity, reqEncoding, resEncoding) =>
-        val response = request("body").acceptEncoding(resEncoding).PUT(entity.entity.encoding(reqEncoding))
+      implicit val writer = EntityWriter.string(MediaType.PlainText.charset(Charset.forName("UTF-8")))
+      forAll(arbitrary[String].suchThat(_.nonEmpty), arbitrary[Encoding], arbitrary[Encoding]) { (entity, reqEncoding, resEncoding) =>
+        val response = request("body").acceptEncoding(resEncoding).encoding(reqEncoding).PUT(entity)
 
         if(resEncoding == Encoding.Identity) response.contentEncoding should be(None)
         else                                 response.contentEncoding should be(Some(List(resEncoding)))
 
-        response.body.as[String] should be(entity.content)
+        response.body.as[String] should be(entity)
       }
     }
 
@@ -85,23 +88,22 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     // - Header helpers ------------------------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
-    def checkConnegs[T](response: Response[ResponseEntity], values: Seq[Conneg[T]], reader: ValueReader[Seq[Conneg[T]]]): Unit = {
+    def checkConnegs[T](response: Response[Response.Entity], values: Seq[Conneg[T]], reader: ValueReader[Seq[Conneg[T]]]): Unit = {
       reader.read(response.body.as[String]).get should be(values)
     }
 
     it("should use the specified Accept header(s)") {
-      forAll(connegs(MediaTypeSpec.mediaType)) { mediaTypes =>
+      forAll { mediaTypes: List[Conneg[MediaType]] =>
         checkConnegs(request("header/Accept").accept(mediaTypes: _*).GET.apply(), mediaTypes, Conneg.MediaTypes)
       }
     }
-
     it("should send the default Accept header (*/*) when none is specified") {
       request("header/Accept").GET.apply().body.as[String] should be("*/*")
       request("header/Accept").accept().GET.apply().body.as[String] should be("*/*")
     }
 
     it("should use the specified Accept-Charset header") {
-      forAll(connegs(charset)) { charsets =>
+      forAll { charsets: List[Conneg[Charset]] =>
         checkConnegs(request("header/Accept-Charset").acceptCharset(charsets:_*).GET.apply(), charsets, Conneg.Charsets)
       }
     }
@@ -112,7 +114,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     }
 
     it("should use the specified Accept-Language header") {
-      forAll(connegs(language)) { languages =>
+      forAll { languages: List[Conneg[Language]] =>
         checkConnegs(request("header/Accept-Language").acceptLanguage(languages :_*).GET.apply(), languages, Conneg.Languages)
       }
     }
@@ -123,7 +125,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     }
 
     it("should use the specified Accept-Encoding header") {
-      forAll(connegs(encoding)) { encodings =>
+      forAll { encodings: List[Conneg[Encoding]] =>
         checkConnegs(request("header/Accept-Encoding").acceptEncoding(encodings:_*).GET.apply(), encodings, Conneg.Encodings)
       }
     }
@@ -150,8 +152,8 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     }
 
     it("should send the correct Date header when specified") {
-      forAll(date) { date =>
-        DateFormat.read(request("header/Date").date(date).GET.apply().body.as[String]) should be(Some(date))
+      forAll { date: Date =>
+        dateHeader.read(request("header/Date").date(date).GET.apply().body.as[String]) should be(Some(date))
       }
     }
 
@@ -170,8 +172,8 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     }
 
     it("should send the correct If-Modified-Since header when specified") {
-      forAll(date) { date =>
-        DateFormat.read(request("header/If-Modified-Since").ifModifiedSince(date).GET.apply().body.as[String]) should be(Some(date))
+      forAll { date: Date =>
+        dateHeader.read(request("header/If-Modified-Since").ifModifiedSince(date).GET.apply().body.as[String]) should be(Some(date))
       }
     }
 
@@ -180,8 +182,8 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     }
 
     it("should send the correct If-Unmodified-Since header when specified") {
-      forAll(date) { date =>
-        DateFormat.read(request("header/If-Unmodified-Since").ifUnmodifiedSince(date).GET.apply().body.as[String]) should be(Some(date))
+      forAll { date: Date =>
+        dateHeader.read(request("header/If-Unmodified-Since").ifUnmodifiedSince(date).GET.apply().body.as[String]) should be(Some(date))
       }
     }
 
@@ -191,13 +193,13 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     }
 
     it("should send the correct Range header when specified") {
-      forAll(byteRanges) { ranges =>
+      forAll { ranges: List[ByteRange] =>
         request("header/Range").range(ranges :_*).GET.apply().body.as[String] should be("bytes=" + ranges.mkString(","))
       }
     }
 
     it("should send the correct If-Match header when specified") {
-      forAll(etags) { tags =>
+      forAll { tags: List[ETag] =>
         request("header/If-Match").ifMatch(tags :_*).GET.apply().body.as[String] should be(tags.mkString(","))
       }
     }
@@ -208,7 +210,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     }
 
     it("should send the correct If-None-Match header when specified") {
-      forAll(etags) { tags =>
+      forAll { tags: List[ETag] =>
         request("header/If-None-Match").ifNoneMatch(tags :_*).GET.apply().body.as[String] should be(tags.mkString(","))
       }
     }
@@ -219,12 +221,12 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     }
 
     it("should send the correct If-Range header when specified") {
-      forAll(etag) { tag =>
+      forAll { tag: ETag =>
         ETag.parse(request("header/If-Range").ifRange(tag).GET.apply().body.as[String]) should be(Some(tag))
       }
 
-      forAll(date) { date =>
-        DateFormat.read(request("header/If-Range").ifRange(date).GET.apply().body.as[String]) should be(Some(date))
+      forAll { date: Date =>
+        dateHeader.read(request("header/If-Range").ifRange(date).GET.apply().body.as[String]) should be(Some(date))
       }
     }
 

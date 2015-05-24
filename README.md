@@ -68,7 +68,7 @@ val req = createRequest.map {
 ```
 
 We were requesting `JSON` content, however, so an instance of `String` is not terribly useful. Fortunately, implicit
-instances of `EntityParser` can be used to transform a `ResponseEntity` into a more immediately useful type.
+instances of `EntityReader` can be used to transform a `Response.Entity` into a more immediately useful type.
 
 Using the [json4s-jackson](json4s-jackson) Fetch module, for example, one would write:
 
@@ -79,10 +79,10 @@ def createRequest = ???
 
 // req is an instance of Request[JValue].
 val req = createRequest.map {
-  case res @ Status.Success(_) => res.body.as[JValue]
-  case res @ Status(s)         =>
+  case Status.Success(res) => res.body.as[JValue]
+  case res                 =>
       res.empty()
-      throw new Exception("Error " + s.code)
+      throw new Exception("Error " + response.status.code)
 }
 ```
 

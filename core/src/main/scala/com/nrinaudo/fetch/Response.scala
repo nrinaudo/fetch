@@ -5,6 +5,16 @@ import Headers._
 import java.io.{FilterInputStream, InputStream}
 
 object Response {
+  class Entity(private val input: InputStream, val mediaType: Option[MediaType]) {
+    def as[A: EntityReader]: A = {
+      try { implicitly[EntityReader[A]].read(input, mediaType) }
+      finally { input.close() }
+    }
+
+    def empty(): Unit = as(EntityReader.empty)
+    def ignore(): Unit = as(EntityReader.ignore)
+  }
+
   // It appears that some stream implementation (decompressing ones, for instance, such as GZipInputStream) stop reading
   // before read returns -1 - which seems to prevent keeping connections alive.
   // The following is a nasty workaround, but it works.
@@ -15,37 +25,32 @@ object Response {
     }
   }
 
-  def fromStream(status: Status, headers: Headers, stream: InputStream): Response[ResponseEntity] =
+  def fromStream(status: Status, headers: Headers, stream: InputStream): Response[Entity] =
     Response(status, headers,
-      new ResponseEntity(headers.getOpt[MediaType]("Content-Type"),
-        headers.getOpt[Seq[Encoding]]("Content-Encoding").fold(stream) { values =>
-          values.foldRight(closing(stream)) { _ decode _ }
-        }))
+      new Entity(headers.get[Seq[Encoding]]("Content-Encoding").fold(stream) { values =>
+        values.foldRight(closing(stream)) { _ decode _ }
+      }, headers.get[MediaType]("Content-Type")))
 }
 
 /** Represents an HTTP response. */
 case class Response[A](status: Status, headers: Headers, body: A) {
-  // - Monadic operations ----------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
   def map[B](f: A => B): Response[B] = copy(body = f(body))
-  def flatMap[B](f: A => Response[B]): Response[B] = copy(body = f(body).body)
-  def foreach[U](f: A => U): U = f(body)
 
 
 
   // - Header helpers ----------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def date: Option[Date] = headers.getOpt[Date]("Date")
-  def contentEncoding: Option[Seq[Encoding]] = headers.getOpt[Seq[Encoding]]("Content-Encoding")
-  def contentLanguage: Option[Seq[Language]] = headers.getOpt[Seq[Language]]("Content-Language")
-  def contentType: Option[MediaType] = headers.getOpt[MediaType]("Content-Type")
-  def lastModified: Option[Date] = headers.getOpt[Date]("Last-Modified")
-  def expires: Option[Date] = headers.getOpt[Date]("Expires")
-  def etag: Option[ETag] = headers.getOpt[ETag]("ETag")
-  def server: Option[String] = headers.getOpt[String]("Server")
-  def allow: Option[Seq[Method]] = headers.getOpt[Seq[Method]]("Allow")
-  def age: Option[Int] = headers.getOpt[Int]("Age")
-  def wwwAuthenticate: Option[String] = headers.getOpt[String]("WWW-Authenticate")
+  def date: Option[Date] = headers.get[Date]("Date")
+  def contentEncoding: Option[Seq[Encoding]] = headers.get[Seq[Encoding]]("Content-Encoding")
+  def contentLanguage: Option[Seq[Language]] = headers.get[Seq[Language]]("Content-Language")
+  def contentType: Option[MediaType] = headers.get[MediaType]("Content-Type")
+  def lastModified: Option[Date] = headers.get[Date]("Last-Modified")
+  def expires: Option[Date] = headers.get[Date]("Expires")
+  def etag: Option[ETag] = headers.get[ETag]("ETag")
+  def server: Option[String] = headers.get[String]("Server")
+  def allow: Option[Seq[Method]] = headers.get[Seq[Method]]("Allow")
+  def age: Option[Int] = headers.get[Int]("Age")
+  def wwwAuthenticate: Option[String] = headers.get[String]("WWW-Authenticate")
 
   // TODO: implement Accept-Ranges
   // TODO: implement Cache-Control

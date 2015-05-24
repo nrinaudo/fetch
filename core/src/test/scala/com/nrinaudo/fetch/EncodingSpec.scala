@@ -12,9 +12,8 @@ import java.util.zip.{InflaterInputStream, DeflaterOutputStream, GZIPOutputStrea
 object EncodingSpec {
   // - Generators ------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def encoding: Gen[Encoding] = Gen.oneOf(Encoding.Gzip, Encoding.Deflate, Encoding.Identity)
-
-  def illegalEncoding = Arbitrary.arbitrary[String].suchThat(e => !Encoding.DefaultEncodings.contains(e))
+  implicit val encoding: Arbitrary[Encoding] = Arbitrary(Gen.oneOf(Encoding.Gzip, Encoding.Deflate, Encoding.Identity))
+  def illegalEncoding: Gen[String] = arbitrary[String].suchThat(e => !Encoding.DefaultEncodings.contains(e))
 
 
 
@@ -45,7 +44,7 @@ class EncodingSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChe
 
   describe("An encoding") {
     it("should be able to decode content it has encoded") {
-      forAll(encoding, arbitrary[String]) { case (encoding, content) =>
+      forAll { (encoding: Encoding, content: String) =>
         implicit val e = encoding
         decode(encode(content)) should be(content)
       }
@@ -56,13 +55,13 @@ class EncodingSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChe
     implicit val gzip = Encoding.Gzip
 
     it("should GZIP raw content") {
-      forAll(arbitrary[String]) { content =>
+      forAll { content: String =>
         readAll(encode(content))(new GZIPInputStream(_)) should be(content)
       }
     }
 
     it("should \"un-GZIP\" GZIPed content") {
-      forAll(arbitrary[String]) { content =>
+      forAll { content: String =>
         decode(writeAll(content)(new GZIPOutputStream(_))) should be(content)
       }
     }
@@ -72,13 +71,13 @@ class EncodingSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChe
     implicit val deflate = Encoding.Deflate
 
     it("should deflate raw content") {
-      forAll(arbitrary[String]) { content =>
+      forAll { content: String =>
         readAll(encode(content))(new InflaterInputStream(_)) should be(content)
       }
     }
 
     it("should inflate deflated content") {
-      forAll(arbitrary[String]) { content =>
+      forAll { content: String =>
         decode(writeAll(content)(new DeflaterOutputStream(_))) should be(content)
       }
     }
@@ -88,13 +87,13 @@ class EncodingSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChe
     implicit val identity = Encoding.Identity
 
     it("should not modify read content") {
-      forAll(arbitrary[String]) { content =>
+      forAll { content: String =>
         readAll(encode(content))(in => in) should be(content)
       }
     }
 
     it("should not modify written content") {
-      forAll(arbitrary[String]) { content =>
+      forAll { content: String =>
         decode(writeAll(content)(out => out)) should be(content)
       }
     }

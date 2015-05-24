@@ -3,35 +3,39 @@ package com.nrinaudo.fetch
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
+import Arbitrary._
 
 /** Utilities for testing [[ByteRange]]. */
 object ByteRangeSpec {
-  def illegalRange = Arbitrary.arbitrary[String].suchThat(_.matches(".*[^0-9-].*"))
+  def illegalRange: Gen[String] = Arbitrary.arbitrary[String].suchThat(_.matches(".*[^0-9-].*"))
 
-  def illegalRanges = Arbitrary.arbitrary[String].suchThat(!_.startsWith("bytes="))
+  def illegalRanges: Gen[String] = Arbitrary.arbitrary[String].suchThat(!_.startsWith("bytes="))
 
   /** Generates valid byte range boundaries. */
-  def boundary = Gen.choose(0, 1000)
+  def boundary: Gen[Int] = Gen.choose(0, 1000)
 
   /** Generates invalid byte range boundaries. */
-  def negBoundary = Gen.choose(-1000, -1)
+  def negBoundary: Gen[Int] = Gen.choose(-1000, -1)
 
   /** Generate valid byte range boundaries. */
-  def boundaries = for {
+  def boundaries: Gen[(Int, Int)] = for {
     from <- Gen.choose(0, 1000)
     to   <- Gen.choose(from, from + 1000)
   } yield (from, to)
 
-  def prefixRange = boundary.map(PrefixRange.apply)
-  def suffixRange = boundary.map(SuffixRange.apply)
-  def fullRange   = for {
-    from <- boundary
-    to   <- boundary
-  } yield FullRange(math.min(from, to), math.max(from, to))
 
-  def byteRange = Gen.oneOf(prefixRange, suffixRange, fullRange)
+  implicit val prefixRange: Arbitrary[PrefixRange] = Arbitrary(boundary.map(PrefixRange.apply))
+  implicit val suffixRange: Arbitrary[SuffixRange] = Arbitrary(boundary.map(SuffixRange.apply))
+  implicit val fullRange: Arbitrary[FullRange] = Arbitrary {
+    for {
+      from <- boundary
+      to   <- boundary
+    } yield FullRange(math.min(from, to), math.max(from, to))
+  }
+  implicit val byteRange: Arbitrary[ByteRange] =
+    Arbitrary(Gen.oneOf(arbitrary[PrefixRange], arbitrary[SuffixRange], arbitrary[FullRange]))
 
-  def byteRanges = HeadersSpec.headers(byteRange)
+  implicit val byteRanges: Arbitrary[List[ByteRange]] = Arbitrary(HeadersSpec.headers(arbitrary[ByteRange]))
 }
 
 /** Tests the [[ByteRange]] class. */
@@ -101,7 +105,7 @@ class ByteRangeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
     }
 
     it("should serialize to itself") {
-      forAll(byteRange) { range => ByteRange.parse(range.toString) should be(Some(range)) }
+      forAll { range: ByteRange => ByteRange.parse(range.toString) should be(Some(range)) }
     }
   }
 }

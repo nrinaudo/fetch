@@ -69,16 +69,16 @@ object ValueFormat {
   // - Standard formatters ---------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   // TODO: Should empty strings format as None by default?
-  val Doubles: ValueFormat[Double]   = apply(s => Try(s.toDouble).toOption,  d => Some {d.toString})
-  val Longs: ValueFormat[Long]       = apply(s => Try(s.toLong).toOption,    l => Some {l.toString})
-  val Shorts: ValueFormat[Short]     = apply(s => Try(s.toShort).toOption,   s => Some {s.toString})
-  val Ints: ValueFormat[Int]         = apply(s => Try(s.toInt).toOption,     i => Some {i.toString})
-  val Bytes: ValueFormat[Byte]       = apply(s => Try(s.toByte).toOption,    b => Some {b.toString})
-  val Floats: ValueFormat[Float]     = apply(s => Try(s.toFloat).toOption,   f => Some {f.toString})
-  val Booleans: ValueFormat[Boolean] = apply(s => Try(s.toBoolean).toOption, b => Some {b.toString})
-  val Strings: ValueFormat[String]   = apply(Some(_),                        Some(_))
-  val Chars: ValueFormat[Char]       = apply(s => if(s.length == 1) Some(s.charAt(0)) else None, b => Some(b.toString))
-  val Charsets: ValueFormat[Charset] = new ValueFormat[Charset] {
+  val doubleParam: ValueFormat[Double]   = apply(s => Try(s.toDouble).toOption,  d => Some(d.toString))
+  val longParam: ValueFormat[Long]       = apply(s => Try(s.toLong).toOption,    l => Some(l.toString))
+  val shortParam: ValueFormat[Short]     = apply(s => Try(s.toShort).toOption,   s => Some(s.toString))
+  val intParam: ValueFormat[Int]         = apply(s => Try(s.toInt).toOption,     i => Some(i.toString))
+  val byteParam: ValueFormat[Byte]       = apply(s => Try(s.toByte).toOption,    b => Some(b.toString))
+  val floatParam: ValueFormat[Float]     = apply(s => Try(s.toFloat).toOption,   f => Some(f.toString))
+  val booleanParam: ValueFormat[Boolean] = apply(s => Try(s.toBoolean).toOption, b => Some(b.toString))
+  val stringParam: ValueFormat[String]   = apply(Some(_),                        Some(_))
+  val charParam: ValueFormat[Char]       = apply(s => if(s.length == 1) Some(s.charAt(0)) else None, b => Some(b.toString))
+  val charsetParam: ValueFormat[Charset] = new ValueFormat[Charset] {
     override def write(value: Charset): Option[String] = Some(value.name())
     override def read(value: String): Option[Charset] = Try(Charset.forName(value)).toOption
   }

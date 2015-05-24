@@ -1,42 +1,41 @@
 package com.nrinaudo.fetch
 
-import org.apache.commons.codec.binary.Base64
-import java.util.Date
-import Headers._
-import java.nio.charset.Charset
+import java.io._
 import java.net.URI
+import java.nio.charset.Charset
+import java.util.Date
+
+import com.nrinaudo.fetch.Headers._
+import com.nrinaudo.fetch.Request.Entity
+import org.apache.commons.codec.binary.Base64
 
 object Request {
+  trait Entity {
+    def contentLength: Option[Long]
+    def write(out: OutputStream): Unit
+    def mediaType: MediaType
+  }
+
   /** Type for underlying HTTP engines.
     *
     * Fetch comes with a default, `java.net.URLConnection` based [[com.nrinaudo.fetch.net.UrlEngine implementation]],
     * but it might not be applicable to all use-cases. Defining your own engine allows you to use another underlying
     * library, such as [[http://hc.apache.org/httpclient-3.x/ Apache HTTP client]].
     */
-  type HttpEngine = (Url, Method, Option[RequestEntity], Headers) => Response[ResponseEntity]
+  type HttpEngine = (Url, Method, Option[Entity], Headers) => Response[Response.Entity]
 
-  private def http(f: HttpEngine): HttpEngine = (url, method, body, headers) => {
-    var h = headers
+  private def http(f: HttpEngine): HttpEngine = (url, method, body, headers) => f(url, method, body,
+    // Sets the content type if applicable.
+    body.fold(headers)(b => headers.set("Content-Type", b.mediaType))
+      .setIfEmpty("User-Agent", UserAgent))
 
-    // Sets body specific HTTP headers (or unsets them if necessary).
-    body foreach {b =>
-      h = h.set("Content-Type", b.mediaType)
-      if(b.encoding == Encoding.Identity) h = h.remove("Content-Encoding")
-      else                                h = h.set("Content-Encoding", b.encoding)
-    }
 
-    // I'm not entirely happy with forcing a default Accept header - it's perfectly legal for it to be empty. The
-    // standard URLConnection forces a somewhat messed up default, however (image/gif, what were they thinking?),
-    // and */* is curl's default behaviour - if it's good enough for curl, it's good enough for me.
-    h = h.setIfEmpty("User-Agent", UserAgent).setIfEmpty("Accept", "*/*")
 
-    f(url, method, body, h)
-  }
 
-  def from(uri: URI)(implicit engine: HttpEngine): Option[Request[Response[ResponseEntity]]] =
+  def from(uri: URI)(implicit engine: HttpEngine): Option[Request[Response[Response.Entity]]] =
     Url.fromUri(uri).map(apply)
 
-  def from(url: String)(implicit engine: HttpEngine): Option[Request[Response[ResponseEntity]]] =
+  def from(url: String)(implicit engine: HttpEngine): Option[Request[Response[Response.Entity]]] =
     Url.parse(url).map(apply)
 
   /**
@@ -47,8 +46,8 @@ object Request {
    * @param url    url on which the request will be performed.
    * @param engine HTTP engine to use when performing the request.
    */
-  def apply(url: Url)(implicit engine: HttpEngine): Request[Response[ResponseEntity]] =
-    new RequestImpl[Response[ResponseEntity]](url, Method.GET, new Headers(), http(engine))
+  def apply(url: Url)(implicit engine: HttpEngine): Request[Response[Response.Entity]] =
+    new Request[Response[Response.Entity]](url, Method.GET, Headers.empty, http(engine))
 
   // TODO: have the version number be dynamic, somehow.
   val UserAgent = "Fetch/0.2"
@@ -60,49 +59,48 @@ object Request {
   * configured through "raw" modification methods ({{{method}}}, {{{headers}}}...) as well as specialised helpers such
   * as {{{GET}}}, {{{acceptGzip}}} or {{{/}}}.
   */
-trait Request[A] {
-  // - Fields ----------------------------------------------------------------------------------------------------------
+case class Request[A](url: Url, method: Method, headers: Headers, run: (Url, Method, Option[Entity], Headers) => A) {
+  // - Execution -------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  /** URL on which the request will be performed. */
-  val url: Url
-  /** HTTP method of the request. */
-  val method: Method
-  /** List of HTTP headers of the request. */
-  val headers: Headers
+  private def entity[B](body: B)(implicit writer: EntityWriter[B]): Entity = {
+    new Entity {
+      override def contentLength =
+        if(encoding != Encoding.Identity) None
+        else                              writer.length(body)
 
+      override def mediaType = writer.mediaType
 
+      override def write(out: OutputStream) = {
+        val eout = encoding.encode(out)
+        try { writer.write(body, eout) }
+        finally { eout.close() }
+      }
+    }
+  }
 
-  // - Abstract methods ------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
-  protected def copy(url: Url, method: Method, headers: Headers): Request[A]
-  def apply(body: Option[RequestEntity]): A
+  def apply(): A = apply(None)
+  def apply[B: EntityWriter](body: B): A = apply(Some(entity(body)))
+  def apply(body: Option[Entity]): A = run(url, method, body, headers)
 
   /** Applies the specified transformation to the request's eventual response.
     *
     * Application developers should be wary of a common pitfall: when working with responses that contain instances
-    * of [[ResponseEntity]], they should always clean these up, either by reading their content (transforming it
-    * to something else or calling [[ResponseEntity.empty]]) or explicitly ignoring them (by calling
-    * [[ResponseEntity.ignore]]).
+    * of [[Response.Entity]], they should always clean these up, either by reading their content (transforming it
+    * to something else or calling [[Response.Entity.empty]]) or explicitly ignoring them (by calling
+    * [[Response.Entity.ignore]]).
     *
     * This is a common source of issues when mapping error statuses to exceptions: each connection will be kept
     * alive until the remote host decides it has timed out.
     */
-  def map[B](f: A => B): Request[B]
-
-
-
-  // - Execution -------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
-  def apply(): A = apply(None)
-  def apply(body: RequestEntity): A = apply(Some(body))
-
+  def map[B](f: A => B): Request[B] =
+    copy(run = (a, b, c, d) => f(run(a, b, c, d)))
 
 
   // - Field modification ----------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def url(value: Url): Request[A] = copy(value, method, headers)
-  def method(value: Method): Request[A] = copy(url, value, headers)
-  def headers(value: Headers): Request[A] = copy(url, method, value)
+  def url(value: Url): Request[A] = copy(url = value)
+  def method(value: Method): Request[A] = copy(method = value)
+  def headers(value: Headers): Request[A] = copy(headers = value)
 
 
 
@@ -143,11 +141,13 @@ trait Request[A] {
   /** Returns the value of this instance's encoding header. */
   def acceptEncoding: Option[Seq[Conneg[Encoding]]] = header[Seq[Conneg[Encoding]]]("Accept-Encoding")
 
+  def acceptEncoding(encoding: Encoding): Request[A] = acceptEncoding(Conneg(encoding, 1f))
+
   /** Notifies the remote server that we accept GZIPed responses. */
-  def acceptGzip: Request[A] = acceptEncoding(Encoding.Gzip)
+  def acceptGzip: Request[A] = acceptEncoding(Conneg(Encoding.Gzip, 1f))
 
   /** Notifies the remote server that we accept deflated responses. */
-  def acceptDeflate: Request[A] = acceptEncoding(Encoding.Deflate)
+  def acceptDeflate: Request[A] = acceptEncoding(Conneg(Encoding.Deflate, 1f))
 
   /** Notifies the remote server about response content type preferences.
     *
@@ -156,6 +156,8 @@ trait Request[A] {
     * @param types list of media types to declare.
     */
   def accept(types: Conneg[MediaType]*): Request[A] = header("Accept", types)
+
+  def accept(mediaType: MediaType): Request[A] = accept(Conneg(mediaType, 1f))
 
   /** Returns the value of this instance's content type preferences. */
   def accept: Option[Seq[Conneg[MediaType]]] = header[Seq[Conneg[MediaType]]]("Accept")
@@ -184,6 +186,34 @@ trait Request[A] {
 
 
 
+  // - Entity body headers ---------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  /** Encodes all request entities with the specified encoding.
+    *
+    * This maps to the [[http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.11 Content-Encoding]] header.
+    *
+    * Since {{{Encoding.Identity}}} is the default value, passing that as argument will cause the corresponding HTTP
+    * header to be unset.
+    */
+  def encoding(encoding: Encoding): Request[A] = {
+    if(encoding == Encoding.Identity) {
+      headers.remove("Content-Encoding")
+      this
+    }
+    else header("Content-Encoding", encoding)
+  }
+
+  /** Returns the content-encoding used by this request. */
+  def encoding: Encoding = header[Encoding]("Content-Encoding").getOrElse(Encoding.Identity)
+
+  /** Encodes all request entities using {{{Encoding.Gzip}}}. */
+  def gzip: Request[A] = encoding(Encoding.Gzip)
+
+  /** Encodes all request entities using {{{Encoding.Deflate}}}. */
+  def deflate: Request[A] = encoding(Encoding.Deflate)
+
+
+
   // - Generic headers -------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Sets the value of the specified header.
@@ -194,7 +224,7 @@ trait Request[A] {
   def header[T: ValueWriter](name: String, value: T): Request[A] = headers(headers.set(name, value))
 
   /** Returns the value of the specified header. */
-  def header[T: ValueReader](name: String): Option[T] = headers.getOpt[T](name)
+  def header[T: ValueReader](name: String): Option[T] = headers.get[T](name)
 
 
 
@@ -246,18 +276,4 @@ trait Request[A] {
   // TODO: do we want to wrap user & pwd in an Authorization case class?
   def auth(user: String, pwd: String): Request[A] =
     header("Authorization", "Basic " + Base64.encodeBase64String((user + ':' + pwd).getBytes))
-}
-
-private class RequestImpl[A](override val url:     Url,
-                             override val method:  Method  = Method.GET,
-                             override val headers: Headers = new Headers(Map[String, String]()),
-                             private val  engine:  (Url, Method, Option[RequestEntity], Headers) => A)
-  extends Request[A] {
-  override def copy(url: Url, method: Method, headers: Headers): Request[A] =
-    new RequestImpl[A](url, method, headers, engine)
-
-  override def apply(body: Option[RequestEntity]): A = engine.apply(url, method, body, headers)
-
-  override def map[B](f: A => B): Request[B] =
-    new RequestImpl(url, method, headers, (a, b, c, d) => f(engine(a, b, c, d)))
 }

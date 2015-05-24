@@ -1,10 +1,12 @@
 package com.nrinaudo.fetch
 
-import org.json4s._
-import com.nrinaudo.fetch.ResponseEntity.EntityParser
-import scala.language.implicitConversions
-import org.json4s.jackson.JsonMethods
+import java.io.OutputStream
+
 import com.fasterxml.jackson.core.JsonGenerator
+import org.json4s._
+import org.json4s.jackson.JsonMethods
+
+import scala.language.implicitConversions
 
 package object json4s {
   /** Polite mapper that does not close streams it does not own. */
@@ -14,10 +16,11 @@ package object json4s {
     m
   }
 
-  implicit def jsonToEntity(json: JValue)(implicit formats: Formats) = RequestEntity.chars {out =>
-    mapper.writeValue(out, Extraction.decompose(json)(formats))
-  }.mediaType(MediaType.Json.charset(DefaultCharset))
+  implicit def writer(implicit formats: Formats): EntityWriter[JValue] = new EntityWriter[JValue] {
+    override def mediaType: MediaType = MediaType.Json.charset(DefaultCharset)
+    override def length(a: JValue): Option[Long] = None
+    override def write(a: JValue, out: OutputStream): Unit = mapper.writeValue(out, Extraction.decompose(a))
+  }
 
-  implicit val Parser: EntityParser[JValue] = (entity: ResponseEntity) =>
-    entity.withReader {in => JsonMethods.parse(ReaderInput(in))}
+  implicit val reader: EntityReader[JValue] = EntityReader.chars(in => JsonMethods.parse(ReaderInput(in)))
 }

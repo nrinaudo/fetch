@@ -89,7 +89,7 @@ trait ConnegFormat[T] extends HttpGrammar with ValueFormat[Seq[Conneg[T]]] {
   * @param  q     weight of the value, as a float between 0 and 1 inclusive. Bigger weights tell remote servers that
   *               the corresponding value is more desirable than values associated with lower weights.
   */
-case class Conneg[T](value: T, q: Float = 1) {
+case class Conneg[T](value: T, q: Float) {
   require(q >= 0 && q <= 1, "q must be between 0 and 1, inclusive.")
 }
 

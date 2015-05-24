@@ -1,12 +1,11 @@
 package com.nrinaudo.fetch
 
-import org.scalatest.{Matchers, FunSpec}
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.{Arbitrary, Gen}
-import org.scalacheck.Gen._
+import com.nrinaudo.fetch.QueryString._
 import org.scalacheck.Arbitrary._
-import QueryString._
-import scala.util.Success
+import org.scalacheck.Gen._
+import org.scalacheck.{Arbitrary, Gen}
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.{FunSpec, Matchers}
 
 object QueryStringSpec {
   /** Returns a single query parameter. */
@@ -22,9 +21,11 @@ object QueryStringSpec {
   } yield params.foldLeft(Map(): Map[String, List[String]]) { (map, param) => map + param}
 
   /** Returns a query string. */
-  def query = for {
-    query <- queryParams
-  } yield QueryString(query)
+  implicit val query: Arbitrary[QueryString] = Arbitrary {
+    for {
+      query <- queryParams
+    } yield QueryString(query)
+  }
 }
 
 class QueryStringSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
@@ -37,20 +38,16 @@ class QueryStringSpec extends FunSpec with Matchers with GeneratorDrivenProperty
 
         params foreach {param =>
           // Complete parameter lists.
-          query.get[String](param._1) should be(Some(Success(param._2)))
-          query.getOpt[String](param._1) should be(Some(param._2))
-          query[String](param._1) should be(param._2)
+          query.get[String](param._1) should be(Some(param._2))
 
           // First parameter helpers.
-          query.getFirst[String](param._1) should be(Some(Success(param._2(0))))
-          query.getFirstOpt[String](param._1) should be(Some(param._2(0)))
-          query.first[String](param._1) should be(param._2(0))
+          query.first[String](param._1) should be(Some(param._2(0)))
         }
       }
     }
 
     it("should serialize to itself") {
-      forAll(query) { query =>
+      forAll { query: QueryString =>
         QueryString(query.toString) should be(query)
         QueryString('?' + query.toString) should be(query)
       }
@@ -68,21 +65,15 @@ class QueryStringSpec extends FunSpec with Matchers with GeneratorDrivenProperty
 
         params.foreach { case (name, values) =>
           // Found.
-          query.get[String](name) should be(params.get(name).map(Success(_)))
-          query.getOpt[String](name) should be(params.get(name))
-          query[String](name) should be(params(name))
+          query.get[String](name) should be(params.get(name))
 
           // Not found.
           val trimmed = QueryString(params - name)
           trimmed.get[String](name) should be(None)
-          trimmed.getOpt[String](name) should be(None)
-          intercept[NoSuchElementException] { trimmed[String](name) }
 
           // Incorrect type.
           val modified = QueryString(params + (name -> List("abc")))
-          modified.get[Int](name).get.isFailure should be(true)
-          modified.getOpt[Int](name) should be(None)
-          intercept[IllegalArgumentException] { modified[Int](name) }
+          modified.get[Int](name) should be(None)
         }
       }
     }
@@ -128,7 +119,7 @@ class QueryStringSpec extends FunSpec with Matchers with GeneratorDrivenProperty
     }
 
     it("should have working hashCode and equals implementation") {
-      forAll(query, query) { (q1, q2) =>
+      forAll { (q1:QueryString, q2: QueryString) =>
         // Simple equality tests.
         q1 should be(q1)
         q1.hashCode should be(q1.hashCode)

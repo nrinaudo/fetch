@@ -2,7 +2,8 @@ package com.nrinaudo.fetch
 
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.Gen
+import org.scalacheck.{Arbitrary, Gen}
+import Arbitrary._
 
 object HttpGrammarSpec {
   def tokenChar: Gen[Char]  = Gen.oneOf(((32.toChar to 126.toChar).toSet &~ HttpGrammar.Separators).toSeq)
@@ -19,15 +20,18 @@ object HttpGrammarSpec {
   def qdtext: Gen[String]  = stringOf(qdtextChar)
   def content: Gen[String] = stringOf(char)
 
-  def param: Gen[(String, String)] = for {
-    name  <- token
-    value <- content
-  } yield (name, value)
+  case class Param(name: String, value: String)
+  implicit val param: Arbitrary[Param] = Arbitrary {
+    for {
+      name <- token
+      value <- content
+    } yield Param(name, value)
+  }
 
   def params: Gen[Map[String, String]] = for {
     n    <- Gen.choose(0, 10)
-    list <- Gen.listOfN(n, param)
-  } yield list.foldLeft(Map[String, String]()) { case (params, param) => params + param }
+    list <- Gen.listOfN(n, arbitrary[Param])
+  } yield list.foldLeft(Map[String, String]()) { case (params, p) => params + (p.name -> p.value) }
 }
 
 class HttpGrammarSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks with HttpGrammar {

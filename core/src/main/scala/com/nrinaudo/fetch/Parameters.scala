@@ -1,15 +1,11 @@
 package com.nrinaudo.fetch
 
-import scala.util.{Success, Try, Failure}
-
 /**
  * Stores a list of name / value pairs.
  *
  * Values are stored in their serialized forms as `String`, but can be manipulated as more specific types provided
  * corresponding instances of [[ValueReader]] and [[ValueWriter]] are in scope. Default implementations of these
  * can be found in [[ValueFormat$ ValueFormat]].
- *
- * @tparam Self
  */
 trait Parameters[Self <: Parameters[Self]] {
   this: Self =>
@@ -18,10 +14,10 @@ trait Parameters[Self <: Parameters[Self]] {
   // - Abstract members ------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Where the parameter and their values are stored. */
-  val values: Map[String, String]
+  def values: Map[String, String]
 
   /** Creates a new instance of [[Parameters]] with the specified values. */
-  def build(values: Map[String, String]): Self
+  protected def build(values: Map[String, String]): Self
 
 
 
@@ -29,46 +25,18 @@ trait Parameters[Self <: Parameters[Self]] {
   // -------------------------------------------------------------------------------------------------------------------
   /** Returns the value of the requested parameter.
     *
-    * This method is unsafe: it will throw an exception if the requested parameter is either absent or not found. For
-    * safer alternatives, see [[Parameters.get]] and [[Parameters.getOpt]].
-    *
-    * @param  name name of the parameter to retrieve.
-    * @tparam T    type of the parameter to retrieve. An implicit instance of [[ValueReader]] for this type is required
-    *              to be in scope.
-    */
-  def apply[T: ValueReader](name: String): T = implicitly[ValueReader[T]].read(values(name)).get
-
-
-  /** Returns the value of the requested parameter.
-    *
-    * This method does not differentiate between an absent parameter and one with an illegal value: both cases will
-    * return `None`. If the distinction is important, use the [[Parameters.get]] method.
+    * This method will only return `Some` if a parameter with the specified name and expected type is found. That is,
+    * if a parameter with the specified name exists, but is not in the expected type, `None` will be returned.
     *
     * @param name name of the parameter to retrieve.
     * @tparam T   type of the parameter to retrieve. An implicit instance of [[ValueReader]] for this type is required
     *             to be in scope.
     */
-  def getOpt[T: ValueReader](name: String): Option[T] = for {
+  def get[T: ValueReader](name: String): Option[T] = for {
     raw    <- values.get(name)
     parsed <- implicitly[ValueReader[T]].read(raw)
   } yield parsed
 
-  /** Returns the value of the requested parameter.
-    *
-    * This method differentiates between an absent parameter (`None`) and one with an illegal value (`Some(Failure))`.
-    * If that distinction is not necessary, used [[Parameters.getOpt]] instead.
-    *
-    * @param name name of the parameter to retrieve.
-    * @tparam T   type of the parameter to retrieve. An implicit instance of [[ValueReader]] for this type is required
-    *             to be in scope.
-    * @return
-    */
-  def get[T: ValueReader](name: String): Option[Try[T]] = values.get(name).map { v =>
-    implicitly[ValueReader[T]].read(v) match {
-      case Some(t) => Success(t)
-      case None    => Failure(new IllegalArgumentException("Illegal value: " + name))
-    }
-  }
 
   /** Checks whether the current instance contains a parameter with the specified name. */
   def contains(name: String): Boolean = values.contains(name)
@@ -77,6 +45,8 @@ trait Parameters[Self <: Parameters[Self]] {
 
   // - Parameter modification ------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
+  private def setRaw(name: String, value: String): Self = build(values + (name -> value))
+
   /** Sets the specified parameter to the specified value.
     *
     * @param  name  name of the parameter.
@@ -85,9 +55,7 @@ trait Parameters[Self <: Parameters[Self]] {
     *               scope.
     */
   def set[T: ValueWriter](name: String, value: T): Self =
-    implicitly[ValueWriter[T]].write(value).fold(this)(set(name, _))
-
-  def set(name: String, value: String): Self = build(values + (name -> value))
+    implicitly[ValueWriter[T]].write(value).fold(this)(setRaw(name, _))
 
   /** Sets the specified parameter to the specified value if it does not exist. Otherwise, does nothing.
     *

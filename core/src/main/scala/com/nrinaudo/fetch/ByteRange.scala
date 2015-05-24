@@ -10,11 +10,10 @@ object ByteRange {
   }
 
   def parse(str: String): Option[ByteRange] = str match {
-    case Extractor(PositiveInt(prefix), null)   => Some(PrefixRange(prefix.toInt))
-    case Extractor(null,   PositiveInt(suffix)) => Some(SuffixRange(suffix.toInt))
-    case Extractor(PositiveInt(prefix), PositiveInt(suffix)) if suffix >= prefix =>
-      Some(FullRange(prefix.toInt, suffix.toInt))
-    case _ => None
+    case Extractor(PositiveInt(prefix), null)                                    => Some(PrefixRange(prefix))
+    case Extractor(null,   PositiveInt(suffix))                                  => Some(SuffixRange(suffix))
+    case Extractor(PositiveInt(prefix), PositiveInt(suffix)) if suffix >= prefix => Some(FullRange(prefix, suffix))
+    case _                                                                       => None
   }
 }
 

@@ -6,15 +6,16 @@ import scala.util.{Success, Failure, Try}
 object QueryString {
   // - Implicit formats ------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  implicit val Doubles: ValueFormat[Double]   = ValueFormat.Doubles
-  implicit val Longs: ValueFormat[Long]       = ValueFormat.Longs
-  implicit val Shorts: ValueFormat[Short]     = ValueFormat.Shorts
-  implicit val Ints: ValueFormat[Int]         = ValueFormat.Ints
-  implicit val Bytes: ValueFormat[Byte]       = ValueFormat.Bytes
-  implicit val Floats: ValueFormat[Float]     = ValueFormat.Floats
-  implicit val Booleans: ValueFormat[Boolean] = ValueFormat.Booleans
-  implicit val Strings: ValueFormat[String]   = ValueFormat.Strings
-  implicit val Chars: ValueFormat[Char]       = ValueFormat.Chars
+  // TODO: do we really need these?
+  implicit val doubleParam: ValueFormat[Double]   = ValueFormat.doubleParam
+  implicit val longParam: ValueFormat[Long]       = ValueFormat.longParam
+  implicit val shortParam: ValueFormat[Short]     = ValueFormat.shortParam
+  implicit val intParam: ValueFormat[Int]         = ValueFormat.intParam
+  implicit val byteParam: ValueFormat[Byte]       = ValueFormat.byteParam
+  implicit val floatParam: ValueFormat[Float]     = ValueFormat.floatParam
+  implicit val booleanParam: ValueFormat[Boolean] = ValueFormat.booleanParam
+  implicit val stringParam: ValueFormat[String]   = ValueFormat.stringParam
+  implicit val charParam: ValueFormat[Char]       = ValueFormat.charParam
 
 
 
@@ -84,27 +85,12 @@ class QueryString private (content: Map[String, List[String]]) {
 
   // - Parameter getting -----------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def getFirst[T: ValueReader](name: String): Option[Try[T]] =  get[T](name) map (_ map (_(0)))
+  def first[T: ValueReader](name: String): Option[T] = get[T](name) map(_(0))
 
-  def get[T: ValueReader](name: String): Option[Try[List[T]]] = values.get(name).map { list =>
-    ValueReader.sequence(list) match {
-      case Some(l) => Success(l)
-      case None    => Failure(new IllegalArgumentException("Illegal value: " + list))
-    }
-  }
-
-  def getFirstOpt[T: ValueReader](name: String): Option[T] = getOpt[T](name) map(_(0))
-
-  def getOpt[T: ValueReader](name: String): Option[List[T]] = for {
+  def get[T: ValueReader](name: String): Option[List[T]] = for {
     v1 <- values.get(name)
     v2 <- ValueReader.sequence(v1)(implicitly[ValueReader[T]])
   } yield v2
-
-  def apply[T: ValueReader](name: String): List[T] = values(name) map { v =>
-    implicitly[ValueReader[T]].read(v).getOrElse(throw new IllegalArgumentException("Illegal value: " + v))
-  }
-
-  def first[T: ValueReader](name: String): T = apply[T](name).apply(0)
 
 
 

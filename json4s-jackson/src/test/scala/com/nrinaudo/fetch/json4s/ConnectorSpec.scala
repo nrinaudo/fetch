@@ -1,17 +1,16 @@
 package com.nrinaudo.fetch.json4s
 
-import org.scalatest.{Matchers, BeforeAndAfterAll, FunSpec}
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.Arbitrary
-import org.json4s.JsonAST._
-import unfiltered.filter.Planify
 import java.io.{OutputStreamWriter, Reader}
-import unfiltered.response.{HttpResponse, ResponseWriter}
-import unfiltered.request.{Path, Seg}
-import com.nrinaudo.fetch._
-import org.json4s.JsonAST.JString
+
 import com.nrinaudo.fetch.Request
 import com.nrinaudo.fetch.net.UrlEngine
+import org.json4s.JsonAST.{JString, _}
+import org.scalacheck.Arbitrary
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
+import unfiltered.filter.Planify
+import unfiltered.request.{Path, Seg}
+import unfiltered.response.{HttpResponse, ResponseWriter}
 
 class ReaderResponse(val reader: Reader) extends ResponseWriter {
   override def respond(res: HttpResponse[Any]): Unit = {

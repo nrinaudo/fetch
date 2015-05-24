@@ -1,29 +1,35 @@
 package com.nrinaudo.fetch
 
+import java.nio.charset.Charset
+
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
+import Arbitrary._
 
 object MediaTypeSpec {
   def main: Gen[String] = Gen.oneOf("text", "application", "video", "audio", "image", "message", "multipart")
   def sub: Gen[String] = Gen.oneOf("plain", "png", "jpg", "rdf", "html", "rdf+xml", "json", "x-fixed-field")
 
-  def allType: Gen[MediaType.All] = Gen.const(MediaType.Everything)
-  def range: Gen[MediaType.Range] = for(main <- main) yield MediaType.Range(main)
-  def specific: Gen[MediaType.Specific] = for {
-    main   <- main
-    sub    <- sub
-  } yield MediaType.Specific(main, sub)
+  implicit val allType: Arbitrary[MediaType.All] = Arbitrary(Gen.const(MediaType.Everything))
+  implicit val range: Arbitrary[MediaType.Range] = Arbitrary(for(main <- main) yield MediaType.Range(main))
+  implicit val specific: Arbitrary[MediaType.Specific] = Arbitrary {
+    for {
+      main   <- main
+      sub    <- sub
+    } yield MediaType.Specific(main, sub)
+  }
 
-
-  def mediaType: Gen[MediaType] = for {
-    mediaType <- Gen.oneOf(allType, range, specific)
-    params    <- MediaTypeParametersSpec.params
-  } yield mediaType.params(params)
+  implicit val mediaType: Arbitrary[MediaType] = Arbitrary {
+    for {
+      mediaType <- Gen.oneOf(arbitrary[MediaType.All], arbitrary[MediaType.Range], arbitrary[MediaType.Specific])
+      params    <- MediaTypeParametersSpec.params
+    } yield mediaType.params(params)
+  }
 
   def illegalMediaType: Gen[String] = Arbitrary.arbitrary[String].suchThat(_.indexOf('/') == -1)
 
-  private def diffTypes[T](gen: Gen[T]) = for {
+  private def diffTypes[T](gen: Gen[T]): Gen[(T, T)] = for {
     t1 <- gen
     t2 <- gen if t1 != t2
   } yield (t1, t2)
@@ -35,27 +41,15 @@ class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
   import ConnegSpec._
   import Headers._
 
-  def response(mediaType: MediaType) = Response(Status.Ok, new Headers().set("Content-Type", mediaType), "Test")
-
-  describe("The MediaType companion object") {
-    it("should unapply on responses with a content type") {
-      forAll(mediaType) { mediaType =>
-        MediaType.unapply(response(mediaType)) should be(Some(mediaType))
-      }
-    }
-
-    it("should not unapply on responses without a content type") {
-      MediaType.unapply(Response(Status.Ok, new Headers(), "Test")) should be(None)
-    }
-  }
+  def response(mediaType: MediaType) = Response(Status.Ok, Headers.empty.set("Content-Type", mediaType), "Test")
 
   describe("A MediaType instance") {
     it("should serialize to itself") {
-      forAll(mediaType) { mediaType => MediaType.parse(mediaType.toString) should be(Some(mediaType)) }
+      forAll { mediaType: MediaType => MediaType.parse(mediaType.toString) should be(Some(mediaType)) }
     }
 
     it("should have a working charset method") {
-      forAll(mediaType, charset) { (mediaType, charset) =>
+      forAll { (mediaType: MediaType, charset: Charset) =>
         mediaType.charset(charset).charset should be(Some(charset))
         mediaType.removeParam("charset").charset should be(None)
         mediaType.charset(charset).removeParam("charset").charset should be(None)
@@ -63,80 +57,80 @@ class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
     }
 
     it("should have a working param method") {
-      forAll(mediaType, param) { case (mediaType, (name, value)) =>
-        mediaType.param(name, value).param[String](name) should be(Some(value))
-        mediaType.removeParam(name).param[String](name) should be(None)
-        mediaType.param(name, value).removeParam(name).param[String](name) should be(None)
+      forAll { (mediaType: MediaType, p: Param) =>
+        mediaType.param(p.name, p.value).param[String](p.name) should be(Some(p.value))
+        mediaType.removeParam(p.name).param[String](p.name) should be(None)
+        mediaType.param(p.name, p.value).removeParam(p.name).param[String](p.name) should be(None)
       }
     }
   }
 
-  def validate(matcher: MediaType, matched: MediaType, expected: Boolean): Unit = {
+  def validateUnapply(matcher: MediaType, matched: MediaType, expected: Boolean): Unit = {
     if(expected) {
       matcher.unapply(matched) should be(Some(matched))
-      matcher.unapply(response(matched)) should be(Some(matched))
+      matcher.unapply(response(matched)).isDefined should be(true)
     }
     else {
       matcher.unapply(matched) should be(None)
-      matcher.unapply(response(matched)) should be(None)
+      matcher.unapply(response(matched)).isDefined should be(false)
     }
   }
 
   describe("A MediaType.Specific instance") {
     it("should unapply for other specific media type with the same raw type") {
-      forAll(specific, params) { (mediaType, params) =>
+      forAll(arbitrary[MediaType.Specific], params) { (mediaType, params) =>
         val full = mediaType.params(new MediaTypeParameters(params))
-        validate(mediaType, full, true)
-        validate(full, mediaType, true)
+        validateUnapply(mediaType, full, true)
+        validateUnapply(full, mediaType, true)
       }
     }
 
     it("should not unapply on media ranges") {
-      forAll(specific, range) { (mediaType, range) => validate(mediaType, range, false) }
+      forAll { (mediaType: MediaType.Specific, range: MediaType.Range) => validateUnapply(mediaType, range, false) }
     }
 
-    it("should not unapply on * / *") {
-      forAll(specific, allType) { (mediaType, all) => validate(mediaType, all, false) }
+    it("should not unapply on */*") {
+      forAll { (mediaType: MediaType.Specific, all: MediaType.All) => validateUnapply(mediaType, all, false) }
     }
 
     it("should not unapply for other specific media types with a different raw type") {
-      forAll(diffTypes(specific)) { case (t1, t2) => validate(t1, t2, false) }
+      forAll(diffTypes(arbitrary[MediaType.Specific])) { case (t1, t2) => validateUnapply(t1, t2, false) }
     }
   }
 
   describe("A MediaType.Range instance") {
     it("should unapply for other media ranges with the same main type") {
-      forAll(range, params) { (mediaType, params) =>
+      forAll(arbitrary[MediaType.Range], params) { (mediaType, params) =>
         val full = mediaType.params(new MediaTypeParameters(params))
-        validate(mediaType, full, true)
-        validate(full, mediaType, true)
+        validateUnapply(mediaType, full, true)
+        validateUnapply(full, mediaType, true)
       }
     }
 
     it("should unapply on media types with the same main type") {
-      forAll(range, sub) { (range, sub) => validate(range, range / sub, true) }
+      forAll(arbitrary[MediaType.Range], sub) { (range, sub) => validateUnapply(range, range / sub, true) }
     }
 
     it("should not unapply on media types with different main types") {
-      forAll(diffTypes(range), sub) { case ((r1, r2), sub) => validate(r1, r2 / sub, false) }
+      forAll(diffTypes(arbitrary[MediaType.Range]), sub) { case ((r1, r2), sub) => validateUnapply(r1, r2 / sub, false) }
     }
 
-    it("should not unapply on * / *") {
-      forAll(range, allType) { (mediaType, all) => validate(mediaType, all, false) }
+    it("should not unapply on */*") {
+      forAll { (mediaType: MediaType.Range, all: MediaType.All) => validateUnapply(mediaType, all, false) }
     }
 
     it("should not unapply for other media ranges with a different raw type") {
-      forAll(diffTypes(range)) { case (t1, t2) => validate(t1, t2, false) }
+      forAll(diffTypes(arbitrary[MediaType.Range])) { case (t1, t2) => validateUnapply(t1, t2, false) }
     }
   }
 
   describe("A MediaType.All instance") {
     it("should unapply for any other instance of MediaType") {
-      forAll(allType, mediaType) { (t1, t2) => validate(t1, t2, true) }
+      forAll { (t1: MediaType.All, t2: MediaType) => validateUnapply(t1, t2, true) }
     }
 
     it("should not unapply for responses without a media type") {
-      MediaType.Everything.unapply(new Response(Status.Ok, new Headers(), "Test")) should be(None)
+      MediaType.Everything.unapply(new Response(Status.Ok, Headers.empty, "Test")) should be(None)
     }
   }
 }

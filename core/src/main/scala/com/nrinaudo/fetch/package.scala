@@ -2,11 +2,11 @@ package com.nrinaudo
 
 import java.io._
 import java.nio.charset.Charset
-import scala.language.implicitConversions
-import java.net.URI
-import com.nrinaudo.fetch.ResponseEntity.EntityParser
 import java.util.Locale
+
 import com.nrinaudo.fetch.Request.HttpEngine
+
+import scala.language.implicitConversions
 
 package object fetch {
   // - Package constants -----------------------------------------------------------------------------------------------
@@ -47,31 +47,4 @@ package object fetch {
       }
     loop(new Array[Char](BufferSize))
   }
-
-
-
-  // - Implicit conversions --------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
-  implicit def urlToRequest(url: Url)(implicit engine: HttpEngine): Request[Response[ResponseEntity]] = Request(url)(engine)
-
-  // Request entities.
-  implicit def stringToEntity(str: String): RequestEntity     = RequestEntity(str)
-  implicit def readerToEntity(reader: Reader): RequestEntity  = RequestEntity(reader)
-  implicit def streamToEntity(in: InputStream): RequestEntity = RequestEntity(in)
-  implicit def fileToEntity(file: File): RequestEntity        = RequestEntity(file)
-
-  // Content negotiation headers.
-  implicit def mediaTypeToConneg(mediaType: MediaType): Conneg[MediaType] = Conneg(mediaType)
-  implicit def encodingToConneg(encoding: Encoding): Conneg[Encoding]     = Conneg(encoding)
-  implicit def charsetToConneg(charset: Charset): Conneg[Charset]         = Conneg(charset)
-  implicit def localeToConneg(locale: Locale): Conneg[Locale]             = Conneg(locale)
-
-  // Response entities.
-  implicit val TextEntityParser: EntityParser[String] = (entity: ResponseEntity) => {
-    val writer = new StringWriter()
-    entity.withReader(writeChars(_, writer))
-    writer.toString
-  }
-
-  implicit val IntEntityParser: EntityParser[Int] = TextEntityParser.andThen {_.toInt}
 }

@@ -56,14 +56,14 @@ object Status {
     *
     *   // Pattern match against a status
     *   res.status match {
-    *     case Success(_) => println("Success")
+    *     case Success(s) => println(s"Success")
     *     case _          => println("Not success")
     *   }
     *
     *   // Pattern match against a Response
     *   res match {
-    *     case Success(_) => println("Success")
-    *     case _          => println("Not success")
+    *     case Success(res) => println("Success")
+    *     case _            => println("Not success")
     *   }
     * }}}
     *
@@ -76,12 +76,10 @@ object Status {
       else          None
 
     /** Pattern matches against [[Response responses]]. */
-    def unapply[T](res: Response[T]): Option[Status] =
-      if(f(res.status)) Some(res.status)
+    def unapply[T](res: Response[T]): Option[Response[T]] =
+      if(f(res.status)) Some(res)
       else              None
   }
-
-  def unapply[T](res: Response[T]): Option[Status] = Some(res.status)
 
 
   /** Used to pattern match [[Status statuses]] and [[Response responses]] on the `2xx` group. */
@@ -131,16 +129,16 @@ case class Status(code: Int) {
   /** Allows instances of [[Status]] to be used as extractors for [[Response]].
     *
     * For example: {{{
-    *  val req: Request[Response[ResponseEntity]] = ???
+    *  val req: Request[Response[Response.Entity]] = ???
     *
     *  req.map {
-    *    case res @ Status.Ok(_) => res.body.as[String]
-    *    case Status(status)     => throw new Exception("Unexpected status: " + status)
+    *    case Status.Ok(res) => res.body.as[String]
+    *    case res            => throw new Exception(s"Unexpected status: ${res.status}")
     *  }
     * }}}
     */
-  def unapply[T](res: Response[T]): Option[Status] =
-    if(res.status == this) Some(res.status)
+  def unapply[T](res: Response[T]): Option[Response[T]] =
+    if(res.status == this) Some(res)
     else                   None
 
   override def toString = code.toString

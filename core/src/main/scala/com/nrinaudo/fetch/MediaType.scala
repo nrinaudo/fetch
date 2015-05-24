@@ -1,14 +1,15 @@
 package com.nrinaudo.fetch
 
 import java.nio.charset.Charset
-import MediaTypeParameters._
+
+import com.nrinaudo.fetch.MediaTypeParameters._
 
 /** Defines [[MediaType]] implementations as well as known types. */
 object MediaType {
   // - MediaType implementations ---------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Specific media type, with both a main- and sub-type (such as `text-plain`, for example). */
-  final case class Specific(main: String, sub: String, params: MediaTypeParameters = new MediaTypeParameters())
+  final case class Specific(main: String, sub: String, params: MediaTypeParameters = MediaTypeParameters.empty)
     extends MediaType {
     override def rawType: String = "%s/%s" format (main, sub)
     override def params(values: MediaTypeParameters): MediaType = copy(params = values)
@@ -21,7 +22,7 @@ object MediaType {
   }
 
   /** Media range, with a main-type only (such as `text/ *`, for example). */
-  final case class Range(main: String, params: MediaTypeParameters = new MediaTypeParameters()) extends MediaType {
+  final case class Range(main: String, params: MediaTypeParameters = MediaTypeParameters.empty) extends MediaType {
     override def rawType: String = "%s/*" format main
     override def params(values: MediaTypeParameters): MediaType = copy(params = values)
 
@@ -37,7 +38,7 @@ object MediaType {
   }
 
   /** All media types: `* / *` */
-  final case class All(params: MediaTypeParameters = new MediaTypeParameters()) extends MediaType {
+  final case class All(params: MediaTypeParameters = MediaTypeParameters.empty) extends MediaType {
     override def rawType: String = "*/*"
     override def params(values: MediaTypeParameters): MediaType = copy(params = values)
 
@@ -71,16 +72,6 @@ object MediaType {
 
   /** Attempts to extract a media type from the specified string. */
   def parse(str: String): Option[MediaType] = Format(str)
-
-  /** Allows pattern matching against instances of [[Response]], as in {{{
-    *  val req: Request[Response[ResponseEntity]] = ???
-    *
-    *  req.map {
-    *    case MediaType(type) => println("Media type: " + type)
-    *  }
-    * }}}
-    */
-  def unapply[T](res: Response[T]): Option[MediaType] = res.contentType
 
 
 
@@ -152,12 +143,13 @@ sealed trait MediaType {
     *  val req: Request[Response[ResponseEntity]] = ???
     *
     *  req.map {
-    *    case res @ MediaType.Text(_) => println("Text content: " + res.body.as[String])
-    *    case MediaType(m)            => println("Unsupported media type: " + m)
+    *    case MediaType.PlainText(res) => println("Plain text content: " + res.body.as[String])
+    *    case MediaType.Text(res)      => println("Text content: " + res.body.as[String])
+    *    case res                      => println(s"Unsupported media type: ${res.contentType}")
     *  }
     * }}}
     */
-  def unapply[T](res: Response[T]): Option[MediaType] = res.contentType.flatMap(unapply)
+  def unapply[T](res: Response[T]): Option[Response[T]] = res.contentType.flatMap(unapply).map(_ => res)
 
   /** Removes the specified parameter. */
   def removeParam(name: String): MediaType =
@@ -170,9 +162,9 @@ sealed trait MediaType {
   /** Returns the value of the requested parameter.
     *
     * This is strictly a convenience method and will simply call the underlying parameter's
-    * [[MediaTypeParameters.getOpt]] method.
+    * [[MediaTypeParameters.get]] method.
     */
-  def param[T: ValueReader](name: String): Option[T] = params.getOpt[T](name)
+  def param[T: ValueReader](name: String): Option[T] = params.get[T](name)
 
   /** Sets the charset associated with this media type (`charset` parameter). */
   def charset: Option[Charset] = param[Charset]("charset")

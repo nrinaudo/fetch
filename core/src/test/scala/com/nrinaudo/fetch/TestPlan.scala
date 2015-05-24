@@ -82,7 +82,6 @@ object TestPlan extends Plan {
           throw new IOException("Unsupported encoding: " + encoding)
         }
       }
-
       new ReaderResponse(new InputStreamReader(in, "UTF-8"))
 
     // Expects to find basic auth credentials. If found, returns them, otherwise fails.

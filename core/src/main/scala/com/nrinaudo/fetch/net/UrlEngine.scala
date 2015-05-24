@@ -20,9 +20,7 @@ object UrlEngine {
   }
 }
 
-/**
- * `java.net` connector for fetch.
- */
+/** `java.net` connector for fetch. */
 case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedirect: Boolean = false,
                       chunkSize: Int = UrlEngine.DefaultChunkSize) extends HttpEngine {
   /** Configures the specified connection to this client's preferences. */
@@ -59,7 +57,7 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
     else stream
   }
 
-  private def process(con: HttpURLConnection, method: Method, body: Option[RequestEntity], headers: Headers) = {
+  private def process(con: HttpURLConnection, method: Method, body: Option[Request.Entity], headers: Headers) = {
     // Generic configuration.
     configure(con)
     setMethod(con, method.name)
@@ -78,7 +76,7 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
     con.connect()
 
     // Writes the request body if necessary.
-    body.foreach {_(con.getOutputStream)}
+    body.foreach {_.write(con.getOutputStream)}
 
     val status = Status(con.getResponseCode)
     Response.fromStream(status,
@@ -86,9 +84,12 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
       responseStream(status, con))
   }
 
-  def apply(url: Url, method: Method, body: Option[RequestEntity], headers: Headers): Response[ResponseEntity] =
+  def apply(url: Url, method: Method, body: Option[Request.Entity], headers: Headers): Response[Response.Entity] =
     url.toURI.toURL.openConnection() match {
-      case con: HttpURLConnection => process(con, method, body, headers)
+      // I'm not entirely happy with forcing a default Accept header - it's perfectly legal for it to be empty. The
+      // standard URLConnection forces a somewhat messed up default, however (image/gif, what were they thinking?),
+      // and */* is curl's default behaviour - if it's good enough for curl, it's good enough for me.
+      case con: HttpURLConnection => process(con, method, body, headers.setIfEmpty("Accept", "*/*")(ValueFormat.stringParam))
       case _                      => throw new AssertionError("An URL opened a non-URL HTTP connection.")
     }
 }

@@ -7,7 +7,7 @@ import org.scalacheck.{Arbitrary, Gen}
 object MediaTypeParametersSpec {
   // Note: q is not considered a valid media type parameter, as it would conflict with the Accept header's q parameter.
   def params: Gen[MediaTypeParameters] = HttpGrammarSpec.params.map(map => new MediaTypeParameters(map - "q"))
-  def illegalParams = Arbitrary.arbitrary[String].suchThat(str => !str.contains('=') && !str.isEmpty)
+  def illegalParams: Gen[String] = Arbitrary.arbitrary[String].suchThat(str => !str.contains('=') && !str.isEmpty)
 }
 
 class MediaTypeParametersSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {

@@ -1,95 +1,98 @@
 package com.nrinaudo.fetch
 
+import org.scalacheck.{Gen, Arbitrary}
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.Gen._
 import org.scalacheck.Arbitrary._
 import QueryStringSpec._
+import ProtocolSpec._
 
 object UrlSpec {
-  def domainSeg = for {
+  def domainSeg: Gen[String] = for {
     first   <- alphaChar
     length  <- choose(1, 10)
     content <- listOfN(length, alphaLowerChar)
   } yield (first :: content).mkString
 
   /** Generates a valid host. */
-  def host = for {
+  def host: Gen[String] = for {
     name <- domainSeg
     ext  <- oneOf("com", "fr", "es", "it", "co.uk", "co.jp", "io")
   } yield name + "." + ext
 
   /** Generates a valid port. */
-  def port = choose(1, 65535)
+  def port: Gen[Int] = choose(1, 65535)
 
-  def segment = arbitrary[String].suchThat(!_.isEmpty)
+  def segment: Gen[String] = arbitrary[String].suchThat(!_.isEmpty)
 
   /** Generates a valid path. */
-  def path = for {
+  def path: Gen[List[String]] = for {
     count <- choose(0, 5)
     path <- listOfN(count, segment)
   } yield path
 
-  def fragment = oneOf(true, false) flatMap {b =>
+  def fragment: Gen[Option[String]] = oneOf(true, false) flatMap {b =>
     if(b) None
     else  arbitrary[String].map(Some(_))
   }
 
-  def url = for {
-    pr <- ProtocolSpec.protocol
-    h  <- host
-    p  <- port
-    s  <- path
-    q  <- query
-    r  <- fragment
-  } yield Url(pr, h, p, s, q, r)
+  implicit val url: Arbitrary[Url] = Arbitrary {
+    for {
+      pr <- arbitrary[Protocol]
+      h  <- host
+      p  <- port
+      s  <- path
+      q  <- arbitrary[QueryString]
+      r  <- fragment
+    } yield Url(pr, h, p, s, q, r)
+  }
 }
 
 class UrlSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  import ProtocolSpec._
   import UrlSpec._
 
   describe("An Url") {
     it("should correctly change protocol") {
-      forAll(url, protocol) { (url, protocol) =>
+      forAll { (url: Url, protocol: Protocol) =>
         url.protocol(protocol).protocol should be(protocol)
       }
     }
 
     it("should correctly change host") {
-      forAll(url, host) { (url, host) =>
+      forAll(arbitrary[Url], host) { (url, host) =>
         url.host(host).host should be(host)
       }
     }
 
     it("should correctly change port") {
-      forAll(url, port) { (url, port) =>
+      forAll(arbitrary[Url], port) { (url, port) =>
         url.port(port).port should be(port)
       }
     }
 
     it("should correctly change path") {
-      forAll(url, path) { (url, path) =>
+      forAll(arbitrary[Url], path) { (url, path) =>
         url.path(path).path should be(path)
       }
     }
 
     it("should correctly append segments to its path") {
-      forAll(url, segment) { (url, segment) =>
+      forAll(arbitrary[Url], segment) { (url, segment) =>
         url.addSegment(segment).path should be(url.path :+ segment)
         (url / segment).path should be(url.path :+ segment)
       }
     }
 
     it("should correctly change query string") {
-      forAll(url, query) { (url, query) =>
+      forAll { (url: Url, query: QueryString) =>
         url.query(query).query should be(query)
         (url ? query).query should be(query)
       }
     }
 
     it("should correctly change fragment") {
-      forAll(url, fragment) { (url, fragment) =>
+      forAll(arbitrary[Url], fragment) { (url, fragment) =>
         url.fragment(fragment).fragment should be(fragment)
       }
     }
@@ -97,13 +100,13 @@ class UrlSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
     it("should correctly append parameters to the query string") {
       import QueryString._
 
-      forAll(url, queryParam) { (url, param) =>
+      forAll(arbitrary[Url], queryParam) { (url, param) =>
         url.param(param._1, param._2: _*).query should be(url.query.set(param._1, param._2: _*))
       }
     }
 
     it("should ignore default ports") {
-      forAll(protocol, host) {(protocol, host) =>
+      forAll(arbitrary[Protocol], host) {(protocol, host) =>
         Url(protocol, host, protocol.defaultPort).toString should be(protocol.name + "://" + host + "/")
       }
     }
@@ -115,7 +118,7 @@ class UrlSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
     }
 
     it("should correctly parse instances of URI") {
-      forAll(url) { url =>
+      forAll { url: Url =>
         Url.fromUri(url.toURI) should be(Some(url))
 
         // Makes sure that we test URLs with the default port, as while the generator will not generate this often,
@@ -126,7 +129,7 @@ class UrlSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
     }
 
     it("should correctly parse valid instances of String") {
-      forAll(url) { url =>
+      forAll { url: Url =>
         Url.parse(url.toString) should be(Some(url))
 
         // Makes sure that we test URLs with the default port, as while the generator will not generate this often,

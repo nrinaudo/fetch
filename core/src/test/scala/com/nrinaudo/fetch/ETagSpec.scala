@@ -3,26 +3,28 @@ package com.nrinaudo.fetch
 import org.scalatest.{Matchers, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
+import Arbitrary._
 
 object ETagSpec {
   def weakTag: Gen[ETag] = for(tag <- Gen.identifier.suchThat(!_.isEmpty)) yield ETag.Weak(tag)
   def strongTag: Gen[ETag] = for(tag <- Gen.identifier.suchThat(!_.isEmpty)) yield ETag.Strong(tag)
 
-  def etag: Gen[ETag] = Gen.oneOf(weakTag, strongTag)
+  implicit val etag: Arbitrary[ETag] = Arbitrary(Gen.oneOf(weakTag, strongTag))
 
-  def etags = HeadersSpec.headers(etag)
+  implicit val etags: Arbitrary[List[ETag]] = Arbitrary(HeadersSpec.headers(arbitrary[ETag]))
 
-  def invalidEtag = Arbitrary.arbitrary[String].suchThat { str =>
+  def invalidEtag: Gen[String] = Arbitrary.arbitrary[String].suchThat { str =>
     str.length == 0 || str.charAt(0) != 'W' || str.charAt(0) != '\"' || str.charAt(str.length - 1) != '\"'
   }
 }
 
 class ETagSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
+
   import ETagSpec._
 
   describe("The ETag companion object") {
     it("should parse valid etags") {
-      forAll(etag) { etag => ETag.parse(etag.toString) should be(Some(etag)) }
+      forAll { etag: ETag => ETag.parse(etag.toString) should be(Some(etag)) }
     }
 
     it("should not parse invalid etags") {
@@ -32,9 +34,11 @@ class ETagSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks 
 
   describe("An ETag instance") {
     it("should have the correct weak flag") {
-      forAll(etag) {
-        case etag @ ETag.Weak(_)   => etag.isWeak should be(true)
-        case etag @ ETag.Strong(_) => etag.isWeak should be(false)
+      forAll { etag: ETag =>
+        etag match {
+          case e@ETag.Weak(_) => e.isWeak should be(true)
+          case e@ETag.Strong(_) => e.isWeak should be(false)
+        }
       }
     }
   }
