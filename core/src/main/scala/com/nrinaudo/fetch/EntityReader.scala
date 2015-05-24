@@ -3,6 +3,8 @@ package com.nrinaudo.fetch
 import java.io._
 import java.nio.charset.Charset
 
+import scala.annotation.implicitNotFound
+
 object EntityReader {
   def bytes[A](f: InputStream => A): EntityReader[A] = new BinaryEntityReader[A] {
     override def read(input: InputStream): A = f(input)
@@ -30,6 +32,7 @@ object EntityReader {
   }))
 }
 
+@implicitNotFound(msg = "Cannot find an EntityReader typeclass for ${A}")
 sealed trait EntityReader[A] { self =>
   def read(input: InputStream, mediaType: Option[MediaType]): A
 

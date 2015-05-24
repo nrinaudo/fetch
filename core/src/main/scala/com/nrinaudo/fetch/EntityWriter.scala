@@ -3,6 +3,8 @@ package com.nrinaudo.fetch
 import java.io._
 import java.nio.charset.Charset
 
+import scala.annotation.implicitNotFound
+
 object EntityWriter {
   def string(m: MediaType): EntityWriter[String] = new TextEntityWriter[String] {
     override def length(str: String, charset: Charset) = Some(str.getBytes(charset).length.toLong)
@@ -35,6 +37,7 @@ object EntityWriter {
 }
 
 // TODO: I'm not entirely sure why this needs to be contravariant, investigate
+@implicitNotFound(msg = "Cannot find an EntityWriter typeclass for ${A}")
 trait EntityWriter[-A] {
   def write(a: A, out: OutputStream): Unit
   def length(a: A): Option[Long]
