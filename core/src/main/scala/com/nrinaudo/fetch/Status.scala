@@ -56,7 +56,7 @@ object Status {
     *
     *   // Pattern match against a status
     *   res.status match {
-    *     case Success(s) => println(s"Success")
+    *     case Success(s) => println("Success")
     *     case _          => println("Not success")
     *   }
     *

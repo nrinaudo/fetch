@@ -31,9 +31,16 @@ class ProtocolSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChe
       forAll { protocol: Protocol => Protocol.parse(protocol.toString) should be(Some(protocol)) }
     }
 
+    it("should unapply as expected") {
+      forAll { protocol: Protocol =>
+        val Protocol(name, port) = protocol
+        name should be(protocol.name)
+        port should be(protocol.defaultPort)
+      }
+    }
+
     it("should generate URLs correctly") {
       forAll(arbitrary[Protocol], UrlSpec.host) { (protocol, host) =>
-        (protocol :/ host).host should be(host)
         protocol.host(host).host should be(host)
       }
     }

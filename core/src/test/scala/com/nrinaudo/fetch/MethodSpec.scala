@@ -51,5 +51,12 @@ class MethodSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     it("should serialize to itself") {
       forAll { method: Method => Method(method.toString) should be(method) }
     }
+
+    it("should unapply as expected") {
+      forAll { method: Method =>
+        val Method(name) = method
+        method.name should be(name)
+      }
+    }
   }
 }
