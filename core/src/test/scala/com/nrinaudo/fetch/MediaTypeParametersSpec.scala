@@ -1,12 +1,29 @@
 package com.nrinaudo.fetch
 
-import org.scalatest.{Matchers, FunSpec}
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalacheck.Arbitrary._
+import org.scalacheck.Gen._
 import org.scalacheck.{Arbitrary, Gen}
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.{FunSpec, Matchers}
 
 object MediaTypeParametersSpec {
+  case class Param(name: String, value: String)
+
   // Note: q is not considered a valid media type parameter, as it would conflict with the Accept header's q parameter.
-  def params: Gen[MediaTypeParameters] = HttpGrammarSpec.params.map(map => new MediaTypeParameters(map - "q"))
+  implicit val arbParam: Arbitrary[Param] = Arbitrary {
+    for {
+      name <-  identifier if name != "q"
+      value <- nonEmptyListOf(oneOf(32.toChar to 126.toChar)).map(_.mkString)
+    } yield Param(name, value)
+  }
+
+  // Note: we don't generate more than 5 parameters because this causes unrelated issues when testing - some HTTP
+  // servers seem to have a limit to the size of a header value.
+  def params: Gen[MediaTypeParameters] = for {
+    size <- choose(0, 5)
+    ps   <- mapOfN(size, arbitrary[Param].map(p => p.name -> p.value))
+  } yield MediaTypeParameters(ps)
+
   def illegalParams: Gen[String] = Arbitrary.arbitrary[String].suchThat(str => !str.contains('=') && !str.isEmpty)
 }
 
@@ -19,7 +36,7 @@ class MediaTypeParametersSpec extends FunSpec with Matchers with GeneratorDriven
     }
 
     it("should serialize to itself") {
-      forAll(params) { params => MediaTypeParameters.parse(params.toString) should be(Some(params)) }
+      forAll(params) { params => MediaTypeParameters.parse(grammar.params(params.values)) should be(Some(params)) }
     }
   }
 }

@@ -11,7 +11,7 @@ class GraphApi(val req: Request[JValue]) {
 }
 
 object GraphApi {
-  val RootUri = Protocol.Https :/ "graph.facebook.com"
+  val RootUri = Protocol.Https.host("graph.facebook.com")
 
   def apply(token: String)(implicit engine: HttpEngine) =
     new GraphApi(RootUri.toRequest.accept(MediaType.Json).map {

@@ -3,6 +3,7 @@ package com.nrinaudo.fetch
 import java.nio.charset.Charset
 
 import com.nrinaudo.fetch.MediaTypeParameters._
+import fastparse._
 
 /** Defines [[MediaType]] implementations as well as known types. */
 object MediaType {
@@ -50,28 +51,15 @@ object MediaType {
 
   // - Parsing ---------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  /** Defines parses for the media type syntax. */
-  trait Grammar extends HttpGrammar {
-    /** Parses `* / *`. */
-    def all: Parser[MediaType]      = "*" ~ "/" ~ "*" ^^ { case _ => Everything }
-    /** Parses `main/ *`. */
-    def range: Parser[MediaType]    = token <~ ("/" ~ "*") ^^ { case main => Range(main) }
-    /** Parses `main/sub`. */
-    def specific: Parser[MediaType] = (token <~ "/") ~ token ^^ { case (main ~ sub) => Specific(main, sub) }
-
-    /** Parses a media type and its parameters. */
-    def mediaType: Parser[MediaType] = (all | range | specific) ~ opt(paramSep ~> parameters) ^^ {
-      case media ~ None         => media
-      case media ~ Some(params) => media.params(new MediaTypeParameters(params))
-    }
-  }
-
-  private object Format extends Grammar {
-    def apply(string: String): Option[MediaType] = parseAll(mediaType, string).map(Some(_)).getOrElse(None)
-  }
+  // TODO: this is nasty, there shouldn't be any reason to parse HTTP grammar manually.
+  private[fetch] val parser: Parser[MediaType] =
+    ((grammar.mediaAll.map(_ => Everything) |
+      grammar.mediaRange.map(s => Range(s)) |
+      grammar.mediaType.map { case (m, s) => Specific(m, s) }) ~
+     P(";" ~ MediaTypeParameters.parser).?.map(_.getOrElse(MediaTypeParameters.empty))).map { case (m, p) => m.params(p) }
 
   /** Attempts to extract a media type from the specified string. */
-  def parse(str: String): Option[MediaType] = Format(str)
+  def parse(str: String): Option[MediaType] = parseFully(parser, str)
 
 
 
@@ -123,9 +111,10 @@ sealed trait MediaType {
   /** Creates a copy of the current instance with the specified parameters. */
   def params(values: MediaTypeParameters): MediaType
 
+  // TODO:
   override lazy val toString =
     if(params.values.isEmpty) rawType
-    else                      rawType + ";" + params.toString
+    else                      rawType + ";" + grammar.params(params.values)
 
   /** Allows instances of [[MediaType]] to be used in pattern matching.
     *

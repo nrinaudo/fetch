@@ -7,6 +7,7 @@ package com.nrinaudo.fetch
  * corresponding instances of [[ValueReader]] and [[ValueWriter]] are in scope. Default implementations of these
  * can be found in [[ValueFormat$ ValueFormat]].
  */
+// TODO: do we really need to split these into Headers and MediaTypeParameters
 trait Parameters[Self <: Parameters[Self]] {
   this: Self =>
 

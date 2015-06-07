@@ -6,10 +6,11 @@ import java.util.Date
 import com.nrinaudo.fetch.Headers._
 import com.nrinaudo.fetch.Request._
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import unfiltered.jetty.Server
+import utest.*
 
 trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
   import ByteRangeSpec._
@@ -88,15 +89,15 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     // - Header helpers ------------------------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
-    def checkConnegs[T](response: Response[Response.Entity], values: Seq[Conneg[T]], reader: ValueReader[Seq[Conneg[T]]]): Unit = {
+    def checkConnegs[T](response: Response[Response.Entity], values: Seq[Conneg[T]], reader: ValueReader[Seq[Conneg[T]]]): Unit =
       reader.read(response.body.as[String]).get should be(values)
-    }
 
     it("should use the specified Accept header(s)") {
       forAll { mediaTypes: List[Conneg[MediaType]] =>
         checkConnegs(request("header/Accept").accept(mediaTypes: _*).GET.apply(), mediaTypes, Conneg.MediaTypes)
       }
     }
+
     it("should send the default Accept header (*/*) when none is specified") {
       request("header/Accept").GET.apply().body.as[String] should be("*/*")
       request("header/Accept").accept().GET.apply().body.as[String] should be("*/*")

@@ -11,7 +11,7 @@ import com.nrinaudo.fetch.Conneg.MediaTypes
 object ConnegSpec {
   private lazy val charsets: List[Charset] = Charset.availableCharsets().values().asScala.toList
 
-  implicit val charset: Arbitrary[Charset] = Arbitrary(Gen.oneOf(charsets))
+  implicit val arbCharset: Arbitrary[Charset] = Arbitrary(Gen.oneOf(charsets))
 
   def illegalCharset: Gen[String] = Arbitrary.arbitrary[String].suchThat(!Charset.availableCharsets().containsKey(_))
 

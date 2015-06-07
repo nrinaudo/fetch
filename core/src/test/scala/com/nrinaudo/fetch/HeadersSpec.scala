@@ -5,7 +5,7 @@ import Gen._
 import java.util.Date
 
 object HeadersSpec {
-  implicit val date: Arbitrary[Date] = Arbitrary(for(time <- choose(0, 253402300799000l)) yield new Date((time / 1000l) * 1000))
+  implicit val arbDate: Arbitrary[Date] = Arbitrary(for(time <- choose(0, 253402300799000l)) yield new Date((time / 1000l) * 1000))
 
   def illegalDate: Gen[String] = Arbitrary.arbitrary[String].suchThat(_.matches(".*[^0-9a-zA-Z,: ].*"))
 

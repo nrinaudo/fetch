@@ -1,127 +1,94 @@
 package com.nrinaudo.fetch
 
+import java.nio.charset.Charset
 import java.util.Date
 
-import org.scalacheck.Gen._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalatest.{Matchers, FunSpec}
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import com.nrinaudo.fetch.Headers._
-import java.nio.charset.Charset
+import com.nrinaudo.fetch.HeadersSpec._
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Gen._
+import org.scalacheck.{Arbitrary, Gen}
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.{FunSpec, Matchers}
 
 object HeaderFormatSpec {
   def cycle[T](format: ValueFormat[T], value: T) = format.read(format.write(value).get)
 }
 
-class HeaderFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  import HeadersSpec._
-  import HeaderFormatSpec._
-  import MethodSpec._
-  import ConnegSpec._
-  import LanguageSpec._
-  import MediaTypeSpec._
-  import EncodingSpec._
-  import ByteRangeSpec._
+trait HeaderFormatSpec[T] extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
+  def illegalT: Gen[String]
+  implicit def arbT: Arbitrary[T]
+  implicit def formatT: ValueFormat[T]
 
-  def validate[T](format: ValueFormat[T], value: T) = cycle(format, value) should be(Some(value))
+  def validate[F: ValueFormat](value: F) = HeaderFormatSpec.cycle(implicitly[ValueFormat[F]], value) should be(Some(value))
 
-  describe("DateFormat") {
-    it("should correctly serialize and parse dates") {
-      forAll { date: Date => validate(dateHeader, date)}
-    }
-
-    it("should refuse illegal dates") {
-      forAll(illegalDate) { str => dateHeader.read(str).isEmpty should be(true)}
-    }
+  it("should correctly serialize and parse legal values") {
+    forAll { value: T => validate(value) }
   }
 
-  describe("LanguageFormat") {
-    it("should correctly serialize and parse languages") {
-      forAll { lang: Language => validate(languageHeader, lang)}
-    }
-
-    it("should correctly serialize and parse lists of languages") {
-      forAll(nonEmptyListOf(arbitrary[Language])) { langs => validate(compositeFormat[Language], langs)}
-    }
-
-    it("should refuse illegal languages") {
-      forAll(illegalLanguage) { str => languageHeader.read(str).isEmpty should be(true)}
-    }
+  it("should refuse illegal values") {
+    forAll(illegalT) { str => formatT.read(str).isEmpty should be(true) }
   }
+}
 
-  describe("CharsetFormat") {
-    it("should correctly serialize and parse charsets") {
-      forAll { charset: Charset => validate(charsetHeader, charset)}
-    }
-
-    it("should correctly serialize and parse lists of charsets") {
-      forAll(nonEmptyListOf(arbitrary[Charset])) { charsets => validate(compositeFormat[Charset], charsets)}
-    }
-
-    it("should refuse illegal charsets") {
-      forAll(illegalCharset) { str => charsetHeader.read(str).isEmpty should be(true) }
-    }
+trait HeaderFormatSpecWithList[T] extends HeaderFormatSpec[T] {
+  it("should correctly serialize and parse lists of legal values") {
+    forAll(nonEmptyListOf(arbitrary[T])) { ts => validate(ts: Seq[T])(compositeFormat[T]) }
   }
+}
 
-  describe("MediaTypeFormat") {
-    it("should correctly serialize and parse media types") {
-      forAll { mediaType: MediaType => validate(mediaTypeHeader, mediaType)}
-    }
+class DateFormatSpec extends HeaderFormatSpec[Date] {
+  override val illegalT = HeadersSpec.illegalDate
 
-    it("should refuse illegal media types") {
-      forAll(illegalMediaType) { str => mediaTypeHeader.read(str).isEmpty should be(true) }
-    }
-  }
+  override implicit val arbT    = HeadersSpec.arbDate
+  override implicit val formatT = dateHeader
+}
 
-  describe("EncodingFormat") {
-    it("should correctly serialize and parse encodings") {
-      forAll { encoding: Encoding => validate(encodingHeader, encoding)}
-    }
+class LanguageFormatSpec extends HeaderFormatSpecWithList[Language] {
+  override val illegalT = LanguageSpec.illegalLanguage
 
-    it("should correctly serialize and parse lists of encodings") {
-      forAll(nonEmptyListOf(arbitrary[Encoding])) { encodings => validate(compositeFormat[Encoding], encodings)}
-    }
+  override implicit val arbT    = LanguageSpec.arbLanguage
+  override implicit val formatT = languageHeader
+}
 
-    it("should refuse illegal encodings") {
-      forAll(illegalEncoding) { str =>
-        encodingHeader.read(str).isEmpty should be(true)
-      }
-    }
-  }
+class CharsetFormatSpec extends HeaderFormatSpecWithList[Charset] {
+  override val illegalT = ConnegSpec.illegalCharset
 
-  describe("ByteRangeFormat") {
-    it("should correctly serialize and parse byte ranges") {
-      forAll { range: ByteRange => validate(byteRangeHeader, range)}
-    }
+  override implicit val arbT    = ConnegSpec.arbCharset
+  override implicit val formatT = charsetHeader
+}
 
-    it("should refuse illegal byte ranges") {
-      forAll(illegalRange) { str => byteRangeHeader.read(str).isEmpty should be(true) }
-    }
-  }
+class MediaTypeFormatSpec extends HeaderFormatSpec[MediaType] {
+  override val illegalT = MediaTypeSpec.illegalMediaType
 
-  describe("ByteRangesFormat") {
-    it("should correctly serialize and parse byte range lists") {
-      forAll(nonEmptyListOf(arbitrary[ByteRange])) { ranges => validate(byteRangesHeader, ranges)}
-    }
+  override implicit val arbT    = MediaTypeSpec.arbMediaType
+  override implicit val formatT = mediaTypeHeader
+}
 
-    it("should refuse illegal lists of byte ranges") {
-      forAll(illegalRanges) { str => byteRangesHeader.read(str).isEmpty should be(true) }
-    }
-  }
+class EncodingFormatSpec extends HeaderFormatSpecWithList[Encoding] {
+  override val illegalT = EncodingSpec.illegalEncoding
 
-  describe("MethodFormat") {
-    it("should correctly serialize and parse methods") {
-      forAll { method: Method => validate(methodHeader, method)}
-    }
+  override implicit val arbT    = EncodingSpec.arbEncoding
+  override implicit val formatT = encodingHeader
+}
 
-    it("should correctly serialize and parse lists of byte ranges") {
-      forAll(nonEmptyListOf(arbitrary[Method])) { methods => validate(compositeFormat[Method], methods)}
-    }
+class ByteRangeFormatSpec extends HeaderFormatSpec[ByteRange] {
+  override val illegalT = ByteRangeSpec.illegalRange
 
-    it("should refuse illegal methods") {
-      forAll(illegalMethod) { method =>
-        methodHeader.read(method).isEmpty should be(true)
-      }
-    }
-  }
+  override implicit val arbT    = ByteRangeSpec.arbByteRange
+  override implicit val formatT = byteRangeHeader
+}
+
+class ByteRangesFormatSpec extends HeaderFormatSpec[Seq[ByteRange]] {
+  override val illegalT = ByteRangeSpec.illegalRanges
+
+  override implicit val arbT: Arbitrary[Seq[ByteRange]] = Arbitrary(nonEmptyListOf(ByteRangeSpec.arbByteRange.arbitrary))
+  override implicit val formatT                         = byteRangesHeader
+}
+
+class MethodFormatSpec extends HeaderFormatSpecWithList[Method] {
+  override val illegalT = MethodSpec.illegalMethod
+
+  override implicit val arbT    = MethodSpec.arbMethod
+  override implicit val formatT = methodHeader
 }

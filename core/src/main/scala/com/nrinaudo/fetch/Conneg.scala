@@ -1,85 +1,54 @@
 package com.nrinaudo.fetch
 
-import java.text.DecimalFormat
 import java.nio.charset.Charset
 import com.nrinaudo.fetch.Headers._
+
+import fastparse._
 
 /** Collection of implicit header formats for known content negotiation headers. */
 object Conneg {
   /** Implicit format for the `Accept` content negotiation header. */
-  implicit object MediaTypes extends MediaType.Grammar with ConnegFormat[MediaType] {
-    override def entry: Parser[MediaType] = mediaType
-
-    // This is slightly different from other formats: media types accept parameter in the exact same syntax as the q
-    // parameter.
-    override def connegs: Parser[List[Conneg[MediaType]]] = repsep(mediaType, ",") ^^ { list =>
-      list.map { mediaType => Conneg(mediaType.removeParam("q"), mediaType.param[Float]("q").getOrElse(1f)) }
-    }
+  implicit val MediaTypes: ValueFormat[Seq[Conneg[MediaType]]] = new ValueFormat[Seq[Conneg[MediaType]]] {
+    override def write(value: Seq[Conneg[MediaType]]): Option[String] =
+    if(value.isEmpty) None
+    else Some(grammar.connegs(value.map {
+      // TODO: this should not rely on toString but rather on serialization methods in grammar.
+      case Conneg(t, q) => t.toString -> q
+    }))
+    override def read(value: String): Option[Seq[Conneg[MediaType]]] = parseFully(parser, value)
+    val parser: Parser[List[Conneg[MediaType]]] = MediaType.parser.rep(",").map(_.map(m => Conneg(m.removeParam("q"), m.param[Float]("q").getOrElse(1F))).toList)
   }
+
 
   /** Implicit format for the `Accept-Encoding` content negotiation header.
     *
     * In its current version, this only supports known transfer encodings (`gzip`, `deflate` and `identity`).
     */
-  implicit object Encodings extends ConnegFormat[Encoding] {
-    override def entry: Parser[Encoding] = (Encoding.Gzip.name | Encoding.Deflate.name | Encoding.Identity.name) ^^ {
-      case Encoding.Gzip.name     => Encoding.Gzip
-      case Encoding.Deflate.name  => Encoding.Deflate
-      case Encoding.Identity.name => Encoding.Identity
-    }
-  }
+  implicit val Encodings: ValueFormat[Seq[Conneg[Encoding]]] = ConnegFormat(
+    P(Encoding.Gzip.name).map(_ => Encoding.Gzip)       |
+    P(Encoding.Deflate.name).map(_ => Encoding.Deflate) |
+    P(Encoding.Identity.name).map(_ => Encoding.Identity), _.name
+  )
 
   /** Implicit format for the `Accept-Charset` content negotiation header. */
   // TODO: check what happens when a valid token that does not map to a supported charset is passed.
-  implicit object Charsets extends ConnegFormat[Charset] {
-    override def entry: Parser[Charset] = token ^^ Charset.forName
-  }
+  implicit val Charsets: ValueFormat[Seq[Conneg[Charset]]] = ConnegFormat(grammar.token.map(Charset.forName), _.name())
 
   /** Implicit format for the `Accept-Language` content negotiation header. */
-  implicit object Languages extends ConnegFormat[Language] with Language.Grammar {
-    override def entry: Parser[Language] = language
-  }
-}
+  implicit val Languages: ValueFormat[Seq[Conneg[Language]]] = ConnegFormat(Language.parser,
+    l => grammar.language(l.main, l.sub))
 
-/** Used to parse / serialize content negotiation header values.
-  *
-  * In order to implement a format for a specific type, application developers only need to provide a `Parser`
-  * instance for that type by implementing the [[entry]] method.
-  */
-trait ConnegFormat[T] extends HttpGrammar with ValueFormat[Seq[Conneg[T]]] {
-  private val qFormat = new DecimalFormat("0.###")
 
-  /** Parser for the underlying type. */
-  def entry: Parser[T]
+  private case class ConnegFormat[T](p: Parser[T], writer: T => String) extends ValueFormat[Seq[Conneg[T]]] {
+    val parser: Parser[List[Conneg[T]]] = grammar.connegs(p).map(_.map { case (t, q) => Conneg(t, q) }.toList)
 
-  /** Parser for a single conneg value. */
-  def conneg: Parser[Conneg[T]] = entry ~ opt(paramSep ~> qValue) ^^ {
-    case entry ~ Some(q) => new Conneg(entry, q)
-    case entry ~ _       => new Conneg(entry, 1.0f)
-  }
-
-  /** Parser for a list of conneg values. */
-  def connegs: Parser[List[Conneg[T]]] = repsep(conneg, ",")
-
-  /** Parser for the content-negotiation `q` parameter. */
-  def qValue: Parser[Float] = ("q" ~ valueSep) ~> """[0-1](\.[0-9]{1,3})?""".r ^^ (_.toFloat)
-
-  /** Formats the content-negotiation `q` parameter. */
-  def qValue(value: Float): String = s"q=${qFormat.format(value.toDouble)}"
-
-  private def writeEntry(entry: Conneg[T]): String =
-    if(entry.q == 1) entry.value.toString
-    else             entry.value.toString + ";" + qValue(entry.q)
-
-  // TODO: this currently relies on toString, change that.
-  override def write(value: Seq[Conneg[T]]): Option[String] = {
+    override def write(value: Seq[Conneg[T]]): Option[String] =
     if(value.isEmpty) None
-    else              Some(value.map(writeEntry).mkString(","))
-  }
+    else Some(grammar.connegs(value.map {
+      case Conneg(t, q) => writer(t) -> q
+    }))
 
-  override def read(value: String): Option[Seq[Conneg[T]]] = parseAll(connegs, value) match {
-    case Success(a, _) => Some(a)
-    case _             => None
+    override def read(value: String): Option[Seq[Conneg[T]]] = parseFully(parser, value)
   }
 }
 
@@ -90,6 +59,6 @@ trait ConnegFormat[T] extends HttpGrammar with ValueFormat[Seq[Conneg[T]]] {
   *               the corresponding value is more desirable than values associated with lower weights.
   */
 case class Conneg[T](value: T, q: Float) {
-  require(q >= 0 && q <= 1, "q must be between 0 and 1, inclusive.")
+  require(q >= 0F && q <= 1F, "q must be between 0 and 1, inclusive.")
 }
 

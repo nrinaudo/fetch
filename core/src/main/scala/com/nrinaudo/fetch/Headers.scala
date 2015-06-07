@@ -50,7 +50,7 @@ object Headers {
 
   implicit object languageHeader extends ValueFormat[Language] {
     override def read (value: String): Option[Language] = Language.parse(value)
-    override def write(value: Language): Option[String] = Some(value.toString)
+    override def write(value: Language): Option[String] = Some(grammar.language(value.main, value.sub))
   }
 
   implicit object encodingHeader extends ValueFormat[Encoding] {

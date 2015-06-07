@@ -2,25 +2,26 @@ package com.nrinaudo.fetch
 
 import java.nio.charset.Charset
 
-import org.scalatest.{Matchers, FunSpec}
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import com.nrinaudo.fetch.MediaTypeParametersSpec._
+import org.scalacheck.Arbitrary._
 import org.scalacheck.{Arbitrary, Gen}
-import Arbitrary._
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.{FunSpec, Matchers}
 
 object MediaTypeSpec {
   def main: Gen[String] = Gen.oneOf("text", "application", "video", "audio", "image", "message", "multipart")
   def sub: Gen[String] = Gen.oneOf("plain", "png", "jpg", "rdf", "html", "rdf+xml", "json", "x-fixed-field")
 
-  implicit val allType: Arbitrary[MediaType.All] = Arbitrary(Gen.const(MediaType.Everything))
-  implicit val range: Arbitrary[MediaType.Range] = Arbitrary(for(main <- main) yield MediaType.Range(main))
-  implicit val specific: Arbitrary[MediaType.Specific] = Arbitrary {
+  implicit val arbAll: Arbitrary[MediaType.All] = Arbitrary(Gen.const(MediaType.Everything))
+  implicit val arbRange: Arbitrary[MediaType.Range] = Arbitrary(for(main <- main) yield MediaType.Range(main))
+  implicit val arbSpecific: Arbitrary[MediaType.Specific] = Arbitrary {
     for {
       main   <- main
       sub    <- sub
     } yield MediaType.Specific(main, sub)
   }
 
-  implicit val mediaType: Arbitrary[MediaType] = Arbitrary {
+  implicit val arbMediaType: Arbitrary[MediaType] = Arbitrary {
     for {
       mediaType <- Gen.oneOf(arbitrary[MediaType.All], arbitrary[MediaType.Range], arbitrary[MediaType.Specific])
       params    <- MediaTypeParametersSpec.params
@@ -36,10 +37,9 @@ object MediaTypeSpec {
 }
 
 class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  import MediaTypeSpec._
-  import HttpGrammarSpec._
   import ConnegSpec._
   import Headers._
+  import MediaTypeSpec._
 
   def response(mediaType: MediaType) = Response(Status.Ok, Headers.empty.set("Content-Type", mediaType), "Test")
 
@@ -79,7 +79,7 @@ class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
   describe("A MediaType.Specific instance") {
     it("should unapply for other specific media type with the same raw type") {
       forAll(arbitrary[MediaType.Specific], params) { (mediaType, params) =>
-        val full = mediaType.params(new MediaTypeParameters(params))
+        val full = mediaType.params(params)
         validateUnapply(mediaType, full, true)
         validateUnapply(full, mediaType, true)
       }
@@ -101,7 +101,7 @@ class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
   describe("A MediaType.Range instance") {
     it("should unapply for other media ranges with the same main type") {
       forAll(arbitrary[MediaType.Range], params) { (mediaType, params) =>
-        val full = mediaType.params(new MediaTypeParameters(params))
+        val full = mediaType.params(params)
         validateUnapply(mediaType, full, true)
         validateUnapply(full, mediaType, true)
       }

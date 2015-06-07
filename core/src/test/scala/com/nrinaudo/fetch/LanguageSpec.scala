@@ -12,7 +12,7 @@ object LanguageSpec {
     Locale.ITALY, Locale.JAPAN, Locale.KOREA, Locale.CHINA, Locale.PRC, Locale.TAIWAN, Locale.UK, Locale.US,
     Locale.CANADA, Locale.CANADA_FRENCH))
 
-  implicit val language: Arbitrary[Language] = Arbitrary(arbitrary[Locale].map(Language.apply))
+  implicit val arbLanguage: Arbitrary[Language] = Arbitrary(arbitrary[Locale].map(l => Language(l.getLanguage, List(l.getCountry).filter(_.nonEmpty))))
 
   def illegalLanguage: Gen[String] = Arbitrary.arbitrary[String].suchThat {_.matches(".*[^a-zA-Z_-].*")}
 }
@@ -22,11 +22,7 @@ class LanguageSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChe
 
   describe("Language") {
     it("should parse valid languages") {
-      forAll { lang: Language => Language.parse(lang.toString) should be(Some(lang))}
-    }
-
-    it("should apply on valid locales") {
-      forAll { locale: Locale => Language(locale).toLocale should be(locale)}
+      forAll { lang: Language => Language.parse(grammar.language(lang.main, lang.sub)) should be(Some(lang)) }
     }
 
     it("should not parse invalid languages") {

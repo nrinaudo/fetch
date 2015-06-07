@@ -5,6 +5,9 @@ import java.nio.charset.Charset
 import java.util.Locale
 
 import com.nrinaudo.fetch.Request.HttpEngine
+import fastparse.Parser
+import fastparse.Parser.End
+import fastparse.Result.Success
 
 import scala.language.implicitConversions
 
@@ -16,6 +19,14 @@ package object fetch {
   /** Size of the buffer used when processing streams. */
   private val BufferSize     = 4096
 
+
+
+  // - Parsing helpers -------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  private[fetch] def parseFully[T](parser: Parser[T], str: String): Option[T] = (parser ~ End).parse(str, 0, false) match {
+    case Success(t, _) => Some(t)
+    case _             => None
+  }
 
 
   // - IO helper methods -----------------------------------------------------------------------------------------------

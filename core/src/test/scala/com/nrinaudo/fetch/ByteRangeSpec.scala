@@ -24,15 +24,15 @@ object ByteRangeSpec {
   } yield (from, to)
 
 
-  implicit val prefixRange: Arbitrary[PrefixRange] = Arbitrary(boundary.map(PrefixRange.apply))
-  implicit val suffixRange: Arbitrary[SuffixRange] = Arbitrary(boundary.map(SuffixRange.apply))
-  implicit val fullRange: Arbitrary[FullRange] = Arbitrary {
+  implicit val arbPrefixRange: Arbitrary[PrefixRange] = Arbitrary(boundary.map(PrefixRange.apply))
+  implicit val arbSuffixRange: Arbitrary[SuffixRange] = Arbitrary(boundary.map(SuffixRange.apply))
+  implicit val arbFullRange: Arbitrary[FullRange] = Arbitrary {
     for {
       from <- boundary
       to   <- boundary
     } yield FullRange(math.min(from, to), math.max(from, to))
   }
-  implicit val byteRange: Arbitrary[ByteRange] =
+  implicit val arbByteRange: Arbitrary[ByteRange] =
     Arbitrary(Gen.oneOf(arbitrary[PrefixRange], arbitrary[SuffixRange], arbitrary[FullRange]))
 
   implicit val byteRanges: Arbitrary[List[ByteRange]] = Arbitrary(HeadersSpec.headers(arbitrary[ByteRange]))
