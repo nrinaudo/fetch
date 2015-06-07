@@ -1,8 +1,9 @@
 package com.nrinaudo.fetch
 
-import java.util.{TimeZone, Locale, Date}
 import java.text.SimpleDateFormat
-import scala.util.{Failure, Success, Try}
+import java.util.{Date, Locale, TimeZone}
+
+import scala.util.Try
 
 object Headers {
   // - Composite header formats ----------------------------------------------------------------------------------------
@@ -89,10 +90,4 @@ object Headers {
 
     override def write(value: Seq[ByteRange]): Option[String] = writer.write(value) map {"bytes=" + _ }
   }
-
-  def empty: Headers = new Headers(Map.empty)
-}
-
-case class Headers(override val values: Map[String, String]) extends Parameters[Headers] {
-  override def build(values: Map[String, String]): Headers = copy(values)
 }

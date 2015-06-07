@@ -22,7 +22,7 @@ object Request {
     * but it might not be applicable to all use-cases. Defining your own engine allows you to use another underlying
     * library, such as [[http://hc.apache.org/httpclient-3.x/ Apache HTTP client]].
     */
-  type HttpEngine = (Url, Method, Option[Entity], Headers) => Response[Response.Entity]
+  type HttpEngine = (Url, Method, Option[Entity], Parameters) => Response[Response.Entity]
 
   private def http(f: HttpEngine): HttpEngine = (url, method, body, headers) => f(url, method, body,
     // Sets the content type if applicable.
@@ -47,7 +47,7 @@ object Request {
    * @param engine HTTP engine to use when performing the request.
    */
   def apply(url: Url)(implicit engine: HttpEngine): Request[Response[Response.Entity]] =
-    new Request[Response[Response.Entity]](url, Method.GET, Headers.empty, http(engine))
+    new Request[Response[Response.Entity]](url, Method.GET, Parameters.empty, http(engine))
 
   // TODO: have the version number be dynamic, somehow.
   val UserAgent = "Fetch/0.2"
@@ -59,7 +59,7 @@ object Request {
   * configured through "raw" modification methods ({{{method}}}, {{{headers}}}...) as well as specialised helpers such
   * as {{{GET}}}, {{{acceptGzip}}} or {{{/}}}.
   */
-case class Request[A](url: Url, method: Method, headers: Headers, run: (Url, Method, Option[Entity], Headers) => A) {
+case class Request[A](url: Url, method: Method, headers: Parameters, run: (Url, Method, Option[Entity], Parameters) => A) {
   // - Execution -------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   private def entity[B](body: B)(implicit writer: EntityWriter[B]): Entity = {
@@ -100,7 +100,7 @@ case class Request[A](url: Url, method: Method, headers: Headers, run: (Url, Met
   // -------------------------------------------------------------------------------------------------------------------
   def url(value: Url): Request[A] = copy(url = value)
   def method(value: Method): Request[A] = copy(method = value)
-  def headers(value: Headers): Request[A] = copy(headers = value)
+  def headers(value: Parameters): Request[A] = copy(headers = value)
 
 
 

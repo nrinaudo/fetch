@@ -1,8 +1,9 @@
 package com.nrinaudo.fetch
 
-import java.util.Date
-import Headers._
 import java.io.{FilterInputStream, InputStream}
+import java.util.Date
+
+import com.nrinaudo.fetch.Headers._
 
 object Response {
   class Entity(private val input: InputStream, val mediaType: Option[MediaType]) {
@@ -25,7 +26,7 @@ object Response {
     }
   }
 
-  def fromStream(status: Status, headers: Headers, stream: InputStream): Response[Entity] =
+  def fromStream(status: Status, headers: Parameters, stream: InputStream): Response[Entity] =
     Response(status, headers,
       new Entity(headers.get[Seq[Encoding]]("Content-Encoding").fold(stream) { values =>
         values.foldRight(closing(stream)) { _ decode _ }
@@ -33,7 +34,7 @@ object Response {
 }
 
 /** Represents an HTTP response. */
-case class Response[A](status: Status, headers: Headers, body: A) {
+case class Response[A](status: Status, headers: Parameters, body: A) {
   def map[B](f: A => B): Response[B] = copy(body = f(body))
 
 

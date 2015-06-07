@@ -41,7 +41,7 @@ class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
   import Headers._
   import MediaTypeSpec._
 
-  def response(mediaType: MediaType) = Response(Status.Ok, Headers.empty.set("Content-Type", mediaType), "Test")
+  def response(mediaType: MediaType) = Response(Status.Ok, Parameters.empty.set("Content-Type", mediaType), "Test")
 
   describe("A MediaType instance") {
     it("should serialize to itself") {
@@ -130,7 +130,7 @@ class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
     }
 
     it("should not unapply for responses without a media type") {
-      MediaType.Everything.unapply(new Response(Status.Ok, Headers.empty, "Test")) should be(None)
+      MediaType.Everything.unapply(new Response(Status.Ok, Parameters.empty, "Test")) should be(None)
     }
   }
 }

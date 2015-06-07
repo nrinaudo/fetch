@@ -1,5 +1,9 @@
 package com.nrinaudo.fetch
 
+object Parameters {
+  val empty: Parameters = Parameters(Map.empty)
+}
+
 /**
  * Stores a list of name / value pairs.
  *
@@ -8,20 +12,7 @@ package com.nrinaudo.fetch
  * can be found in [[ValueFormat$ ValueFormat]].
  */
 // TODO: do we really need to split these into Headers and MediaTypeParameters
-trait Parameters[Self <: Parameters[Self]] {
-  this: Self =>
-
-
-  // - Abstract members ------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
-  /** Where the parameter and their values are stored. */
-  def values: Map[String, String]
-
-  /** Creates a new instance of [[Parameters]] with the specified values. */
-  protected def build(values: Map[String, String]): Self
-
-
-
+case class Parameters(values: Map[String, String]) {
   // - Parameter retrieval ---------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Returns the value of the requested parameter.
@@ -46,7 +37,7 @@ trait Parameters[Self <: Parameters[Self]] {
 
   // - Parameter modification ------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  private def setRaw(name: String, value: String): Self = build(values + (name -> value))
+  private def setRaw(name: String, value: String): Parameters = copy(values + (name -> value))
 
   /** Sets the specified parameter to the specified value.
     *
@@ -55,7 +46,7 @@ trait Parameters[Self <: Parameters[Self]] {
     * @tparam T     type of the parameter. An implicit instance of [[ValueWriter]] for this type is required to be in
     *               scope.
     */
-  def set[T: ValueWriter](name: String, value: T): Self =
+  def set[T: ValueWriter](name: String, value: T): Parameters =
     implicitly[ValueWriter[T]].write(value).fold(this)(setRaw(name, _))
 
   /** Sets the specified parameter to the specified value if it does not exist. Otherwise, does nothing.
@@ -65,7 +56,7 @@ trait Parameters[Self <: Parameters[Self]] {
     * @tparam T    type of the parameter. An implicit instance of [[ValueWriter]] for this type is required to be in
     *              scope.
     */
-  def setIfEmpty[T: ValueWriter](name: String, value: T): Self =
+  def setIfEmpty[T: ValueWriter](name: String, value: T): Parameters =
     if(contains(name)) this
     else               set(name, value)
 
@@ -73,20 +64,7 @@ trait Parameters[Self <: Parameters[Self]] {
     *
     * @param name name of the parameter to remove.
     */
-  def remove(name: String): Self =
-    if(contains(name)) build(values - name)
+  def remove(name: String): Parameters =
+    if(contains(name)) copy(values - name)
     else               this
-
-
-
-  // - Object implementation -------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
-  override def toString = values.mkString("(", ",", ")")
-
-  override def hashCode(): Int = values.hashCode()
-
-  override def equals(p1: scala.Any): Boolean = p1 match {
-    case a: Parameters[_] => a.values == values
-    case _                => false
-  }
 }

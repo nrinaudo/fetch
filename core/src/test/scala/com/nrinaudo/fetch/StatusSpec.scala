@@ -14,7 +14,7 @@ object StatusSpec {
   implicit val status: Arbitrary[Status] = Arbitrary(Gen.oneOf(success, redirection, clientError, serverError))
 
   def invalidStatus: Gen[Int] = Arbitrary.arbitrary[Int].suchThat(i => i < 0 || i > 600)
-  private def response(status: Status) = new Response(status, Headers.empty, status.code)
+  private def response(status: Status) = new Response(status, Parameters.empty, status.code)
 }
 
 class StatusSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {

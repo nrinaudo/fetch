@@ -15,7 +15,7 @@ class ResponseSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gen
   import EncodingSpec._
 
 
-  val response = new Response[String](Status.Ok, Headers.empty, "test")
+  val response = new Response[String](Status.Ok, Parameters.empty, "test")
 
   describe("A Response") {
     it("should have the expected Date header when set") {

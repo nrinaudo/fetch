@@ -57,7 +57,7 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
     else stream
   }
 
-  private def process(con: HttpURLConnection, method: Method, body: Option[Request.Entity], headers: Headers) = {
+  private def process(con: HttpURLConnection, method: Method, body: Option[Request.Entity], headers: Parameters) = {
     // Generic configuration.
     configure(con)
     setMethod(con, method.name)
@@ -80,11 +80,11 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
 
     val status = Status(con.getResponseCode)
     Response.fromStream(status,
-      new Headers(con.getHeaderFields.asScala.mapValues(_.asScala.mkString(", ")).toMap),
+      Parameters(con.getHeaderFields.asScala.mapValues(_.asScala.mkString(", ")).toMap),
       responseStream(status, con))
   }
 
-  def apply(url: Url, method: Method, body: Option[Request.Entity], headers: Headers): Response[Response.Entity] =
+  def apply(url: Url, method: Method, body: Option[Request.Entity], headers: Parameters): Response[Response.Entity] =
     url.toURI.toURL.openConnection() match {
       // I'm not entirely happy with forcing a default Accept header - it's perfectly legal for it to be empty. The
       // standard URLConnection forces a somewhat messed up default, however (image/gif, what were they thinking?),

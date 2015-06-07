@@ -19,10 +19,10 @@ object MediaTypeParametersSpec {
 
   // Note: we don't generate more than 5 parameters because this causes unrelated issues when testing - some HTTP
   // servers seem to have a limit to the size of a header value.
-  def params: Gen[MediaTypeParameters] = for {
+  def params: Gen[Parameters] = for {
     size <- choose(0, 5)
     ps   <- mapOfN(size, arbitrary[Param].map(p => p.name -> p.value))
-  } yield MediaTypeParameters(ps)
+  } yield Parameters(ps)
 
   def illegalParams: Gen[String] = Arbitrary.arbitrary[String].suchThat(str => !str.contains('=') && !str.isEmpty)
 }

@@ -10,10 +10,10 @@ object MediaType {
   // - MediaType implementations ---------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Specific media type, with both a main- and sub-type (such as `text-plain`, for example). */
-  final case class Specific(main: String, sub: String, params: MediaTypeParameters = MediaTypeParameters.empty)
+  final case class Specific(main: String, sub: String, params: Parameters = Parameters.empty)
     extends MediaType {
     override def rawType: String = "%s/%s" format (main, sub)
-    override def params(values: MediaTypeParameters): MediaType = copy(params = values)
+    override def params(values: Parameters): MediaType = copy(params = values)
 
     /** Matches any instance of [[Specific]] with the same main- and sub-type. */
     override def unapply(mediaType:  MediaType): Option[MediaType] = mediaType match {
@@ -23,9 +23,9 @@ object MediaType {
   }
 
   /** Media range, with a main-type only (such as `text/ *`, for example). */
-  final case class Range(main: String, params: MediaTypeParameters = MediaTypeParameters.empty) extends MediaType {
+  final case class Range(main: String, params: Parameters = Parameters.empty) extends MediaType {
     override def rawType: String = "%s/*" format main
-    override def params(values: MediaTypeParameters): MediaType = copy(params = values)
+    override def params(values: Parameters): MediaType = copy(params = values)
 
     /** Matches any instance of either [[Specific]] or [[Range]] that have the same main type. */
     override def unapply(mediaType: MediaType): Option[MediaType] = mediaType match {
@@ -39,9 +39,9 @@ object MediaType {
   }
 
   /** All media types: `* / *` */
-  final case class All(params: MediaTypeParameters = MediaTypeParameters.empty) extends MediaType {
+  final case class All(params: Parameters = Parameters.empty) extends MediaType {
     override def rawType: String = "*/*"
-    override def params(values: MediaTypeParameters): MediaType = copy(params = values)
+    override def params(values: Parameters): MediaType = copy(params = values)
 
     /** Matches all media types. */
     override def unapply(mediaType: MediaType): Option[MediaType] = Some(mediaType)
@@ -56,7 +56,7 @@ object MediaType {
     ((grammar.mediaAll.map(_ => Everything) |
       grammar.mediaRange.map(s => Range(s)) |
       grammar.mediaType.map { case (m, s) => Specific(m, s) }) ~
-     P(";" ~ MediaTypeParameters.parser).?.map(_.getOrElse(MediaTypeParameters.empty))).map { case (m, p) => m.params(p) }
+     P(";" ~ MediaTypeParameters.parser).?.map(_.getOrElse(Parameters.empty))).map { case (m, p) => m.params(p) }
 
   /** Attempts to extract a media type from the specified string. */
   def parse(str: String): Option[MediaType] = parseFully(parser, str)
@@ -105,11 +105,11 @@ object MediaType {
 
 sealed trait MediaType {
   /** Parameters associated with this instance. */
-  val params: MediaTypeParameters
+  val params: Parameters
   /** Raw string representation of the media type, ignoring parameters. */
   def rawType: String
   /** Creates a copy of the current instance with the specified parameters. */
-  def params(values: MediaTypeParameters): MediaType
+  def params(values: Parameters): MediaType
 
   // TODO:
   override lazy val toString =
@@ -151,7 +151,7 @@ sealed trait MediaType {
   /** Returns the value of the requested parameter.
     *
     * This is strictly a convenience method and will simply call the underlying parameter's
-    * [[MediaTypeParameters.get]] method.
+    * [[Parameters.get]] method.
     */
   def param[T: ValueReader](name: String): Option[T] = params.get[T](name)
 
