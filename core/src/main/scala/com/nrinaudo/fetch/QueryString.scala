@@ -1,7 +1,5 @@
 package com.nrinaudo.fetch
 
-import scala.util.{Success, Failure, Try}
-
 
 object QueryString {
   // - Implicit formats ------------------------------------------------------------------------------------------------

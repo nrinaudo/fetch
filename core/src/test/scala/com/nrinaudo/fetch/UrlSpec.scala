@@ -1,57 +1,11 @@
 package com.nrinaudo.fetch
 
-import org.scalacheck.{Gen, Arbitrary}
-import org.scalatest.{Matchers, FunSpec}
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.Gen._
+import com.nrinaudo.fetch.Generators._
 import org.scalacheck.Arbitrary._
-import QueryStringSpec._
-import ProtocolSpec._
-
-object UrlSpec {
-  def domainSeg: Gen[String] = for {
-    first   <- alphaChar
-    length  <- choose(1, 10)
-    content <- listOfN(length, alphaLowerChar)
-  } yield (first :: content).mkString
-
-  /** Generates a valid host. */
-  def host: Gen[String] = for {
-    name <- domainSeg
-    ext  <- oneOf("com", "fr", "es", "it", "co.uk", "co.jp", "io")
-  } yield name + "." + ext
-
-  /** Generates a valid port. */
-  def port: Gen[Int] = choose(1, 65535)
-
-  def segment: Gen[String] = arbitrary[String].suchThat(!_.isEmpty)
-
-  /** Generates a valid path. */
-  def path: Gen[List[String]] = for {
-    count <- choose(0, 5)
-    path <- listOfN(count, segment)
-  } yield path
-
-  def fragment: Gen[Option[String]] = oneOf(true, false) flatMap {b =>
-    if(b) None
-    else  arbitrary[String].map(Some(_))
-  }
-
-  implicit val url: Arbitrary[Url] = Arbitrary {
-    for {
-      pr <- arbitrary[Protocol]
-      h  <- host
-      p  <- port
-      s  <- path
-      q  <- arbitrary[QueryString]
-      r  <- fragment
-    } yield Url(pr, h, p, s, q, r)
-  }
-}
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.{FunSpec, Matchers}
 
 class UrlSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  import UrlSpec._
-
   describe("An Url") {
     it("should correctly change protocol") {
       forAll { (url: Url, protocol: Protocol) =>

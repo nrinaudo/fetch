@@ -6,8 +6,8 @@ import java.util.Date
 import com.nrinaudo.fetch.Generators._
 import com.nrinaudo.fetch.net.UrlEngine
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Gen
 import org.scalacheck.Gen._
-import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 
@@ -28,8 +28,6 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
   import HeadersSpec._
   import LanguageSpec._
   import MethodSpec._
-  import QueryStringSpec._
-  import UrlSpec._
 
   implicit val engine = UrlEngine()
 

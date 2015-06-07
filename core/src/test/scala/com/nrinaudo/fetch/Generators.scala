@@ -53,4 +53,77 @@ object Generators {
   }
 
   def illegalMediaType: Gen[String] = Arbitrary.arbitrary[String].suchThat(_.indexOf('/') == -1)
+
+
+  // - Protocol generators ---------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  /** Generates a random supported protocol (http or https). */
+  implicit val arbProtocol: Arbitrary[Protocol] = Arbitrary(Gen.oneOf(Protocol.Http, Protocol.Https))
+
+  /** Generates invalid protocol names. */
+  def invalidProtocol: Gen[String] = Arbitrary.arbitrary[String].suchThat(s => s != Protocol.Http.name && s != Protocol.Https.name)
+
+
+  // - QueryString generators ------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  /** Returns a single query parameter. */
+  def queryParam: Gen[(String, List[String])] = for {
+    name   <- arbitrary[String].suchThat(!_.isEmpty)
+    count  <- choose(1, 5)
+    values <- listOfN(count, arbitrary[String].suchThat(!_.isEmpty))
+  } yield (name, values)
+
+  def queryParams: Gen[Map[String, List[String]]] = for {
+    count  <- choose(1, 10)
+    params <- listOfN(count, queryParam)
+  } yield params.foldLeft(Map(): Map[String, List[String]]) { (map, param) => map + param}
+
+  /** Returns a query string. */
+  implicit val arbQueryString: Arbitrary[QueryString] = Arbitrary {
+    for {
+      query <- queryParams
+    } yield QueryString(query)
+  }
+
+
+  // - URL generators --------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  def domainSeg: Gen[String] = for {
+    first   <- alphaChar
+    length  <- choose(1, 10)
+    content <- listOfN(length, alphaLowerChar)
+  } yield (first :: content).mkString
+
+  /** Generates a valid host. */
+  def host: Gen[String] = for {
+    name <- domainSeg
+    ext  <- oneOf("com", "fr", "es", "it", "co.uk", "co.jp", "io")
+  } yield name + "." + ext
+
+  /** Generates a valid port. */
+  def port: Gen[Int] = choose(1, 65535)
+
+  def segment: Gen[String] = arbitrary[String].suchThat(!_.isEmpty)
+
+  /** Generates a valid path. */
+  def path: Gen[List[String]] = for {
+    count <- choose(0, 5)
+    path <- listOfN(count, segment)
+  } yield path
+
+  def fragment: Gen[Option[String]] = oneOf(true, false) flatMap {b =>
+    if(b) None
+    else  arbitrary[String].map(Some(_))
+  }
+
+  implicit val arbUrl: Arbitrary[Url] = Arbitrary {
+    for {
+      pr <- arbitrary[Protocol]
+      h  <- host
+      p  <- port
+      s  <- path
+      q  <- arbitrary[QueryString]
+      r  <- fragment
+    } yield Url(pr, h, p, s, q, r)
+  }
 }
