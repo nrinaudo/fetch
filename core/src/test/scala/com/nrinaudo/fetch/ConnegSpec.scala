@@ -1,12 +1,15 @@
 package com.nrinaudo.fetch
 
-import org.scalacheck.{Arbitrary, Gen}
-import Arbitrary._
 import java.nio.charset.Charset
-import scala.collection.JavaConverters._
-import org.scalatest.{Matchers, FunSpec}
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
+
 import com.nrinaudo.fetch.Conneg.MediaTypes
+import org.scalacheck.Arbitrary._
+import org.scalacheck.{Arbitrary, Gen}
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.{FunSpec, Matchers}
+import Generators._
+
+import scala.collection.JavaConverters._
 
 object ConnegSpec {
   private lazy val charsets: List[Charset] = Charset.availableCharsets().values().asScala.toList
@@ -27,7 +30,6 @@ object ConnegSpec {
 
 class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
   import ConnegSpec._
-  import MediaTypeSpec._
   import EncodingSpec._
   import HeaderFormatSpec._
   import LanguageSpec._

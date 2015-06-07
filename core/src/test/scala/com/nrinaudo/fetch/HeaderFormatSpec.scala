@@ -3,8 +3,8 @@ package com.nrinaudo.fetch
 import java.nio.charset.Charset
 import java.util.Date
 
+import com.nrinaudo.fetch.Generators._
 import com.nrinaudo.fetch.Headers._
-import com.nrinaudo.fetch.HeadersSpec._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen._
 import org.scalacheck.{Arbitrary, Gen}
@@ -59,9 +59,9 @@ class CharsetFormatSpec extends HeaderFormatSpecWithList[Charset] {
 }
 
 class MediaTypeFormatSpec extends HeaderFormatSpec[MediaType] {
-  override val illegalT = MediaTypeSpec.illegalMediaType
+  override val illegalT = illegalMediaType
 
-  override implicit val arbT    = MediaTypeSpec.arbMediaType
+  override implicit val arbT    = arbMediaType
   override implicit val formatT = mediaTypeHeader
 }
 

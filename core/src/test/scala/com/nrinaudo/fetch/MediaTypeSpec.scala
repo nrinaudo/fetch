@@ -1,34 +1,14 @@
 package com.nrinaudo.fetch
 
 import java.nio.charset.Charset
-
-import com.nrinaudo.fetch.MediaTypeParametersSpec._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FunSpec, Matchers}
+import Generators._
 
 object MediaTypeSpec {
-  def main: Gen[String] = Gen.oneOf("text", "application", "video", "audio", "image", "message", "multipart")
-  def sub: Gen[String] = Gen.oneOf("plain", "png", "jpg", "rdf", "html", "rdf+xml", "json", "x-fixed-field")
 
-  implicit val arbAll: Arbitrary[MediaType.All] = Arbitrary(Gen.const(MediaType.Everything))
-  implicit val arbRange: Arbitrary[MediaType.Range] = Arbitrary(for(main <- main) yield MediaType.Range(main))
-  implicit val arbSpecific: Arbitrary[MediaType.Specific] = Arbitrary {
-    for {
-      main   <- main
-      sub    <- sub
-    } yield MediaType.Specific(main, sub)
-  }
-
-  implicit val arbMediaType: Arbitrary[MediaType] = Arbitrary {
-    for {
-      mediaType <- Gen.oneOf(arbitrary[MediaType.All], arbitrary[MediaType.Range], arbitrary[MediaType.Specific])
-      params    <- MediaTypeParametersSpec.params
-    } yield mediaType.params(params)
-  }
-
-  def illegalMediaType: Gen[String] = Arbitrary.arbitrary[String].suchThat(_.indexOf('/') == -1)
 
   private def diffTypes[T](gen: Gen[T]): Gen[(T, T)] = for {
     t1 <- gen
@@ -78,7 +58,7 @@ class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
 
   describe("A MediaType.Specific instance") {
     it("should unapply for other specific media type with the same raw type") {
-      forAll(arbitrary[MediaType.Specific], params) { (mediaType, params) =>
+      forAll(arbitrary[MediaType.Specific], arbitrary[Parameters]) { (mediaType, params) =>
         val full = mediaType.params(params)
         validateUnapply(mediaType, full, true)
         validateUnapply(full, mediaType, true)
@@ -100,7 +80,7 @@ class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
 
   describe("A MediaType.Range instance") {
     it("should unapply for other media ranges with the same main type") {
-      forAll(arbitrary[MediaType.Range], params) { (mediaType, params) =>
+      forAll(arbitrary[MediaType.Range], arbitrary[Parameters]) { (mediaType, params) =>
         val full = mediaType.params(params)
         validateUnapply(mediaType, full, true)
         validateUnapply(full, mediaType, true)
@@ -108,11 +88,11 @@ class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
     }
 
     it("should unapply on media types with the same main type") {
-      forAll(arbitrary[MediaType.Range], sub) { (range, sub) => validateUnapply(range, range / sub, true) }
+      forAll(arbitrary[MediaType.Range], subType) { (range, sub) => validateUnapply(range, range / sub, true) }
     }
 
     it("should not unapply on media types with different main types") {
-      forAll(diffTypes(arbitrary[MediaType.Range]), sub) { case ((r1, r2), sub) => validateUnapply(r1, r2 / sub, false) }
+      forAll(diffTypes(arbitrary[MediaType.Range]), subType) { case ((r1, r2), sub) => validateUnapply(r1, r2 / sub, false) }
     }
 
     it("should not unapply on */*") {

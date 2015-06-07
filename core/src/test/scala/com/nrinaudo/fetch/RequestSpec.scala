@@ -3,12 +3,13 @@ package com.nrinaudo.fetch
 import java.nio.charset.Charset
 import java.util.Date
 
-import org.scalatest.{Matchers, BeforeAndAfterAll, FunSpec}
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.{Arbitrary, Gen}
-import Arbitrary.arbitrary
-import Gen._
+import com.nrinaudo.fetch.Generators._
 import com.nrinaudo.fetch.net.UrlEngine
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Gen._
+import org.scalacheck.{Arbitrary, Gen}
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 
 object RequestSpec {
   // Note that this is not entirely correct: according to the RFC, password are allowed to contain a ':'. This is not
@@ -20,16 +21,15 @@ object RequestSpec {
 }
 
 class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
-  import MethodSpec._
-  import UrlSpec._
-  import QueryStringSpec._
-  import HeadersSpec._
   import ByteRangeSpec._
-  import ETagSpec._
   import ConnegSpec._
-  import LanguageSpec._
+  import ETagSpec._
   import EncodingSpec._
-  import MediaTypeSpec._
+  import HeadersSpec._
+  import LanguageSpec._
+  import MethodSpec._
+  import QueryStringSpec._
+  import UrlSpec._
 
   implicit val engine = UrlEngine()
 

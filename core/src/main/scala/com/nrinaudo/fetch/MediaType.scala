@@ -52,11 +52,15 @@ object MediaType {
   // - Parsing ---------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   // TODO: this is nasty, there shouldn't be any reason to parse HTTP grammar manually.
-  private[fetch] val parser: Parser[MediaType] =
-    ((grammar.mediaAll.map(_ => Everything) |
-      grammar.mediaRange.map(s => Range(s)) |
-      grammar.mediaType.map { case (m, s) => Specific(m, s) }) ~
-     P(";" ~ MediaTypeParameters.parser).?.map(_.getOrElse(Parameters.empty))).map { case (m, p) => m.params(p) }
+  private[fetch] val parser: Parser[MediaType] = grammar.mediaType.map {
+    case (main, sub, ps) =>
+      val params = Parameters(ps.foldLeft(Map.empty[String, String])(_ + _))
+      ((main, sub) match {
+        case ("*", "*") => Everything
+        case (_, "*")   => Range(main)
+        case (_, _)     => Specific(main, sub)
+      }).params(params)
+  }
 
   /** Attempts to extract a media type from the specified string. */
   def parse(str: String): Option[MediaType] = parseFully(parser, str)

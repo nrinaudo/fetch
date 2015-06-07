@@ -51,19 +51,20 @@ class HttpGrammarSpec extends FunSpec with Matchers with GeneratorDrivenProperty
       }
     }
 
+    // TODO: add parameters to media type parsing
     it("should parse */*") {
-      parse(mediaAll, "*/*").isDefined should be(true)
+      parse(mediaType, "*/*") should be(Some(("*", "*", Seq.empty)))
     }
 
     it("should parse valid media ranges") {
       forAll(tokenString) { range =>
-        parse(mediaRange, s"$range/*") should be(Some(range))
+        parse(mediaType, s"$range/*") should be(Some((range, "*", Seq.empty)))
       }
     }
 
     it("should parse valid media types") {
       forAll(tokenString, tokenString) { (main, sub) =>
-        parse(mediaType, s"$main/$sub") should be(Some(main -> sub))
+        parse(mediaType, s"$main/$sub") should be(Some((main, sub, Seq.empty)))
       }
     }
 

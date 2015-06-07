@@ -10,7 +10,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import unfiltered.jetty.Server
-import utest.*
+import Generators._
 
 trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
   import ByteRangeSpec._
