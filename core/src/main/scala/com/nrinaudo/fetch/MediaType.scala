@@ -51,7 +51,6 @@ object MediaType {
 
   // - Parsing ---------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  // TODO: this is nasty, there shouldn't be any reason to parse HTTP grammar manually.
   private[fetch] val parser: Parser[MediaType] = grammar.mediaType.map {
     case (main, sub, ps) =>
       val params = Parameters(ps.foldLeft(Map.empty[String, String])(_ + _))

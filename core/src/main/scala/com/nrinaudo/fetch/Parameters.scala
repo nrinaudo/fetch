@@ -20,7 +20,6 @@ object Parameters {
  * corresponding instances of [[ValueReader]] and [[ValueWriter]] are in scope. Default implementations of these
  * can be found in [[ValueFormat$ ValueFormat]].
  */
-// TODO: do we really need to split these into Headers and MediaTypeParameters
 case class Parameters(values: Map[String, String]) {
   // - Parameter retrieval ---------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
