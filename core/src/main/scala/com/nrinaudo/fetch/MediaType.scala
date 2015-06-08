@@ -2,11 +2,13 @@ package com.nrinaudo.fetch
 
 import java.nio.charset.Charset
 
-import com.nrinaudo.fetch.MediaTypeParameters._
+import com.nrinaudo.fetch.MediaType.charsetParam
 import fastparse._
 
 /** Defines [[MediaType]] implementations as well as known types. */
 object MediaType {
+  implicit val charsetParam = ValueFormat.charsetParam
+
   // - MediaType implementations ---------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Specific media type, with both a main- and sub-type (such as `text-plain`, for example). */
