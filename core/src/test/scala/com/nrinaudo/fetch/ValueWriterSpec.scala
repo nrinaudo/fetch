@@ -1,16 +1,14 @@
 package com.nrinaudo.fetch
 
-import org.scalatest.{Matchers, FunSpec}
+import org.scalacheck.Arbitrary._
+import org.scalacheck.Gen._
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalatest.{FunSpec, Matchers}
 
 class ValueWriterSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  implicit val Ints    = ValueFormat.intParam
-  implicit val Strings = Headers.stringHeader
-
   describe("ValueWriter") {
     it("should sequence non-empty lists properly") {
-      forAll(Gen.listOf(Arbitrary.arbitrary[Int]).suchThat(!_.isEmpty)) { values =>
+      forAll(nonEmptyListOf(arbitrary[Int])) { values =>
         ValueWriter.sequence(values) should be(Some(values.map(_.toString)))
       }
     }
@@ -19,19 +17,7 @@ class ValueWriterSpec extends FunSpec with Matchers with GeneratorDrivenProperty
       ValueWriter.sequence(Nil: List[Int]) should be(None)
     }
 
-    it("should sequence non-empty lists of empty elements properly") {
-      forAll(Gen.choose(1, 10)) { size =>
-        ValueWriter.sequence(List.fill(size)("")) should be(None)
-      }
-    }
 
-    it("should sequence lists with some empty elements properly") {
-      forAll(Gen.nonEmptyListOf(Arbitrary.arbitrary[String])) { values =>
-        val e1 = values.filter(!_.isEmpty)
-        val e2 = if(e1.isEmpty) None else Some(e1)
-
-        ValueWriter.sequence(values) should be(e2)
-      }
-    }
+    // TODO: test sequence for objects that fail to serialize
   }
 }

@@ -5,8 +5,6 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.{Arbitrary, Gen}
 
 class ValueReaderSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  implicit val Ints = ValueFormat.intParam
-
   describe("ValueReader") {
     it("should sequence empty lists properly") {
       ValueReader.sequence[Int](Nil) should be(Some(Nil))

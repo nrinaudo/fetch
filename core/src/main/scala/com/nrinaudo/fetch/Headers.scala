@@ -18,25 +18,10 @@ object Headers {
     ValueReader((s: String) => ValueReader.sequence[T](s.split(',')))
 
 
-  // - Generic default formats -----------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
-  implicit val stringHeader: ValueFormat[String] = new ValueFormat[String] {
-    override def write(value: String): Option[String] =
-    if(value.isEmpty) None
-    else Some(value)
-
-    override def read(value: String): Option[String] = Some(value)
-  }
-
-  implicit val intHeader: ValueFormat[Int] = ValueFormat.intParam
-  implicit val floatHeader: ValueFormat[Float] = ValueFormat.floatParam
-  implicit val charsetHeader = ValueFormat.charsetParam
-
-
-
 
   // - Header specific default formats ---------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
+  // TODO: value class and generic?
   /** Formats dates to the proper RFC compliant syntax. */
   implicit object dateHeader extends ValueFormat[Date] {
     private val HttpDateFormat = {

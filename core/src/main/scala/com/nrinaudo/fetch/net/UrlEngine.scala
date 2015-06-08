@@ -89,7 +89,7 @@ case class UrlEngine(readTimeout: Int = 0, connectTimeout: Int = 0, followsRedir
       // I'm not entirely happy with forcing a default Accept header - it's perfectly legal for it to be empty. The
       // standard URLConnection forces a somewhat messed up default, however (image/gif, what were they thinking?),
       // and */* is curl's default behaviour - if it's good enough for curl, it's good enough for me.
-      case con: HttpURLConnection => process(con, method, body, headers.setIfEmpty("Accept", "*/*")(ValueFormat.stringParam))
+      case con: HttpURLConnection => process(con, method, body, headers.setIfEmpty("Accept", "*/*"))
       case _                      => throw new AssertionError("An URL opened a non-URL HTTP connection.")
     }
 }

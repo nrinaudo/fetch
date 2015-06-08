@@ -4,9 +4,12 @@ import java.text.DecimalFormat
 
 import fastparse.Intrinsics.CharPred
 import fastparse._
-import utest.*
 
+/** Implements parsers for the various elements of the HTTP grammar as defined in [[http://tools.ietf.org/html/rfc2616 RFC 2616]]. */
 package object grammar {
+  // - Character predicates --------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  /** List of separator characters. */
   val Separators = Set('(', ')', '<', '>', '@', ',', ';', ':', '\\', '"', '/', '[', ']', '?', '=', '{', '}', ' ', '\t')
 
   def isChar(c: Char): Boolean = c >= 0 && c <= 127
@@ -16,7 +19,7 @@ package object grammar {
   def isText(c: Char): Boolean = !isCtl(c) || isLws(c)
 
   val token: Parser[String] = CharsWhile(c => isChar(c) && !(isCtl(c) || isSeparator(c)), 1).!
-  // Note: I've added the \\ exclusion here because while the specs don't specify it, it seems that it should be there
+  // Note: I've added the \\ exclusion here because while the RFC does not specify it, it seems that it should be there
   // to prevent conflict with quoted pairs.
   val qdtext: Parser[String] = Intrinsics.CharsWhile(c => isText(c) &&  c != '"' && c != '\\', 1).!
   val quotedPair: Parser[String] = "\\" ~ CharPred(isChar).!
@@ -25,11 +28,7 @@ package object grammar {
   val param: Parser[(String, String)] = token ~ "=" ~ (token | quotedString).?.map(_.getOrElse(""))
   val params: Parser[Map[String, String]] = param.rep(";").map(_.foldLeft(Map.empty[String, String])(_ + _))
 
-  //val mediaAll: Parser[Unit] = "*/*"
-  //val mediaRange: Parser[String] = token ~ "/*"
-  //val mediaType: Parser[(String, String)] = token ~ "/" ~ token
   val mediaType: Parser[(String, String, Seq[(String, String)])] = token ~ "/" ~ token ~ (";" ~ params).?.map(_.getOrElse(List.empty).toSeq)
-
 
   // TODO: both languageTag and qValue are incorrect: they do not check for max size.
   val languageTag: Parser[String] = P(CharIn('a' to 'z', 'A' to 'Z')).rep1.!

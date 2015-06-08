@@ -23,6 +23,20 @@ object ValueReader {
       case (Some(v), Some(list)) => Some(v :: list)
       case _                     => None
     }
+
+
+  // - Default readers -------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  implicit val Double: ValueReader[Double]   = apply(s => Try(s.toDouble).toOption)
+  implicit val Long: ValueReader[Long]       = apply(s => Try(s.toLong).toOption)
+  implicit val Short: ValueReader[Short]     = apply(s => Try(s.toShort).toOption)
+  implicit val Int: ValueReader[Int]         = apply(s => Try(s.toInt).toOption)
+  implicit val Byte: ValueReader[Byte]       = apply(s => Try(s.toByte).toOption)
+  implicit val Float: ValueReader[Float]     = apply(s => Try(s.toFloat).toOption)
+  implicit val Boolean: ValueReader[Boolean] = apply(s => Try(s.toBoolean).toOption)
+  implicit val String: ValueReader[String]   = apply(Some(_))
+  implicit val Char: ValueReader[Char]       = apply(s => if(s.length == 1) Some(s.charAt(0)) else None)
+  implicit val Charset: ValueReader[Charset] = apply(c => Try(java.nio.charset.Charset.forName(c)).toOption)
 }
 
 /** Used to read parameter values from an instance of [[Parameters]]. */
@@ -37,7 +51,7 @@ trait ValueReader[T] {
 // - Value Writing -----------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 object ValueWriter {
-  /** Transforms the specified function into an instance of [[ValueWriter]]. */
+    /** Transforms the specified function into an instance of [[ValueWriter]]. */
   def apply[T](f: T => Option[String]): ValueWriter[T] = new ValueWriter[T] {
     override def write(value: T): Option[String] = f(value)
   }
@@ -50,6 +64,20 @@ object ValueWriter {
       case Nil => None
       case list => Some(list)
     }
+
+
+  // - Default writers -------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  implicit val Double: ValueWriter[Double]   = apply(d => Some(d.toString))
+  implicit val Long: ValueWriter[Long]       = apply(l => Some(l.toString))
+  implicit val Short: ValueWriter[Short]     = apply(s => Some(s.toString))
+  implicit val Int: ValueWriter[Int]         = apply(i => Some(i.toString))
+  implicit val Byte: ValueWriter[Byte]       = apply(b => Some(b.toString))
+  implicit val Float: ValueWriter[Float]     = apply(f => Some(f.toString))
+  implicit val Boolean: ValueWriter[Boolean] = apply(b => Some(b.toString))
+  implicit val String: ValueWriter[String]   = apply(Some(_))
+  implicit val Char: ValueWriter[Char]       = apply(b => Some(b.toString))
+  implicit val Charset: ValueWriter[Charset] = apply(c => Some(c.name()))
 }
 
 /** Used to write parameter values to an instance of [[Parameters]]. */
@@ -66,23 +94,6 @@ trait ValueWriter[T] {
 // - Formats -----------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 object ValueFormat {
-  // - Standard formatters ---------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
-  // TODO: Should empty strings format as None by default?
-  val doubleParam: ValueFormat[Double]   = apply(s => Try(s.toDouble).toOption,  d => Some(d.toString))
-  val longParam: ValueFormat[Long]       = apply(s => Try(s.toLong).toOption,    l => Some(l.toString))
-  val shortParam: ValueFormat[Short]     = apply(s => Try(s.toShort).toOption,   s => Some(s.toString))
-  val intParam: ValueFormat[Int]         = apply(s => Try(s.toInt).toOption,     i => Some(i.toString))
-  val byteParam: ValueFormat[Byte]       = apply(s => Try(s.toByte).toOption,    b => Some(b.toString))
-  val floatParam: ValueFormat[Float]     = apply(s => Try(s.toFloat).toOption,   f => Some(f.toString))
-  val booleanParam: ValueFormat[Boolean] = apply(s => Try(s.toBoolean).toOption, b => Some(b.toString))
-  val stringParam: ValueFormat[String]   = apply(Some(_),                        Some(_))
-  val charParam: ValueFormat[Char]       = apply(s => if(s.length == 1) Some(s.charAt(0)) else None, b => Some(b.toString))
-  val charsetParam: ValueFormat[Charset] = new ValueFormat[Charset] {
-    override def write(value: Charset): Option[String] = Some(value.name())
-    override def read(value: String): Option[Charset] = Try(Charset.forName(value)).toOption
-  }
-
   /** Transforms the specified functions into an instance of [[ValueFormat]]. */
   def apply[T](f: String => Option[T], g: T => Option[String]): ValueFormat[T] = apply(ValueReader(f), ValueWriter(g))
 

@@ -2,24 +2,9 @@ package com.nrinaudo.fetch
 
 
 object QueryString {
-  // - Implicit formats ------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
-  // TODO: do we really need these?
-  implicit val doubleParam: ValueFormat[Double]   = ValueFormat.doubleParam
-  implicit val longParam: ValueFormat[Long]       = ValueFormat.longParam
-  implicit val shortParam: ValueFormat[Short]     = ValueFormat.shortParam
-  implicit val intParam: ValueFormat[Int]         = ValueFormat.intParam
-  implicit val byteParam: ValueFormat[Byte]       = ValueFormat.byteParam
-  implicit val floatParam: ValueFormat[Float]     = ValueFormat.floatParam
-  implicit val booleanParam: ValueFormat[Boolean] = ValueFormat.booleanParam
-  implicit val stringParam: ValueFormat[String]   = ValueFormat.stringParam
-  implicit val charParam: ValueFormat[Char]       = ValueFormat.charParam
-
-
-
   // - Instance creation -----------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def apply(content: Map[String, List[String]] = Map()): QueryString = new QueryString(content)
+  def apply(content: Map[String, List[String]] = Map.empty): QueryString = new QueryString(content)
 
   def apply(query: String): QueryString = {
     def extract(str: String) = new QueryString(str.split("&").foldLeft(Map[String, List[String]]()) {
@@ -87,7 +72,7 @@ class QueryString private (content: Map[String, List[String]]) {
 
   def get[T: ValueReader](name: String): Option[List[T]] = for {
     v1 <- values.get(name)
-    v2 <- ValueReader.sequence(v1)(implicitly[ValueReader[T]])
+    v2 <- ValueReader.sequence(v1)
   } yield v2
 
 

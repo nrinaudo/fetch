@@ -56,7 +56,7 @@ class CharsetFormatSpec extends HeaderFormatSpecWithList[Charset] {
   override val illegalT = illegalCharset
 
   override implicit val arbT    = arbCharset
-  override implicit val formatT = charsetHeader
+  override implicit val formatT = ValueFormat(ValueReader.Charset, ValueWriter.Charset)
 }
 
 class MediaTypeFormatSpec extends HeaderFormatSpec[MediaType] {
