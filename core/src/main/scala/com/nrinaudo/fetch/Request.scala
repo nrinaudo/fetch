@@ -4,8 +4,8 @@ import java.io._
 import java.net.URI
 import java.nio.charset.Charset
 import java.util.Date
+import Headers._
 
-import com.nrinaudo.fetch.Headers._
 import com.nrinaudo.fetch.Request.Entity
 import org.apache.commons.codec.binary.Base64
 

@@ -130,8 +130,8 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     }
 
     it("should return its Accept-Encoding header when set") {
-      forAll { (url: Url, encodings: List[Conneg[Encoding]]) =>
-        Request(url).acceptEncoding(encodings: _*).acceptEncoding should be(Some(encodings))
+      forAll { (url: Url, encodings: Seq[Conneg[Encoding]]) =>
+        Request(url).acceptEncoding(encodings:_*).acceptEncoding should be(Some(encodings))
       }
     }
 
@@ -147,7 +147,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     }
 
     it("should return its Accept header when set") {
-      forAll { (url: Url, types: List[Conneg[MediaType]]) => Request(url).accept(types: _*).accept should be(Some(types)) }
+      forAll { (url: Url, types: Seq[Conneg[MediaType]]) => Request(url).accept(types: _*).accept should be(Some(types)) }
     }
 
     it("should not return a Accept when the header is not set") {
@@ -155,7 +155,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     }
 
     it("should return its Accept-Charset header when set") {
-      forAll { (url: Url, charsets: List[Conneg[Charset]]) =>
+      forAll { (url: Url, charsets: Seq[Conneg[Charset]]) =>
         Request(url).acceptCharset(charsets: _*).acceptCharset should be(Some(charsets))
       }
     }
@@ -165,7 +165,7 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
     }
 
     it("should return its Accept-Language header when set") {
-      forAll { (url: Url, languages: List[Conneg[Language]]) =>
+      forAll { (url: Url, languages: Seq[Conneg[Language]]) =>
         Request(url).acceptLanguage(languages: _*).acceptLanguage should be(Some(languages))
       }
     }

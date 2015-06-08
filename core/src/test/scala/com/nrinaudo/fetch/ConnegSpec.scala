@@ -2,7 +2,7 @@ package com.nrinaudo.fetch
 
 import java.nio.charset.Charset
 
-import com.nrinaudo.fetch.Conneg.MediaTypes
+import com.nrinaudo.fetch.Conneg._
 import com.nrinaudo.fetch.Generators._
 import org.scalacheck.Gen
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
@@ -25,34 +25,30 @@ class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCheck
     }
 
     it("should not serialize q when it's equal to 1") {
-      forAll { charset: Charset => Conneg.Charsets.write(Seq(Conneg(charset, 1))) should be(Some(charset.name())) }
+      forAll { charset: Charset => Charsets.write(Seq(Conneg(charset, 1))) should be(Some(charset.name())) }
     }
 
     it("should assume an absent q defaults to 1.0") {
       forAll { charset: Charset =>
-        Conneg.Charsets.read(charset.name()) should be(Some(List(Conneg(charset, 1.0f))))
+        Charsets.read(charset.name()) should be(Some(List(Conneg(charset, 1.0f))))
       }
     }
 
     it("should correctly serialize and parse languages") {
-      forAll { headers: List[Conneg[Language]] =>
-        cycle(Conneg.Languages, headers) should be(Some(headers))
-      }
+      forAll { headers: Seq[Conneg[Language]] => cycle(headers) should be(Some(headers)) }
     }
 
     it("should correctly serialize and parse charsets") {
-      forAll { headers: List[Conneg[Charset]] =>
-        cycle(Conneg.Charsets, headers) should be(Some(headers))
-      }
+      forAll { headers: Seq[Conneg[Charset]] => cycle(headers) should be(Some(headers)) }
     }
 
     it("should correctly serialize and parse media types") {
-      forAll { headers: List[Conneg[MediaType]] => cycle(MediaTypes, headers) should be(Some(headers)) }
+      forAll { headers: Seq[Conneg[MediaType]] => cycle(headers) should be(Some(headers)) }
     }
 
     it("should correctly serialize and parse content encodings") {
-      forAll { headers: List[Conneg[Encoding]] =>
-        cycle(Conneg.Encodings, headers) should be(Some(headers))
+      forAll { headers: Seq[Conneg[Encoding]] =>
+        cycle(headers) should be(Some(headers))
       }
     }
   }

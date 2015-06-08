@@ -82,7 +82,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
       reader.read(response.body.as[String]).get should be(values)
 
     it("should use the specified Accept header(s)") {
-      forAll { mediaTypes: List[Conneg[MediaType]] =>
+      forAll { mediaTypes: Seq[Conneg[MediaType]] =>
         checkConnegs(request("header/Accept").accept(mediaTypes: _*).GET.apply(), mediaTypes, Conneg.MediaTypes)
       }
     }
@@ -93,7 +93,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     }
 
     it("should use the specified Accept-Charset header") {
-      forAll { charsets: List[Conneg[Charset]] =>
+      forAll { charsets: Seq[Conneg[Charset]] =>
         checkConnegs(request("header/Accept-Charset").acceptCharset(charsets:_*).GET.apply(), charsets, Conneg.Charsets)
       }
     }
@@ -104,7 +104,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     }
 
     it("should use the specified Accept-Language header") {
-      forAll { languages: List[Conneg[Language]] =>
+      forAll { languages: Seq[Conneg[Language]] =>
         checkConnegs(request("header/Accept-Language").acceptLanguage(languages :_*).GET.apply(), languages, Conneg.Languages)
       }
     }
@@ -115,7 +115,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     }
 
     it("should use the specified Accept-Encoding header") {
-      forAll { encodings: List[Conneg[Encoding]] =>
+      forAll { encodings: Seq[Conneg[Encoding]] =>
         checkConnegs(request("header/Accept-Encoding").acceptEncoding(encodings:_*).GET.apply(), encodings, Conneg.Encodings)
       }
     }
@@ -143,7 +143,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     it("should send the correct Date header when specified") {
       forAll { date: Date =>
-        dateHeader.read(request("header/Date").date(date).GET.apply().body.as[String]) should be(Some(date))
+        HttpDate.read(request("header/Date").date(date).GET.apply().body.as[String]) should be(Some(date))
       }
     }
 
@@ -163,7 +163,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     it("should send the correct If-Modified-Since header when specified") {
       forAll { date: Date =>
-        dateHeader.read(request("header/If-Modified-Since").ifModifiedSince(date).GET.apply().body.as[String]) should be(Some(date))
+        HttpDate.read(request("header/If-Modified-Since").ifModifiedSince(date).GET.apply().body.as[String]) should be(Some(date))
       }
     }
 
@@ -173,7 +173,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
 
     it("should send the correct If-Unmodified-Since header when specified") {
       forAll { date: Date =>
-        dateHeader.read(request("header/If-Unmodified-Since").ifUnmodifiedSince(date).GET.apply().body.as[String]) should be(Some(date))
+        HttpDate.read(request("header/If-Unmodified-Since").ifUnmodifiedSince(date).GET.apply().body.as[String]) should be(Some(date))
       }
     }
 
@@ -216,7 +216,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
       }
 
       forAll { date: Date =>
-        dateHeader.read(request("header/If-Range").ifRange(date).GET.apply().body.as[String]) should be(Some(date))
+        HttpDate.read(request("header/If-Range").ifRange(date).GET.apply().body.as[String]) should be(Some(date))
       }
     }
 

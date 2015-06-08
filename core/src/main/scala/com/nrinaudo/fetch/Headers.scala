@@ -23,7 +23,7 @@ object Headers {
   // -------------------------------------------------------------------------------------------------------------------
   // TODO: value class and generic?
   /** Formats dates to the proper RFC compliant syntax. */
-  implicit object dateHeader extends ValueFormat[Date] {
+  implicit object HttpDate extends ValueFormat[Date] {
     private val HttpDateFormat = {
       val format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US)
       format.setTimeZone(TimeZone.getTimeZone("GMT"))
@@ -32,37 +32,6 @@ object Headers {
 
     override def read(str: String): Option[Date] = HttpDateFormat.synchronized {Try(HttpDateFormat.parse(str)).toOption}
     override def write(date: Date): Option[String] = Some(HttpDateFormat.synchronized {HttpDateFormat.format(date)})
-  }
-
-  implicit object languageHeader extends ValueFormat[Language] {
-    override def read (value: String): Option[Language] = Language.parse(value)
-    override def write(value: Language): Option[String] = Some(grammar.language(value.main, value.sub))
-  }
-
-  implicit object encodingHeader extends ValueFormat[Encoding] {
-    override def read(value: String): Option[Encoding] = Encoding.DefaultEncodings.get(value)
-    override def write(value: Encoding): Option[String] = Some(value.name)
-  }
-
-  implicit object mediaTypeHeader extends ValueFormat[MediaType] {
-    override def read(str: String): Option[MediaType] = MediaType.parse(str)
-    override def write(t: MediaType): Option[String]  = Some(t.toString)
-  }
-
-  implicit object methodHeader extends ValueFormat[Method] {
-    override def read(value: String): Option[Method] = Method.parse(value)
-
-    override def write(value: Method): Option[String] = Some(value.name)
-  }
-
-  implicit object etagHeader extends ValueFormat[ETag] {
-    override def read(value: String): Option[ETag]  = ETag.parse(value)
-    override def write(value: ETag): Option[String] = Some(value.toString)
-  }
-
-  implicit object byteRangeHeader extends ValueFormat[ByteRange] {
-    override def read(value: String): Option[ByteRange]  = ByteRange.parse(value)
-    override def write(value: ByteRange): Option[String] = Some(value.toString)
   }
 
   implicit object byteRangesHeader extends ValueFormat[Seq[ByteRange]] {

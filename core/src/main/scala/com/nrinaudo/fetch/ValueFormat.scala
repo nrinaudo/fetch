@@ -2,6 +2,9 @@ package com.nrinaudo.fetch
 
 import java.nio.charset.Charset
 
+import com.nrinaudo
+import com.nrinaudo.fetch
+
 import scala.annotation.implicitNotFound
 import scala.util.Try
 
@@ -27,16 +30,22 @@ object ValueReader {
 
   // - Default readers -------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  implicit val Double: ValueReader[Double]   = apply(s => Try(s.toDouble).toOption)
-  implicit val Long: ValueReader[Long]       = apply(s => Try(s.toLong).toOption)
-  implicit val Short: ValueReader[Short]     = apply(s => Try(s.toShort).toOption)
-  implicit val Int: ValueReader[Int]         = apply(s => Try(s.toInt).toOption)
-  implicit val Byte: ValueReader[Byte]       = apply(s => Try(s.toByte).toOption)
-  implicit val Float: ValueReader[Float]     = apply(s => Try(s.toFloat).toOption)
-  implicit val Boolean: ValueReader[Boolean] = apply(s => Try(s.toBoolean).toOption)
-  implicit val String: ValueReader[String]   = apply(Some(_))
-  implicit val Char: ValueReader[Char]       = apply(s => if(s.length == 1) Some(s.charAt(0)) else None)
-  implicit val Charset: ValueReader[Charset] = apply(c => Try(java.nio.charset.Charset.forName(c)).toOption)
+  implicit val Double: ValueReader[Double]       = ValueReader(s => Try(s.toDouble).toOption)
+  implicit val Long: ValueReader[Long]           = ValueReader(s => Try(s.toLong).toOption)
+  implicit val Short: ValueReader[Short]         = ValueReader(s => Try(s.toShort).toOption)
+  implicit val Int: ValueReader[Int]             = ValueReader(s => Try(s.toInt).toOption)
+  implicit val Byte: ValueReader[Byte]           = ValueReader(s => Try(s.toByte).toOption)
+  implicit val Float: ValueReader[Float]         = ValueReader(s => Try(s.toFloat).toOption)
+  implicit val Boolean: ValueReader[Boolean]     = ValueReader(s => Try(s.toBoolean).toOption)
+  implicit val String: ValueReader[String]       = ValueReader(Some(_))
+  implicit val Char: ValueReader[Char]           = ValueReader(s => if(s.length == 1) Some(s.charAt(0)) else None)
+  implicit val Charset: ValueReader[Charset]     = ValueReader(c => Try(java.nio.charset.Charset.forName(c)).toOption)
+  implicit val Language: ValueReader[Language]   = ValueReader(l => nrinaudo.fetch.Language.parse(l))
+  implicit val Encoding: ValueReader[Encoding]   = ValueReader(e => nrinaudo.fetch.Encoding.DefaultEncodings.get(e))
+  implicit val MediaType: ValueReader[MediaType] = ValueReader(m => nrinaudo.fetch.MediaType.parse(m))
+  implicit val Method: ValueReader[Method]       = ValueReader(m => nrinaudo.fetch.Method.parse(m))
+  implicit val ETag: ValueReader[ETag]           = ValueReader(e => nrinaudo.fetch.ETag.parse(e))
+  implicit val ByteRange: ValueReader[ByteRange] = ValueReader(b => nrinaudo.fetch.ByteRange.parse(b))
 }
 
 /** Used to read parameter values from an instance of [[Parameters]]. */
@@ -68,16 +77,22 @@ object ValueWriter {
 
   // - Default writers -------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  implicit val Double: ValueWriter[Double]   = apply(d => Some(d.toString))
-  implicit val Long: ValueWriter[Long]       = apply(l => Some(l.toString))
-  implicit val Short: ValueWriter[Short]     = apply(s => Some(s.toString))
-  implicit val Int: ValueWriter[Int]         = apply(i => Some(i.toString))
-  implicit val Byte: ValueWriter[Byte]       = apply(b => Some(b.toString))
-  implicit val Float: ValueWriter[Float]     = apply(f => Some(f.toString))
-  implicit val Boolean: ValueWriter[Boolean] = apply(b => Some(b.toString))
-  implicit val String: ValueWriter[String]   = apply(Some(_))
-  implicit val Char: ValueWriter[Char]       = apply(b => Some(b.toString))
-  implicit val Charset: ValueWriter[Charset] = apply(c => Some(c.name()))
+  implicit val Double: ValueWriter[Double]       = ValueWriter(d => Some(d.toString))
+  implicit val Long: ValueWriter[Long]           = ValueWriter(l => Some(l.toString))
+  implicit val Short: ValueWriter[Short]         = ValueWriter(s => Some(s.toString))
+  implicit val Int: ValueWriter[Int]             = ValueWriter(i => Some(i.toString))
+  implicit val Byte: ValueWriter[Byte]           = ValueWriter(b => Some(b.toString))
+  implicit val Float: ValueWriter[Float]         = ValueWriter(f => Some(f.toString))
+  implicit val Boolean: ValueWriter[Boolean]     = ValueWriter(b => Some(b.toString))
+  implicit val String: ValueWriter[String]       = ValueWriter(Some(_))
+  implicit val Char: ValueWriter[Char]           = ValueWriter(b => Some(b.toString))
+  implicit val Charset: ValueWriter[Charset]     = ValueWriter(c => Some(c.name()))
+  implicit val Language: ValueWriter[Language]   = ValueWriter(l => Some(grammar.language(l.main, l.sub)))
+  implicit val Encoding: ValueWriter[Encoding]   = ValueWriter(e => Some(e.name))
+  implicit val MediaType: ValueWriter[MediaType] = ValueWriter(m => Some(m.toString))
+  implicit val Method: ValueWriter[Method]       = ValueWriter(m => Some(m.name))
+  implicit val ETag: ValueWriter[ETag]           = ValueWriter(e => Some(e.toString))
+  implicit val ByteRange: ValueWriter[ByteRange] = ValueWriter(b => Some(b.toString))
 }
 
 /** Used to write parameter values to an instance of [[Parameters]]. */

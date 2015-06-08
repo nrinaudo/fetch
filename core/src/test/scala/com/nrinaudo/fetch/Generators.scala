@@ -191,7 +191,8 @@ object Generators {
     } yield Conneg(value, q / 1000f)
   }
 
-  implicit def connegs[A: Arbitrary]: Arbitrary[List[Conneg[A]]] = Arbitrary(HeadersSpec.headers(arbitrary[Conneg[A]]))
+  implicit def connegs[A: Arbitrary]: Arbitrary[Seq[Conneg[A]]] = Arbitrary(HeadersSpec.headers(arbitrary[Conneg[A]]))
+
 
 
 

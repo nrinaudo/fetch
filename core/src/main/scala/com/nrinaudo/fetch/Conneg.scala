@@ -10,11 +10,11 @@ object Conneg {
   /** Implicit format for the `Accept` content negotiation header. */
   implicit val MediaTypes: ValueFormat[Seq[Conneg[MediaType]]] = new ValueFormat[Seq[Conneg[MediaType]]] {
     override def write(value: Seq[Conneg[MediaType]]): Option[String] =
-    if(value.isEmpty) None
-    else Some(grammar.connegs(value.map {
-      // TODO: this should not rely on toString but rather on serialization methods in grammar.
-      case Conneg(t, q) => t.toString -> q
-    }))
+      if(value.isEmpty) None
+      else Some(grammar.connegs(value.map {
+        // TODO: this should not rely on toString but rather on serialization methods in grammar.
+        case Conneg(t, q) => t.toString -> q
+      }))
     override def read(value: String): Option[Seq[Conneg[MediaType]]] = parseFully(parser, value)
     val parser: Parser[List[Conneg[MediaType]]] = MediaType.parser.rep(",").map(_.map(m => Conneg(m.removeParam("q"), m.param[Float]("q").getOrElse(1F))).toList)
   }
@@ -43,10 +43,12 @@ object Conneg {
     val parser: Parser[List[Conneg[T]]] = grammar.connegs(p).map(_.map { case (t, q) => Conneg(t, q) }.toList)
 
     override def write(value: Seq[Conneg[T]]): Option[String] =
-    if(value.isEmpty) None
-    else Some(grammar.connegs(value.map {
-      case Conneg(t, q) => writer(t) -> q
-    }))
+      if(value.isEmpty) None
+      else Some(grammar.connegs(value.map {
+        case Conneg(t, q) => writer(t) -> q
+      }))
+
+
 
     override def read(value: String): Option[Seq[Conneg[T]]] = parseFully(parser, value)
   }

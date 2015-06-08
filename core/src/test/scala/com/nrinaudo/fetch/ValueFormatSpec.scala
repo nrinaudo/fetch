@@ -1,6 +1,6 @@
 package com.nrinaudo.fetch
 
-import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary._
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FunSpec, Matchers}
 
@@ -11,35 +11,35 @@ class ValueFormatSpec extends FunSpec with Matchers with GeneratorDrivenProperty
 
   describe("ValueFormat") {
     it("should have a working default Double implementation") {
-      forAll(Arbitrary.arbitrary[Double]) { value => cycle(value) }
+      forAll { value: Double => cycle(value) }
     }
 
     it("should have a working default Long implementation") {
-      forAll(Arbitrary.arbitrary[Long]) { value => cycle(value) }
+      forAll { value: Long => cycle(value) }
     }
 
     it("should have a working default Short implementation") {
-      forAll(Arbitrary.arbitrary[Short]) { value => cycle(value) }
+      forAll { value: Short => cycle(value) }
     }
 
     it("should have a working default Int implementation") {
-      forAll(Arbitrary.arbitrary[Int]) { value => cycle(value) }
+      forAll { value: Int => cycle(value) }
     }
 
     it("should have a working default Byte implementation") {
-      forAll(Arbitrary.arbitrary[Byte]) { value => cycle(value) }
+      forAll { value: Byte => cycle(value) }
     }
 
     it("should have a working default Float implementation") {
-      forAll(Arbitrary.arbitrary[Float]) { value => cycle(value) }
+      forAll { value: Float => cycle(value) }
     }
 
     it("should have a working default Boolean implementation") {
-      forAll(Arbitrary.arbitrary[Boolean]) { value => cycle(value) }
+      forAll { value: Boolean => cycle(value) }
     }
 
     it("should have a working default String implementation") {
-      forAll(Arbitrary.arbitrary[String]) { value => cycle(value) }
+      forAll { value: String => cycle(value) }
     }
   }
 }
