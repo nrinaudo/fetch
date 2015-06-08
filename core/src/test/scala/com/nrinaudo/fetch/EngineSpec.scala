@@ -3,27 +3,16 @@ package com.nrinaudo.fetch
 import java.nio.charset.Charset
 import java.util.Date
 
+import com.nrinaudo.fetch.Generators._
 import com.nrinaudo.fetch.Headers._
 import com.nrinaudo.fetch.Request._
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Gen
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import unfiltered.jetty.Server
-import Generators._
 
 trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
-  import ByteRangeSpec._
-  import ConnegSpec._
-  import ETagSpec._
-  import EncodingSpec._
-  import MediaTypeSpec._
-  import HeadersSpec._
-  import LanguageSpec._
-  import MethodSpec._
-  import RequestSpec._
-
-
   def httpEngine: HttpEngine
   def name: String
 

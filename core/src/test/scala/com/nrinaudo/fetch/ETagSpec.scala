@@ -1,26 +1,11 @@
 package com.nrinaudo.fetch
 
-import org.scalatest.{Matchers, FunSpec}
+import com.nrinaudo.fetch.Generators._
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.{Arbitrary, Gen}
-import Arbitrary._
+import org.scalatest.{FunSpec, Matchers}
 
-object ETagSpec {
-  def weakTag: Gen[ETag] = for(tag <- Gen.identifier.suchThat(!_.isEmpty)) yield ETag.Weak(tag)
-  def strongTag: Gen[ETag] = for(tag <- Gen.identifier.suchThat(!_.isEmpty)) yield ETag.Strong(tag)
-
-  implicit val etag: Arbitrary[ETag] = Arbitrary(Gen.oneOf(weakTag, strongTag))
-
-  implicit val etags: Arbitrary[List[ETag]] = Arbitrary(HeadersSpec.headers(arbitrary[ETag]))
-
-  def invalidEtag: Gen[String] = Arbitrary.arbitrary[String].suchThat { str =>
-    str.length == 0 || str.charAt(0) != 'W' || str.charAt(0) != '\"' || str.charAt(str.length - 1) != '\"'
-  }
-}
 
 class ETagSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-
-  import ETagSpec._
 
   describe("The ETag companion object") {
     it("should parse valid etags") {

@@ -12,6 +12,7 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FunSpec, Matchers}
 
 object HeaderFormatSpec {
+  // TODO: rename this, cycle is a horrible name
   def cycle[T](format: ValueFormat[T], value: T) = format.read(format.write(value).get)
 }
 
@@ -38,23 +39,23 @@ trait HeaderFormatSpecWithList[T] extends HeaderFormatSpec[T] {
 }
 
 class DateFormatSpec extends HeaderFormatSpec[Date] {
-  override val illegalT = HeadersSpec.illegalDate
+  override val illegalT = illegalDate
 
-  override implicit val arbT    = HeadersSpec.arbDate
+  override implicit val arbT    = arbDate
   override implicit val formatT = dateHeader
 }
 
 class LanguageFormatSpec extends HeaderFormatSpecWithList[Language] {
-  override val illegalT = LanguageSpec.illegalLanguage
+  override val illegalT = illegalLanguage
 
-  override implicit val arbT    = LanguageSpec.arbLanguage
+  override implicit val arbT    = arbLanguage
   override implicit val formatT = languageHeader
 }
 
 class CharsetFormatSpec extends HeaderFormatSpecWithList[Charset] {
-  override val illegalT = ConnegSpec.illegalCharset
+  override val illegalT = illegalCharset
 
-  override implicit val arbT    = ConnegSpec.arbCharset
+  override implicit val arbT    = arbCharset
   override implicit val formatT = charsetHeader
 }
 
@@ -66,29 +67,29 @@ class MediaTypeFormatSpec extends HeaderFormatSpec[MediaType] {
 }
 
 class EncodingFormatSpec extends HeaderFormatSpecWithList[Encoding] {
-  override val illegalT = EncodingSpec.illegalEncoding
+  override val illegalT = illegalEncoding
 
-  override implicit val arbT    = EncodingSpec.arbEncoding
+  override implicit val arbT    = arbEncoding
   override implicit val formatT = encodingHeader
 }
 
 class ByteRangeFormatSpec extends HeaderFormatSpec[ByteRange] {
-  override val illegalT = ByteRangeSpec.illegalRange
+  override val illegalT = illegalRange
 
-  override implicit val arbT    = ByteRangeSpec.arbByteRange
+  override implicit val arbT    = arbByteRange
   override implicit val formatT = byteRangeHeader
 }
 
 class ByteRangesFormatSpec extends HeaderFormatSpec[Seq[ByteRange]] {
-  override val illegalT = ByteRangeSpec.illegalRanges
+  override val illegalT = illegalRanges
 
-  override implicit val arbT: Arbitrary[Seq[ByteRange]] = Arbitrary(nonEmptyListOf(ByteRangeSpec.arbByteRange.arbitrary))
+  override implicit val arbT: Arbitrary[Seq[ByteRange]] = Arbitrary(nonEmptyListOf(arbByteRange.arbitrary))
   override implicit val formatT                         = byteRangesHeader
 }
 
 class MethodFormatSpec extends HeaderFormatSpecWithList[Method] {
-  override val illegalT = MethodSpec.illegalMethod
+  override val illegalT = illegalMethod
 
-  override implicit val arbT    = MethodSpec.arbMethod
+  override implicit val arbT    = arbMethod
   override implicit val formatT = methodHeader
 }

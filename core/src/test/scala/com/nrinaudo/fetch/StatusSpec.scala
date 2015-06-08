@@ -1,25 +1,14 @@
 package com.nrinaudo.fetch
 
-import org.scalatest.{Matchers, FunSpec}
+import com.nrinaudo.fetch.Generators._
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.{Arbitrary, Gen}
-import Arbitrary.arbitrary
+import org.scalatest.{FunSpec, Matchers}
 
-object StatusSpec {
-  val success: Gen[Status]     = for(status <- Gen.choose(200, 299)) yield Status(status)
-  val redirection: Gen[Status] = for(status <- Gen.choose(300, 399)) yield Status(status)
-  val clientError: Gen[Status] = for(status <- Gen.choose(400, 499)) yield Status(status)
-  val serverError: Gen[Status] = for(status <- Gen.choose(500, 599)) yield Status(status)
-
-  implicit val status: Arbitrary[Status] = Arbitrary(Gen.oneOf(success, redirection, clientError, serverError))
-
-  def invalidStatus: Gen[Int] = Arbitrary.arbitrary[Int].suchThat(i => i < 0 || i > 600)
-  private def response(status: Status) = new Response(status, Parameters.empty, status.code)
-}
 
 class StatusSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  import StatusSpec._
 
+  def response(status: Status) = new Response(status, Parameters.empty, status.code)
 
   describe("The Status companion object") {
     it("should apply on legal statuses") {

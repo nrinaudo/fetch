@@ -3,36 +3,14 @@ package com.nrinaudo.fetch
 import java.nio.charset.Charset
 
 import com.nrinaudo.fetch.Conneg.MediaTypes
-import org.scalacheck.Arbitrary._
-import org.scalacheck.{Arbitrary, Gen}
+import com.nrinaudo.fetch.Generators._
+import org.scalacheck.Gen
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FunSpec, Matchers}
-import Generators._
 
-import scala.collection.JavaConverters._
-
-object ConnegSpec {
-  private lazy val charsets: List[Charset] = Charset.availableCharsets().values().asScala.toList
-
-  implicit val arbCharset: Arbitrary[Charset] = Arbitrary(Gen.oneOf(charsets))
-
-  def illegalCharset: Gen[String] = Arbitrary.arbitrary[String].suchThat(!Charset.availableCharsets().containsKey(_))
-
-  implicit def conneg[A: Arbitrary]: Arbitrary[Conneg[A]] = Arbitrary {
-    for {
-      value <- arbitrary[A]
-      q     <- Gen.choose(0, 1000)
-    } yield Conneg(value, q / 1000f)
-  }
-
-  implicit def connegs[A: Arbitrary]: Arbitrary[List[Conneg[A]]] = Arbitrary(HeadersSpec.headers(arbitrary[Conneg[A]]))
-}
 
 class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  import ConnegSpec._
-  import EncodingSpec._
   import HeaderFormatSpec._
-  import LanguageSpec._
 
   describe("Content negotiation headers") {
     it("should refuse illegal value of q") {

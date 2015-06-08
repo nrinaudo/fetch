@@ -1,21 +1,17 @@
 package com.nrinaudo.fetch
 
-import org.scalatest.{Matchers, FunSpec}
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.{Arbitrary, Gen}
-import Arbitrary._
-import java.io.{OutputStream, InputStream, ByteArrayInputStream, ByteArrayOutputStream}
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
 import java.nio.charset.Charset
+import java.util.zip.{DeflaterOutputStream, GZIPInputStream, GZIPOutputStream, InflaterInputStream}
+
+import com.nrinaudo.fetch.Generators._
+import org.scalacheck.Arbitrary._
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.{FunSpec, Matchers}
+
 import scala.io.Source
-import java.util.zip.{InflaterInputStream, DeflaterOutputStream, GZIPOutputStream, GZIPInputStream}
 
-object EncodingSpec {
-  // - Generators ------------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
-  implicit val arbEncoding: Arbitrary[Encoding] = Arbitrary(Gen.oneOf(Encoding.Gzip, Encoding.Deflate, Encoding.Identity))
-  def illegalEncoding: Gen[String] = arbitrary[String].suchThat(e => !Encoding.DefaultEncodings.contains(e))
-
-
+class EncodingSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   // - Helper functions ------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
@@ -37,10 +33,6 @@ object EncodingSpec {
 
   def readAll(content: Array[Byte])(f: InputStream => InputStream): String =
     Source.fromInputStream(f(new ByteArrayInputStream(content)), "utf-8").mkString
-}
-
-class EncodingSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  import EncodingSpec._
 
   describe("An encoding") {
     it("should be able to decode content it has encoded") {

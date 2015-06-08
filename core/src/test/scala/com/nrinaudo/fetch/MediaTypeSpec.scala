@@ -1,25 +1,20 @@
 package com.nrinaudo.fetch
 
 import java.nio.charset.Charset
+
+import com.nrinaudo.fetch.Generators._
 import org.scalacheck.Arbitrary._
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Gen
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FunSpec, Matchers}
-import Generators._
 
-object MediaTypeSpec {
+class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
+  import Headers._
 
-
-  private def diffTypes[T](gen: Gen[T]): Gen[(T, T)] = for {
+  def diffTypes[T](gen: Gen[T]): Gen[(T, T)] = for {
     t1 <- gen
     t2 <- gen if t1 != t2
   } yield (t1, t2)
-}
-
-class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  import ConnegSpec._
-  import Headers._
-  import MediaTypeSpec._
 
   def response(mediaType: MediaType) = Response(Status.Ok, Parameters.empty.set("Content-Type", mediaType), "Test")
 

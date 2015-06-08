@@ -2,17 +2,13 @@ package com.nrinaudo.fetch
 
 import java.util.Date
 
-import org.scalatest.{Matchers, BeforeAndAfterAll, FunSpec}
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import com.nrinaudo.fetch.Generators._
 import org.scalacheck.Gen
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 
 class ResponseSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
-  import HeadersSpec._
   import Headers._
-  import ETagSpec._
-  import MethodSpec._
-  import LanguageSpec._
-  import EncodingSpec._
 
 
   val response = new Response[String](Status.Ok, Parameters.empty, "test")

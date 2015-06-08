@@ -6,29 +6,11 @@ import java.util.Date
 import com.nrinaudo.fetch.Generators._
 import com.nrinaudo.fetch.net.UrlEngine
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen
 import org.scalacheck.Gen._
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 
-object RequestSpec {
-  // Note that this is not entirely correct: according to the RFC, password are allowed to contain a ':'. This is not
-  // properly handled in version 0.7.1 of unfiltered, however (the issue is fixed in github, but not yet released).
-  def authCredentials: Gen[(String, String)] = for {
-    user <- arbitrary[String].suchThat {str => !(str.isEmpty || str.contains(':'))}
-    pwd  <- arbitrary[String].suchThat {str => !(str.isEmpty || str.contains(':'))}
-  } yield (user, pwd)
-}
-
 class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
-  import ByteRangeSpec._
-  import ConnegSpec._
-  import ETagSpec._
-  import EncodingSpec._
-  import HeadersSpec._
-  import LanguageSpec._
-  import MethodSpec._
-
   implicit val engine = UrlEngine()
 
   describe("A Request") {

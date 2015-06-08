@@ -1,29 +1,11 @@
 package com.nrinaudo.fetch
 
-import org.scalacheck.{Arbitrary, Gen}
-import Arbitrary._
-import org.scalatest.{Matchers, FunSpec}
+import com.nrinaudo.fetch.Generators._
+import org.scalacheck.Gen
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-
-object MethodSpec {
-  /** Generates random, legal HTTP methods. */
-  implicit val arbMethod: Arbitrary[Method] = Arbitrary {
-    Gen.oneOf(Method.GET, Method.POST, Method.PUT, Method.DELETE, Method.OPTIONS, Method.TRACE,
-      Method.PATCH, Method.LINK, Method.UNLINK)
-  }
-
-  def illegalMethod: Gen[String] = Arbitrary.arbitrary[String].suchThat(_.exists(!_.isLetter))
-
-  implicit val arbMethods: Arbitrary[List[Method]] = Arbitrary {
-    for {
-      count <- Gen.choose(1, 5)
-      set   <- Gen.containerOfN[Set, Method](count, arbitrary[Method])
-    } yield set.toList
-  }
-}
+import org.scalatest.{FunSpec, Matchers}
 
 class MethodSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  import MethodSpec._
 
   describe("The Method companion object") {
     it("should parse known methods") {
