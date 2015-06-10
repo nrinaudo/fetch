@@ -8,7 +8,6 @@ import org.scalacheck.Gen
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FunSpec, Matchers}
 
-
 class ConnegSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
   import HeaderFormatSpec._
 

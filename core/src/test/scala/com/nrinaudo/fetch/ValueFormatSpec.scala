@@ -1,45 +1,47 @@
 package com.nrinaudo.fetch
 
-import org.scalacheck.Arbitrary._
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FunSpec, Matchers}
 
-class ValueFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  def cycle[A](value: A)(implicit reader: ValueReader[A], writer: ValueWriter[A]): Unit = {
-    writer.write(value).flatMap(reader.read) should be(Some(value))
+object ValueFormatSpec {
+  class FromImplicits[T: ValueReader: ValueWriter: Arbitrary](override val illegalT: Gen[String]) extends WithErrors[T] {
+    override val arbT     = implicitly[Arbitrary[T]]
+    override val writer   = implicitly[ValueWriter[T]]
+    override val reader   = implicitly[ValueReader[T]]
   }
 
-  describe("ValueFormat") {
-    it("should have a working default Double implementation") {
-      forAll { value: Double => cycle(value) }
-    }
+  trait Simple[T] extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
+    implicit def arbT: Arbitrary[T]
+    implicit def reader: ValueReader[T]
+    implicit def writer: ValueWriter[T]
 
-    it("should have a working default Long implementation") {
-      forAll { value: Long => cycle(value) }
-    }
+    def validate[F: ValueReader: ValueWriter](value: F)(implicit reader: ValueReader[F], writer: ValueWriter[F]) =
+      reader.read(writer.write(value).get) should be(Some(value))
 
-    it("should have a working default Short implementation") {
-      forAll { value: Short => cycle(value) }
-    }
-
-    it("should have a working default Int implementation") {
-      forAll { value: Int => cycle(value) }
-    }
-
-    it("should have a working default Byte implementation") {
-      forAll { value: Byte => cycle(value) }
-    }
-
-    it("should have a working default Float implementation") {
-      forAll { value: Float => cycle(value) }
-    }
-
-    it("should have a working default Boolean implementation") {
-      forAll { value: Boolean => cycle(value) }
-    }
-
-    it("should have a working default String implementation") {
-      forAll { value: String => cycle(value) }
+    it("should correctly serialize and parse legal values") {
+      forAll { value: T => validate(value) }
     }
   }
+
+  trait WithErrors[T] extends Simple[T] {
+    def illegalT: Gen[String]
+
+    it("should refuse illegal values") {
+      forAll(illegalT) { str => reader.read(str) should be(None) }
+    }
+  }
+}
+
+class DoubleFormatSpec extends ValueFormatSpec.FromImplicits[Double](Gen.identifier)
+class FloatFormatSpec extends ValueFormatSpec.FromImplicits[Float](Gen.identifier)
+class LongFormatSpec extends ValueFormatSpec.FromImplicits[Long](Gen.identifier)
+class IntFormatSpec extends ValueFormatSpec.FromImplicits[Int](Gen.identifier)
+class ShortFormatSpec extends ValueFormatSpec.FromImplicits[Short](Gen.identifier)
+class ByteFormatSpec extends ValueFormatSpec.FromImplicits[Byte](Gen.identifier)
+class BooleanFormatSpec extends ValueFormatSpec.FromImplicits[Boolean](Gen.identifier)
+class StringFormatSpec extends ValueFormatSpec.Simple[String] {
+  override val arbT     = implicitly[Arbitrary[String]]
+  override val writer   = implicitly[ValueWriter[String]]
+  override val reader   = implicitly[ValueReader[String]]
 }
