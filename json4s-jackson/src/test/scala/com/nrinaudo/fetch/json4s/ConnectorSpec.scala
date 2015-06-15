@@ -5,7 +5,7 @@ import java.io.{OutputStreamWriter, Reader}
 import com.nrinaudo.fetch.Request
 import com.nrinaudo.fetch.net.UrlEngine
 import org.json4s.JsonAST.{JString, _}
-import org.scalacheck.Arbitrary
+import org.scalacheck.{Gen, Arbitrary}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import unfiltered.filter.Planify
@@ -48,7 +48,7 @@ class ConnectorSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
 
   val request: Request[JValue] = Request.from("http://localhost:" + server.ports.head + "/echo").get.map(_.body.as[JValue])
 
-  def json = for {
+  def json: Gen[JValue] = for {
     str <- Arbitrary.arbitrary[String]
     d   <- Arbitrary.arbitrary[Double]
     b   <- Arbitrary.arbitrary[Boolean]
@@ -56,7 +56,7 @@ class ConnectorSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
 
   describe("The json4s-native connector") {
     it("should serialize / deserialize as expected") {
-      forAll(json) {json =>
+      forAll(json) { json =>
         request(json) should be(json)
       }
     }

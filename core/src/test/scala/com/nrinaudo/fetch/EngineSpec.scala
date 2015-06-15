@@ -177,17 +177,6 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
       }
     }
 
-    it("should not send a Range header when none is specified") {
-      request("header/Range").GET.apply().status should be(Status.NotFound)
-      request("header/Range").range().GET.apply().status should be(Status.NotFound)
-    }
-
-    it("should send the correct Range header when specified") {
-      forAll { ranges: List[ByteRange] =>
-        request("header/Range").range(ranges :_*).GET.apply().body.as[String] should be("bytes=" + ranges.mkString(","))
-      }
-    }
-
     it("should send the correct If-Match header when specified") {
       forAll { tags: List[ETag] =>
         request("header/If-Match").ifMatch(tags :_*).GET.apply().body.as[String] should be(tags.mkString(","))

@@ -3,7 +3,7 @@ package com.nrinaudo.fetch
 import java.nio.charset.Charset
 
 import com.nrinaudo
-import com.nrinaudo.fetch
+import simulacrum._
 
 import scala.annotation.implicitNotFound
 import scala.util.Try
@@ -45,12 +45,11 @@ object ValueReader {
   implicit val MediaType: ValueReader[MediaType] = ValueReader(m => nrinaudo.fetch.MediaType.parse(m))
   implicit val Method: ValueReader[Method]       = ValueReader(m => nrinaudo.fetch.Method.parse(m))
   implicit val ETag: ValueReader[ETag]           = ValueReader(e => nrinaudo.fetch.ETag.parse(e))
-  implicit val ByteRange: ValueReader[ByteRange] = ValueReader(b => nrinaudo.fetch.ByteRange.parse(b))
 }
 
 /** Used to read parameter values from an instance of [[Parameters]]. */
 @implicitNotFound(msg = "Cannot find a ValueReader type class for ${T}")
-trait ValueReader[T] {
+@typeclass trait ValueReader[T] {
   /** Extract an instance of `T` from the specified value. */
   def read(value: String): Option[T]
 }
@@ -92,12 +91,11 @@ object ValueWriter {
   implicit val MediaType: ValueWriter[MediaType] = ValueWriter(m => Some(m.toString))
   implicit val Method: ValueWriter[Method]       = ValueWriter(m => Some(m.name))
   implicit val ETag: ValueWriter[ETag]           = ValueWriter(e => Some(e.toString))
-  implicit val ByteRange: ValueWriter[ByteRange] = ValueWriter(b => Some(b.toString))
 }
 
 /** Used to write parameter values to an instance of [[Parameters]]. */
 @implicitNotFound(msg = "Cannot find a ValueWriter type class for ${T}")
-trait ValueWriter[T] {
+@typeclass trait ValueWriter[T] {
   /** Writes the specified `T` to a `String`. A return value of `None` means that the specified value serialises to
     * nothing (the empty string, `Nil`, ...).
     */

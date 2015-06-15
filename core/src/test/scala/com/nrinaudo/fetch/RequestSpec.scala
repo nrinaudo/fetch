@@ -81,14 +81,6 @@ class RequestSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gene
       forAll { url: Url => Request(url).date should be(None) }
     }
 
-    it("should return its Range header when set") {
-      forAll { (url: Url, ranges: List[ByteRange]) => Request(url).range(ranges: _*).range should be(Some(ranges)) }
-    }
-
-    it("should not return a Range when the header is not set") {
-      forAll { url: Url => Request(url).range should be(None) }
-    }
-
     it("should return its User-Agent header when set") {
       forAll(arbitrary[Url], identifier) { (url, id) => Request(url).userAgent(id).userAgent should be(Some(id)) }
     }

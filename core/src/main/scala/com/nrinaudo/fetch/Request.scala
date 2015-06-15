@@ -255,12 +255,6 @@ case class Request[A](url: Url, method: Method, headers: Parameters, run: (Url, 
 
   // - Misc. helpers ---------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def range(ranges: ByteRange*): Request[A] =
-    if(ranges.isEmpty) this
-    else               header("Range", ranges)
-
-  def range: Option[Seq[ByteRange]] = header[Seq[ByteRange]]("Range")
-
   def date(date: Date = new Date()): Request[A] = header("Date", date)
 
   def date: Option[Date] = header[Date]("Date")

@@ -33,15 +33,4 @@ object Headers {
     override def read(str: String): Option[Date] = HttpDateFormat.synchronized {Try(HttpDateFormat.parse(str)).toOption}
     override def write(date: Date): Option[String] = Some(HttpDateFormat.synchronized {HttpDateFormat.format(date)})
   }
-
-  implicit object byteRangesHeader extends ValueFormat[Seq[ByteRange]] {
-    private val reader = compositeReader[ByteRange]
-    private val writer = compositeWriter[ByteRange]
-
-    override def read(value: String): Option[Seq[ByteRange]] =
-      if(value.startsWith("bytes=")) reader.read(value.substring(6))
-      else                           None
-
-    override def write(value: Seq[ByteRange]): Option[String] = writer.write(value) map {"bytes=" + _ }
-  }
 }

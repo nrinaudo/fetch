@@ -235,37 +235,4 @@ object Generators {
     user <- arbitrary[String].suchThat {str => !(str.isEmpty || str.contains(':'))}
     pwd  <- arbitrary[String].suchThat {str => !(str.isEmpty || str.contains(':'))}
   } yield (user, pwd)
-
-
-  // - ByteRange generators --------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
-  def illegalRange: Gen[String] = Arbitrary.arbitrary[String].suchThat(_.matches(".*[^0-9-].*"))
-
-  def illegalRanges: Gen[String] = Arbitrary.arbitrary[String].suchThat(!_.startsWith("bytes="))
-
-  /** Generates valid byte range boundaries. */
-  def rangeBoundary: Gen[Int] = Gen.choose(0, 1000)
-
-  /** Generates invalid byte range boundaries. */
-  def negRangeBoundary: Gen[Int] = Gen.choose(-1000, -1)
-
-  /** Generate valid byte range boundaries. */
-  def rangeBoundaries: Gen[(Int, Int)] = for {
-    from <- Gen.choose(0, 1000)
-    to   <- Gen.choose(from, from + 1000)
-  } yield (from, to)
-
-
-  implicit val arbPrefixRange: Arbitrary[PrefixRange] = Arbitrary(rangeBoundary.map(PrefixRange.apply))
-  implicit val arbSuffixRange: Arbitrary[SuffixRange] = Arbitrary(rangeBoundary.map(SuffixRange.apply))
-  implicit val arbFullRange: Arbitrary[FullRange] = Arbitrary {
-    for {
-      from <- rangeBoundary
-      to   <- rangeBoundary
-    } yield FullRange(math.min(from, to), math.max(from, to))
-  }
-  implicit val arbByteRange: Arbitrary[ByteRange] =
-    Arbitrary(Gen.oneOf(arbitrary[PrefixRange], arbitrary[SuffixRange], arbitrary[FullRange]))
-
-  implicit val arbByteRanges: Arbitrary[List[ByteRange]] = Arbitrary(HeadersSpec.headers(arbitrary[ByteRange]))
 }

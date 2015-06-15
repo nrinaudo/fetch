@@ -2,7 +2,7 @@ package com.nrinaudo.fetch.json4s
 
 import org.scalatest.{Matchers, BeforeAndAfterAll, FunSpec}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalacheck.Arbitrary
+import org.scalacheck.{Gen, Arbitrary}
 import org.json4s.JsonAST._
 import unfiltered.filter.Planify
 import java.io.{OutputStreamWriter, Reader}
@@ -51,7 +51,7 @@ class ConnectorSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
 
   val request: Request[JValue] = Request.from("http://localhost:" + server.ports.head + "/echo").get.map(_.body.as[JValue])
 
-  def json = for {
+  def json: Gen[JValue] = for {
     str <- Arbitrary.arbitrary[String]
     d   <- Arbitrary.arbitrary[Double]
     b   <- Arbitrary.arbitrary[Boolean]

@@ -32,8 +32,6 @@ object HeaderFormatSpec {
 
 // Note that DateFormatSpec doesn't test for lists - the HTTP serialization format doesn't allow for lists of dates.
 class DateFormatSpec extends ValueFormatSpec.FromImplicits[Date](illegalDate)
-//class ByteRangeFormatSpec extends ValueFormatSpec.FromImplicits[ByteRange](illegalRange)
-class ByteRangeFormatSpec extends HeaderFormatSpec.FromImplicits[ByteRange](illegalRange)
 class LanguageFormatSpec extends HeaderFormatSpec.FromImplicits[Language](illegalLanguage)
 class CharsetFormatSpec extends HeaderFormatSpec.FromImplicits[Charset](illegalCharset)
 class EncodingFormatSpec extends HeaderFormatSpec.FromImplicits[Encoding](illegalEncoding)

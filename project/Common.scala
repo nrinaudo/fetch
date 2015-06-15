@@ -43,7 +43,11 @@ object Common extends Build {
                               "-Ywarn-numeric-widen",
                               "-Ywarn-value-discard",
                               "-Xfuture"),
-                             incOptions         := incOptions.value.withNameHashing(true),
-                             pomExtra           := pom)
+                             incOptions          := incOptions.value.withNameHashing(true),
+                             libraryDependencies ++= Seq(
+                               "com.github.mpilquist" %% "simulacrum" % "0.3.0",
+                               compilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full)
+                             ),
+                             pomExtra            := pom)
 
 }

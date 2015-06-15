@@ -3,6 +3,8 @@ package com.nrinaudo.fetch
 import java.io._
 import java.nio.charset.Charset
 
+import simulacrum.typeclass
+
 import scala.annotation.implicitNotFound
 
 object EntityReader {
@@ -43,7 +45,7 @@ object EntityReader {
   * Instances of {{{EntityReader}}} are typically created through the companion's object helper methods.
   */
 @implicitNotFound(msg = "Cannot find an EntityReader typeclass for ${A}")
-sealed trait EntityReader[A] { self =>
+@typeclass sealed trait EntityReader[A] { self =>
   def read(input: InputStream, mediaType: Option[MediaType]): A
 
   def map[B](f: A => B): EntityReader[B] = new EntityReader[B] {

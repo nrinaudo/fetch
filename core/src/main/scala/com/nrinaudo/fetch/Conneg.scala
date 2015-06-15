@@ -19,7 +19,6 @@ object Conneg {
     val parser: Parser[List[Conneg[MediaType]]] = MediaType.parser.rep(",").map(_.map(m => Conneg(m.removeParam("q"), m.param[Float]("q").getOrElse(1F))).toList)
   }
 
-
   /** Implicit format for the `Accept-Encoding` content negotiation header.
     *
     * In its current version, this only supports known transfer encodings (`gzip`, `deflate` and `identity`).
