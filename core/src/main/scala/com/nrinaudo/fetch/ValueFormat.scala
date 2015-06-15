@@ -3,6 +3,7 @@ package com.nrinaudo.fetch
 import java.nio.charset.Charset
 
 import com.nrinaudo
+import fastparse.Parser
 import simulacrum._
 
 import scala.annotation.implicitNotFound
@@ -35,30 +36,34 @@ object ValueReader {
     else          ValueReader.sequence[T](s.split(','))
   }
 
+  def parserList[T](parser: Parser[T]): ValueReader[Seq[T]] = ValueReader { s =>
+    parseFully(parser.rep(","), s)
+  }
+
 
 
   // - Default readers -------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  implicit val Double: ValueReader[Double]           = ValueReader(s => Try(s.toDouble).toOption)
-  implicit val Long: ValueReader[Long]               = ValueReader(s => Try(s.toLong).toOption)
-  implicit val Short: ValueReader[Short]             = ValueReader(s => Try(s.toShort).toOption)
-  implicit val Int: ValueReader[Int]                 = ValueReader(s => Try(s.toInt).toOption)
-  implicit val Byte: ValueReader[Byte]               = ValueReader(s => Try(s.toByte).toOption)
-  implicit val Float: ValueReader[Float]             = ValueReader(s => Try(s.toFloat).toOption)
-  implicit val Boolean: ValueReader[Boolean]         = ValueReader(s => Try(s.toBoolean).toOption)
-  implicit val String: ValueReader[String]           = ValueReader(Some(_))
-  implicit val Char: ValueReader[Char]               = ValueReader(s => if(s.length == 1) Some(s.charAt(0)) else None)
-  implicit val Charset: ValueReader[Charset]         = ValueReader(c => Try(java.nio.charset.Charset.forName(c)).toOption)
-  implicit val Language: ValueReader[Language]       = ValueReader(l => nrinaudo.fetch.Language.parse(l))
-  implicit val Languages: ValueReader[Seq[Language]] = commaList[Language]
-  implicit val Encoding: ValueReader[Encoding]       = ValueReader(e => nrinaudo.fetch.Encoding.DefaultEncodings.get(e))
-  implicit val Encodings: ValueReader[Seq[Encoding]] = commaList[Encoding]
-  implicit val MediaType: ValueReader[MediaType]     = ValueReader(m => nrinaudo.fetch.MediaType.parse(m))
-  // TODO: MediaTypes
-  implicit val Method: ValueReader[Method]           = ValueReader(m => nrinaudo.fetch.Method.parse(m))
-  implicit val Methods: ValueReader[Seq[Method]]    = commaList[Method]
-  implicit val ETag: ValueReader[ETag]               = ValueReader(e => nrinaudo.fetch.ETag.parse(e))
-  implicit val ETags: ValueReader[Seq[ETag]]         = commaList[ETag]
+  implicit val Double: ValueReader[Double]             = ValueReader(s => Try(s.toDouble).toOption)
+  implicit val Long: ValueReader[Long]                 = ValueReader(s => Try(s.toLong).toOption)
+  implicit val Short: ValueReader[Short]               = ValueReader(s => Try(s.toShort).toOption)
+  implicit val Int: ValueReader[Int]                   = ValueReader(s => Try(s.toInt).toOption)
+  implicit val Byte: ValueReader[Byte]                 = ValueReader(s => Try(s.toByte).toOption)
+  implicit val Float: ValueReader[Float]               = ValueReader(s => Try(s.toFloat).toOption)
+  implicit val Boolean: ValueReader[Boolean]           = ValueReader(s => Try(s.toBoolean).toOption)
+  implicit val String: ValueReader[String]             = ValueReader(Some(_))
+  implicit val Char: ValueReader[Char]                 = ValueReader(s => if(s.length == 1) Some(s.charAt(0)) else None)
+  implicit val Charset: ValueReader[Charset]           = ValueReader(c => Try(java.nio.charset.Charset.forName(c)).toOption)
+  implicit val Language: ValueReader[Language]         = ValueReader(l => nrinaudo.fetch.Language.parse(l))
+  implicit val Languages: ValueReader[Seq[Language]]   = commaList[Language]
+  implicit val Encoding: ValueReader[Encoding]         = ValueReader(e => nrinaudo.fetch.Encoding.DefaultEncodings.get(e))
+  implicit val Encodings: ValueReader[Seq[Encoding]]   = commaList[Encoding]
+  implicit val MediaType: ValueReader[MediaType]       = ValueReader(m => nrinaudo.fetch.MediaType.parse(m))
+  implicit val MediaTypes: ValueReader[Seq[MediaType]] = parserList(nrinaudo.fetch.MediaType.parser)
+  implicit val Method: ValueReader[Method]             = ValueReader(m => nrinaudo.fetch.Method.parse(m))
+  implicit val Methods: ValueReader[Seq[Method]]       = commaList[Method]
+  implicit val ETag: ValueReader[ETag]                 = ValueReader(e => nrinaudo.fetch.ETag.parse(e))
+  implicit val ETags: ValueReader[Seq[ETag]]           = commaList[ETag]
 }
 
 /** Used to read parameter values from an instance of [[Parameters]]. */
@@ -93,26 +98,26 @@ object ValueWriter {
 
   // - Default writers -------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  implicit val Double: ValueWriter[Double]           = ValueWriter(d => Some(d.toString))
-  implicit val Long: ValueWriter[Long]               = ValueWriter(l => Some(l.toString))
-  implicit val Short: ValueWriter[Short]             = ValueWriter(s => Some(s.toString))
-  implicit val Int: ValueWriter[Int]                 = ValueWriter(i => Some(i.toString))
-  implicit val Byte: ValueWriter[Byte]               = ValueWriter(b => Some(b.toString))
-  implicit val Float: ValueWriter[Float]             = ValueWriter(f => Some(f.toString))
-  implicit val Boolean: ValueWriter[Boolean]         = ValueWriter(b => Some(b.toString))
-  implicit val String: ValueWriter[String]           = ValueWriter(Some(_))
-  implicit val Char: ValueWriter[Char]               = ValueWriter(b => Some(b.toString))
-  implicit val Charset: ValueWriter[Charset]         = ValueWriter(c => Some(c.name()))
-  implicit val Language: ValueWriter[Language]       = ValueWriter(l => Some(grammar.language(l.main, l.sub)))
-  implicit val Languages: ValueWriter[Seq[Language]] = commaList[Language]
-  implicit val Encoding: ValueWriter[Encoding]       = ValueWriter(e => Some(e.name))
-  implicit val Encodings: ValueWriter[Seq[Encoding]] = commaList[Encoding]
-  implicit val MediaType: ValueWriter[MediaType]     = ValueWriter(m => Some(m.toString))
-  // TODO: MediaTypes
-  implicit val Method: ValueWriter[Method]           = ValueWriter(m => Some(m.name))
-  implicit val Methods: ValueWriter[Seq[Method]]     = commaList[Method]
-  implicit val ETag: ValueWriter[ETag]               = ValueWriter(e => Some(e.toString))
-  implicit val ETags: ValueWriter[Seq[ETag]]         = commaList[ETag]
+  implicit val Double: ValueWriter[Double]             = ValueWriter(d => Some(d.toString))
+  implicit val Long: ValueWriter[Long]                 = ValueWriter(l => Some(l.toString))
+  implicit val Short: ValueWriter[Short]               = ValueWriter(s => Some(s.toString))
+  implicit val Int: ValueWriter[Int]                   = ValueWriter(i => Some(i.toString))
+  implicit val Byte: ValueWriter[Byte]                 = ValueWriter(b => Some(b.toString))
+  implicit val Float: ValueWriter[Float]               = ValueWriter(f => Some(f.toString))
+  implicit val Boolean: ValueWriter[Boolean]           = ValueWriter(b => Some(b.toString))
+  implicit val String: ValueWriter[String]             = ValueWriter(Some(_))
+  implicit val Char: ValueWriter[Char]                 = ValueWriter(b => Some(b.toString))
+  implicit val Charset: ValueWriter[Charset]           = ValueWriter(c => Some(c.name()))
+  implicit val Language: ValueWriter[Language]         = ValueWriter(l => Some(grammar.language(l.main, l.sub)))
+  implicit val Languages: ValueWriter[Seq[Language]]   = commaList[Language]
+  implicit val Encoding: ValueWriter[Encoding]         = ValueWriter(e => Some(e.name))
+  implicit val Encodings: ValueWriter[Seq[Encoding]]   = commaList[Encoding]
+  implicit val MediaType: ValueWriter[MediaType]       = ValueWriter(m => Some(m.toString))
+  implicit val MediaTypes: ValueWriter[Seq[MediaType]] = commaList[MediaType]
+  implicit val Method: ValueWriter[Method]             = ValueWriter(m => Some(m.name))
+  implicit val Methods: ValueWriter[Seq[Method]]       = commaList[Method]
+  implicit val ETag: ValueWriter[ETag]                 = ValueWriter(e => Some(e.toString))
+  implicit val ETags: ValueWriter[Seq[ETag]]           = commaList[ETag]
 }
 
 /** Used to write parameter values to an instance of [[Parameters]]. */

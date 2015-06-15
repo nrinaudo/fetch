@@ -51,11 +51,17 @@ class EncodingFormatSpec extends ValueFormatSpec.FromImplicits[Encoding](illegal
 class EncodingsFormatSpec extends ValueFormatSpec.FromImplicits[Seq[Encoding]](illegalEncoding)
 class MethodFormatSpec extends ValueFormatSpec.FromImplicits[Method](illegalMethod)
 class MethodsFormatSpec extends ValueFormatSpec.FromImplicits[Seq[Method]](illegalMethod)
-//class DateFormatSpec extends ValueFormatSpec.FromImplicits[Date](illegalDate)
 class MediaTypeFormatSpec extends ValueFormatSpec.FromImplicits[MediaType](illegalMediaType)
+class MediaTypesFormatSpec extends ValueFormatSpec.FromImplicits[Seq[MediaType]](illegalMediaType)
+
+class HttpDateFormatSpec extends ValueFormatSpec.Simple[Date] {
+  override val arbT   = implicitly[Arbitrary[Date]]
+  override val writer = HttpDate
+  override val reader = HttpDate
+}
 
 class StringFormatSpec extends ValueFormatSpec.Simple[String] {
-  override val arbT     = implicitly[Arbitrary[String]]
-  override val writer   = implicitly[ValueWriter[String]]
-  override val reader   = implicitly[ValueReader[String]]
+  override val arbT   = implicitly[Arbitrary[String]]
+  override val writer = implicitly[ValueWriter[String]]
+  override val reader = implicitly[ValueReader[String]]
 }

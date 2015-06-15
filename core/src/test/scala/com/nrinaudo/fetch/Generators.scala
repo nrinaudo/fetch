@@ -60,7 +60,7 @@ object Generators {
     } yield mediaType.params(params)
   }
 
-  def illegalMediaType: Gen[String] = Arbitrary.arbitrary[String].suchThat(_.indexOf('/') == -1)
+  def illegalMediaType: Gen[String] = Arbitrary.arbitrary[String].suchThat(s => s.nonEmpty && s.indexOf('/') == -1)
 
 
   // - Protocol generators ---------------------------------------------------------------------------------------------
