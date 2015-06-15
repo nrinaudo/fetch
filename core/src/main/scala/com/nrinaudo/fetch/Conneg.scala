@@ -1,7 +1,6 @@
 package com.nrinaudo.fetch
 
 import java.nio.charset.Charset
-import com.nrinaudo.fetch.Headers._
 
 import fastparse._
 

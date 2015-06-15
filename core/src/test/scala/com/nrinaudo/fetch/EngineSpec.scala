@@ -4,13 +4,14 @@ import java.nio.charset.Charset
 import java.util.Date
 
 import com.nrinaudo.fetch.Generators._
-import com.nrinaudo.fetch.Headers._
 import com.nrinaudo.fetch.Request._
+import com.sun.xml.internal.bind.v2.TODO
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import unfiltered.jetty.Server
+import utest.*
 
 trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
   def httpEngine: HttpEngine
@@ -58,8 +59,6 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
       }
     }
 
-
-
     // - Entity submission / reception ---------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
     it("should correctly read and write entity bodies, regardless of the request and response encoding") {
@@ -75,7 +74,6 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     }
 
 
-
     // - Header helpers ------------------------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
     def checkConnegs[T](response: Response[Response.Entity], values: Seq[Conneg[T]], reader: ValueReader[Seq[Conneg[T]]]): Unit =
@@ -87,7 +85,7 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
       }
     }
 
-    it("should send the default Accept header (*/*) when none is specified") {
+    it("should send the default Accept header when none is specified") {
       request("header/Accept").GET.apply().body.as[String] should be("*/*")
       request("header/Accept").accept().GET.apply().body.as[String] should be("*/*")
     }

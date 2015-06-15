@@ -3,8 +3,6 @@ package com.nrinaudo.fetch
 import java.io.{FilterInputStream, InputStream}
 import java.util.Date
 
-import com.nrinaudo.fetch.Headers._
-
 object Response {
   class Entity(private val input: InputStream, val mediaType: Option[MediaType]) {
     def as[A: EntityReader]: A = {
@@ -41,12 +39,12 @@ case class Response[A](status: Status, headers: Parameters, body: A) {
 
   // - Header helpers ----------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def date: Option[Date] = headers.get[Date]("Date")
+  def date: Option[Date] = headers.get[Date]("Date")(HttpDate)
   def contentEncoding: Option[Seq[Encoding]] = headers.get[Seq[Encoding]]("Content-Encoding")
   def contentLanguage: Option[Seq[Language]] = headers.get[Seq[Language]]("Content-Language")
   def contentType: Option[MediaType] = headers.get[MediaType]("Content-Type")
-  def lastModified: Option[Date] = headers.get[Date]("Last-Modified")
-  def expires: Option[Date] = headers.get[Date]("Expires")
+  def lastModified: Option[Date] = headers.get[Date]("Last-Modified")(HttpDate)
+  def expires: Option[Date] = headers.get[Date]("Expires")(HttpDate)
   def etag: Option[ETag] = headers.get[ETag]("ETag")
   def server: Option[String] = headers.get[String]("Server")
   def allow: Option[Seq[Method]] = headers.get[Seq[Method]]("Allow")

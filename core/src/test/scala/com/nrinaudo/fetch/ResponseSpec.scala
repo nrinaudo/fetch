@@ -8,9 +8,7 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 
 class ResponseSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
-  import Headers._
-
-
+  implicit val dateFormat = HttpDate
   val response = new Response[String](Status.Ok, Parameters.empty, "test")
 
   describe("A Response") {

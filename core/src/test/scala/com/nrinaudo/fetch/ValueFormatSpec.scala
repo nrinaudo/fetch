@@ -1,5 +1,9 @@
 package com.nrinaudo.fetch
 
+import java.nio.charset.Charset
+import java.util.Date
+
+import com.nrinaudo.fetch.Generators._
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FunSpec, Matchers}
@@ -40,6 +44,16 @@ class IntFormatSpec extends ValueFormatSpec.FromImplicits[Int](Gen.identifier)
 class ShortFormatSpec extends ValueFormatSpec.FromImplicits[Short](Gen.identifier)
 class ByteFormatSpec extends ValueFormatSpec.FromImplicits[Byte](Gen.identifier)
 class BooleanFormatSpec extends ValueFormatSpec.FromImplicits[Boolean](Gen.identifier)
+class LanguageFormatSpec extends ValueFormatSpec.FromImplicits[Language](illegalLanguage)
+class LanguagesFormatSpec extends ValueFormatSpec.FromImplicits[Seq[Language]](illegalLanguage)
+class CharsetFormatSpec extends ValueFormatSpec.FromImplicits[Charset](illegalCharset)
+class EncodingFormatSpec extends ValueFormatSpec.FromImplicits[Encoding](illegalEncoding)
+class EncodingsFormatSpec extends ValueFormatSpec.FromImplicits[Seq[Encoding]](illegalEncoding)
+class MethodFormatSpec extends ValueFormatSpec.FromImplicits[Method](illegalMethod)
+class MethodsFormatSpec extends ValueFormatSpec.FromImplicits[Seq[Method]](illegalMethod)
+//class DateFormatSpec extends ValueFormatSpec.FromImplicits[Date](illegalDate)
+class MediaTypeFormatSpec extends ValueFormatSpec.FromImplicits[MediaType](illegalMediaType)
+
 class StringFormatSpec extends ValueFormatSpec.Simple[String] {
   override val arbT     = implicitly[Arbitrary[String]]
   override val writer   = implicitly[ValueWriter[String]]

@@ -32,6 +32,10 @@ object Generators {
 
   def illegalParams: Gen[String] = Arbitrary.arbitrary[String].suchThat(str => !str.contains('=') && !str.isEmpty)
 
+  def headers[T](gen: Gen[T]): Gen[List[T]] = for {
+    size <- Gen.choose(1, 5)
+    list <- Gen.listOfN(size, gen)
+  } yield list
 
 
   // - MediaType generators --------------------------------------------------------------------------------------------
@@ -139,7 +143,7 @@ object Generators {
 
   implicit val arbEtag: Arbitrary[ETag] = Arbitrary(Gen.oneOf(weakTag, strongTag))
 
-  implicit val arbEtags: Arbitrary[List[ETag]] = Arbitrary(HeadersSpec.headers(arbitrary[ETag]))
+  implicit val arbEtags: Arbitrary[List[ETag]] = Arbitrary(headers(arbitrary[ETag]))
 
   def invalidEtag: Gen[String] = Arbitrary.arbitrary[String].suchThat { str =>
     str.length == 0 || str.charAt(0) != 'W' || str.charAt(0) != '\"' || str.charAt(str.length - 1) != '\"'
@@ -158,7 +162,7 @@ object Generators {
   // - Encoding generators ------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   implicit val arbEncoding: Arbitrary[Encoding] = Arbitrary(Gen.oneOf(Encoding.Gzip, Encoding.Deflate, Encoding.Identity))
-  def illegalEncoding: Gen[String] = arbitrary[String].suchThat(e => !Encoding.DefaultEncodings.contains(e))
+  def illegalEncoding: Gen[String] = arbitrary[String].suchThat(e => !Encoding.DefaultEncodings.contains(e) && e.nonEmpty)
 
 
   // - Date generators ------------------------------------------------------------------------------------------------------
@@ -191,7 +195,7 @@ object Generators {
     } yield Conneg(value, q / 1000f)
   }
 
-  implicit def connegs[A: Arbitrary]: Arbitrary[Seq[Conneg[A]]] = Arbitrary(HeadersSpec.headers(arbitrary[Conneg[A]]))
+  implicit def connegs[A: Arbitrary]: Arbitrary[Seq[Conneg[A]]] = Arbitrary(headers(arbitrary[Conneg[A]]))
 
 
 

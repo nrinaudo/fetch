@@ -4,7 +4,6 @@ import java.io._
 import java.net.URI
 import java.nio.charset.Charset
 import java.util.Date
-import Headers._
 
 import com.nrinaudo.fetch.Request.Entity
 import org.apache.commons.codec.binary.Base64
@@ -24,10 +23,14 @@ object Request {
     */
   type HttpEngine = (Url, Method, Option[Entity], Parameters) => Response[Response.Entity]
 
-  private def http(f: HttpEngine): HttpEngine = (url, method, body, headers) => f(url, method, body,
-    // Sets the content type if applicable.
-    body.fold(headers)(b => headers.set("Content-Type", b.mediaType))
-      .setIfEmpty("User-Agent", UserAgent))
+  private def prepareHeaders(ps: Parameters): Parameters =
+    ps.copy(ps.values.filter { case (_, p) => p.nonEmpty }).setIfEmpty("User-Agent", UserAgent)
+
+  private def normalize(f: HttpEngine): HttpEngine = (url, method, body, headers) =>
+    f(url, method, body,
+      // Sets the content type if applicable.
+      prepareHeaders(body.fold(headers)(b => headers.set("Content-Type", b.mediaType))
+      ))
 
 
 
@@ -47,7 +50,7 @@ object Request {
    * @param engine HTTP engine to use when performing the request.
    */
   def apply(url: Url)(implicit engine: HttpEngine): Request[Response[Response.Entity]] =
-    new Request[Response[Response.Entity]](url, Method.GET, Parameters.empty, http(engine))
+    new Request[Response[Response.Entity]](url, Method.GET, Parameters.empty, normalize(engine))
 
   // TODO: have the version number be dynamic, somehow.
   val UserAgent = "Fetch/0.2"
@@ -231,13 +234,13 @@ case class Request[A](url: Url, method: Method, headers: Parameters, run: (Url, 
 
   // - Cache headers ---------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def ifModifiedSince(date: Date): Request[A] = header("If-Modified-Since", date)
+  def ifModifiedSince(date: Date): Request[A] = header("If-Modified-Since", date)(HttpDate)
 
-  def ifModifiedSince: Option[Date] = header[Date]("If-Modified-Since")
+  def ifModifiedSince: Option[Date] = header[Date]("If-Modified-Since")(HttpDate)
 
-  def ifUnmodifiedSince(date: Date): Request[A] = header("If-Unmodified-Since", date)
+  def ifUnmodifiedSince(date: Date): Request[A] = header("If-Unmodified-Since", date)(HttpDate)
 
-  def ifUnmodifiedSince: Option[Date] = header[Date]("If-Unmodified-Since")
+  def ifUnmodifiedSince: Option[Date] = header[Date]("If-Unmodified-Since")(HttpDate)
 
   def ifNoneMatch(tags: ETag*): Request[A] = header("If-None-Match", tags)
 
@@ -249,15 +252,15 @@ case class Request[A](url: Url, method: Method, headers: Parameters, run: (Url, 
 
   def ifRange(tag: ETag): Request[A] = header("If-Range", tag)
 
-  def ifRange(date: Date): Request[A] = header("If-Range", date)
+  def ifRange(date: Date): Request[A] = header("If-Range", date)(HttpDate)
 
 
 
   // - Misc. helpers ---------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  def date(date: Date = new Date()): Request[A] = header("Date", date)
+  def date(date: Date = new Date()): Request[A] = header("Date", date)(HttpDate)
 
-  def date: Option[Date] = header[Date]("Date")
+  def date: Option[Date] = header[Date]("Date")(HttpDate)
 
   def userAgent(name: String): Request[A] = header("User-Agent", name)
 

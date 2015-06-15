@@ -9,7 +9,6 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FunSpec, Matchers}
 
 class MediaTypeSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  import Headers._
 
   def diffTypes[T](gen: Gen[T]): Gen[(T, T)] = for {
     t1 <- gen
