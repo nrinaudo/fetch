@@ -9,8 +9,7 @@ object Conneg {
   /** Implicit format for the `Accept` content negotiation header. */
   implicit val MediaTypes: ValueFormat[Seq[Conneg[MediaType]]] = new ValueFormat[Seq[Conneg[MediaType]]] {
     override def write(value: Seq[Conneg[MediaType]]): Option[String] =
-      if(value.isEmpty) None
-      else Some(grammar.connegs(value.map {
+      Some(grammar.connegs(value.map {
         // TODO: this should not rely on toString but rather on serialization methods in grammar.
         case Conneg(t, q) => t.toString -> q
       }))
@@ -40,13 +39,9 @@ object Conneg {
   private case class ConnegFormat[T](p: Parser[T], writer: T => String) extends ValueFormat[Seq[Conneg[T]]] {
     val parser: Parser[List[Conneg[T]]] = grammar.connegs(p).map(_.map { case (t, q) => Conneg(t, q) }.toList)
 
-    override def write(value: Seq[Conneg[T]]): Option[String] =
-      if(value.isEmpty) None
-      else Some(grammar.connegs(value.map {
-        case Conneg(t, q) => writer(t) -> q
-      }))
-
-
+    override def write(value: Seq[Conneg[T]]): Option[String] = Some(grammar.connegs(value.map {
+      case Conneg(t, q) => writer(t) -> q
+    }))
 
     override def read(value: String): Option[Seq[Conneg[T]]] = parseFully(parser, value)
   }

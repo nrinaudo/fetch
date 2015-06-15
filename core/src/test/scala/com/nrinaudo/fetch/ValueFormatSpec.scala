@@ -45,19 +45,20 @@ class ShortFormatSpec extends ValueFormatSpec.FromImplicits[Short](Gen.identifie
 class ByteFormatSpec extends ValueFormatSpec.FromImplicits[Byte](Gen.identifier)
 class BooleanFormatSpec extends ValueFormatSpec.FromImplicits[Boolean](Gen.identifier)
 class LanguageFormatSpec extends ValueFormatSpec.FromImplicits[Language](illegalLanguage)
-class LanguagesFormatSpec extends ValueFormatSpec.FromImplicits[Seq[Language]](illegalLanguage)
+class LanguagesFormatSpec extends ValueFormatSpec.FromImplicits[Seq[Language]](illegalLanguages)
 class CharsetFormatSpec extends ValueFormatSpec.FromImplicits[Charset](illegalCharset)
 class EncodingFormatSpec extends ValueFormatSpec.FromImplicits[Encoding](illegalEncoding)
-class EncodingsFormatSpec extends ValueFormatSpec.FromImplicits[Seq[Encoding]](illegalEncoding)
+class EncodingsFormatSpec extends ValueFormatSpec.FromImplicits[Seq[Encoding]](illegalEncodings)
 class MethodFormatSpec extends ValueFormatSpec.FromImplicits[Method](illegalMethod)
 class MethodsFormatSpec extends ValueFormatSpec.FromImplicits[Seq[Method]](illegalMethod)
 class MediaTypeFormatSpec extends ValueFormatSpec.FromImplicits[MediaType](illegalMediaType)
-class MediaTypesFormatSpec extends ValueFormatSpec.FromImplicits[Seq[MediaType]](illegalMediaType)
+class MediaTypesFormatSpec extends ValueFormatSpec.FromImplicits[Seq[MediaType]](illegalMediaTypes)
 
-class HttpDateFormatSpec extends ValueFormatSpec.Simple[Date] {
-  override val arbT   = implicitly[Arbitrary[Date]]
-  override val writer = HttpDate
-  override val reader = HttpDate
+class HttpDateFormatSpec extends ValueFormatSpec.WithErrors[Date] {
+  override val arbT     = implicitly[Arbitrary[Date]]
+  override val writer   = HttpDate
+  override val reader   = HttpDate
+  override def illegalT = illegalHttpDate
 }
 
 class StringFormatSpec extends ValueFormatSpec.Simple[String] {

@@ -60,7 +60,8 @@ object Generators {
     } yield mediaType.params(params)
   }
 
-  def illegalMediaType: Gen[String] = Arbitrary.arbitrary[String].suchThat(s => s.nonEmpty && s.indexOf('/') == -1)
+  def illegalMediaType: Gen[String] = Arbitrary.arbitrary[String].suchThat(_.indexOf('/') == -1)
+  def illegalMediaTypes: Gen[String] = illegalMediaType.suchThat(_.nonEmpty)
 
 
   // - Protocol generators ---------------------------------------------------------------------------------------------
@@ -157,19 +158,21 @@ object Generators {
   implicit val arbCharset: Arbitrary[Charset] = Arbitrary(Gen.oneOf(charsets))
 
   def illegalCharset: Gen[String] = Arbitrary.arbitrary[String].suchThat(!Charset.availableCharsets().containsKey(_))
+  def illegalCharsets: Gen[String] = illegalCharset.suchThat(_.nonEmpty)
 
 
   // - Encoding generators ------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   implicit val arbEncoding: Arbitrary[Encoding] = Arbitrary(Gen.oneOf(Encoding.Gzip, Encoding.Deflate, Encoding.Identity))
-  def illegalEncoding: Gen[String] = arbitrary[String].suchThat(e => !Encoding.DefaultEncodings.contains(e) && e.nonEmpty)
+  def illegalEncoding: Gen[String] = arbitrary[String].suchThat(!Encoding.DefaultEncodings.contains(_))
+  def illegalEncodings: Gen[String] = illegalEncoding.suchThat(_.nonEmpty)
 
 
   // - Date generators ------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   implicit val arbDate: Arbitrary[Date] = Arbitrary(for(time <- choose(0, 253402300799000l)) yield new Date((time / 1000l) * 1000))
 
-  def illegalDate: Gen[String] = Arbitrary.arbitrary[String].suchThat(_.matches(".*[^0-9a-zA-Z,: ].*"))
+  def illegalHttpDate: Gen[String] = Arbitrary.arbitrary[String].suchThat(_.matches(".*[^0-9a-zA-Z,: ].*"))
 
 
 
@@ -183,6 +186,7 @@ object Generators {
   implicit val arbLanguage: Arbitrary[Language] = Arbitrary(arbitrary[Locale].map(l => Language(l.getLanguage, List(l.getCountry).filter(_.nonEmpty))))
 
   def illegalLanguage: Gen[String] = Arbitrary.arbitrary[String].suchThat {_.matches(".*[^a-zA-Z_-].*")}
+  def illegalLanguages: Gen[String] = illegalLanguage.suchThat(_.nonEmpty)
 
 
 
