@@ -25,7 +25,7 @@ class ValueReaderSpec extends FunSpec with Matchers with GeneratorDrivenProperty
     }
 
     it("should sequence failures properly") {
-      forAll(brokenSequence) { values => ValueReader.sequence[Int](values).isEmpty should be(true) }
+      forAll(brokenSequence) { values => ValueReader.sequence[Int](values) should be(None) }
     }
   }
 }

@@ -113,7 +113,6 @@ sealed trait MediaType {
   /** Creates a copy of the current instance with the specified parameters. */
   def params(values: Parameters): MediaType
 
-  // TODO:
   override lazy val toString =
     if(params.values.isEmpty) rawType
     else                      rawType + ";" + grammar.params(params.values)
