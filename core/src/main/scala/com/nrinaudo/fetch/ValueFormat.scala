@@ -37,7 +37,7 @@ object ValueReader {
   }
 
   def parserList[T](parser: Parser[T]): ValueReader[Seq[T]] = ValueReader { s =>
-    parseFully(parser.rep(","), s)
+    parseFully(parser.rep(0, ","), s)
   }
 
 

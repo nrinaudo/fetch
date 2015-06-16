@@ -6,8 +6,8 @@ import java.util.Locale
 
 import com.nrinaudo.fetch.Request.HttpEngine
 import fastparse.Parser
-import fastparse.Parser.End
 import fastparse.Result.Success
+import fastparse.parsers.Terminals.{Pass, End}
 
 import scala.language.implicitConversions
 
@@ -27,6 +27,8 @@ package object fetch {
     case Success(t, _) => Some(t)
     case _             => None
   }
+
+  private[fetch] def pass[T](t: T): Parser[T] = Pass.map(_ => t)
 
 
   // - IO helper methods -----------------------------------------------------------------------------------------------

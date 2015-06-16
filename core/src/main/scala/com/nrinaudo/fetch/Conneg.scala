@@ -16,7 +16,7 @@ object Conneg {
         case Conneg(t, q) => t.toString -> q
       }))
     override def read(value: String): Option[Seq[Conneg[MediaType]]] = parseFully(parser, value)
-    val parser: Parser[List[Conneg[MediaType]]] = MediaType.parser.rep(",").map(_.map(m => Conneg(m.removeParam("q"), m.param[Float]("q").getOrElse(1F))).toList)
+    val parser: Parser[List[Conneg[MediaType]]] = MediaType.parser.rep(0, ",").map(_.map(m => Conneg(m.removeParam("q"), m.param[Float]("q").getOrElse(1F))).toList)
   }
 
   /** Implicit format for the `Accept-Encoding` content negotiation header.
@@ -30,8 +30,8 @@ object Conneg {
   )
 
   /** Implicit format for the `Accept-Charset` content negotiation header. */
-  // TODO: check what happens when a valid token that does not map to a supported charset is passed.
-  implicit val Charsets: ValueFormat[Seq[Conneg[Charset]]] = ConnegFormat(grammar.token.map(Charset.forName), _.name())
+  implicit val Charsets: ValueFormat[Seq[Conneg[Charset]]] =
+    ConnegFormat(grammar.token.flatMap(n => Try(pass(Charset.forName(n))).getOrElse(Fail)), _.name())
 
   /** Implicit format for the `Accept-Language` content negotiation header. */
   implicit val Languages: ValueFormat[Seq[Conneg[Language]]] = ConnegFormat(Language.parser,
@@ -45,10 +45,7 @@ object Conneg {
       case Conneg(t, q) => writer(t) -> q
     }))
 
-    // TODO: the Try...getOrElse bit is nasty. fastparse doesn't currently allow us to fail within a call to map
-    // - that is, it does not have a flatMap method - and Charsets can throw exceptions when the name is legal but not
-    // that of a known charset.
-    override def read(value: String): Option[Seq[Conneg[T]]] = Try(parseFully(parser, value)).getOrElse(None)
+    override def read(value: String): Option[Seq[Conneg[T]]] = parseFully(parser, value)
   }
 }
 

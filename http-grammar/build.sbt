@@ -1,4 +1,4 @@
-libraryDependencies += "com.lihaoyi" %% "scalaparse" % "0.3.0"
+libraryDependencies += "com.lihaoyi" %% "fastparse" % "0.1.7"
 
 libraryDependencies += "org.scalatest"  %% "scalatest"  % "2.2.5"  % "test"
 

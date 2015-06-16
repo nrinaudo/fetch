@@ -2,7 +2,6 @@ package com.nrinaudo.fetch
 
 import java.text.DecimalFormat
 
-import fastparse.Intrinsics.CharPred
 import fastparse._
 
 /** Implements parsers for the various elements of the HTTP grammar as defined in [[http://tools.ietf.org/html/rfc2616 RFC 2616]]. */
@@ -21,23 +20,23 @@ package object grammar {
   val token: Parser[String] = CharsWhile(c => isChar(c) && !(isCtl(c) || isSeparator(c)), 1).!
   // Note: I've added the \\ exclusion here because while the RFC does not specify it, it seems that it should be there
   // to prevent conflict with quoted pairs.
-  val qdtext: Parser[String] = Intrinsics.CharsWhile(c => isText(c) &&  c != '"' && c != '\\', 1).!
+  val qdtext: Parser[String] = CharsWhile(c => isText(c) &&  c != '"' && c != '\\', 1).!
   val quotedPair: Parser[String] = "\\" ~ CharPred(isChar).!
   val quotedString: Parser[String] = "\"" ~ (quotedPair | qdtext).rep.map(_.mkString) ~ "\""
 
   val param: Parser[(String, String)] = token ~ "=" ~ (token | quotedString).?.map(_.getOrElse(""))
-  val params: Parser[Map[String, String]] = param.rep(";").map(_.foldLeft(Map.empty[String, String])(_ + _))
+  val params: Parser[Map[String, String]] = param.rep(0, ";").map(_.foldLeft(Map.empty[String, String])(_ + _))
 
   val mediaType: Parser[(String, String, Seq[(String, String)])] = token ~ "/" ~ token ~ (";" ~ params).?.map(_.getOrElse(List.empty).toSeq)
 
   // TODO: both languageTag and qValue are incorrect: they do not check for max size.
-  val languageTag: Parser[String] = P(CharIn('a' to 'z', 'A' to 'Z')).rep1.!
+  val languageTag: Parser[String] = P(CharIn('a' to 'z', 'A' to 'Z')).rep(1).!
   val language: Parser[(String, Seq[String])] = languageTag ~ ("-" ~ languageTag).rep
 
   val qValue: Parser[Float] = (P("0" ~ ("." ~ CharsWhile('0' to '9' contains _)).?) |
-                               P("1" ~ ("." ~ "0".rep1).?)).!.map(_.toFloat)
+                               P("1" ~ ("." ~ "0".rep(1)).?)).!.map(_.toFloat)
   def conneg[T](parser: Parser[T]): Parser[(T, Float)] = parser ~ (";q=" ~ qValue).?.map(_.getOrElse(1.0F))
-  def connegs[T](parser: Parser[T]): Parser[Seq[(T, Float)]] = conneg(parser).rep(",")
+  def connegs[T](parser: Parser[T]): Parser[Seq[(T, Float)]] = conneg(parser).rep(0, ",")
 
 
 

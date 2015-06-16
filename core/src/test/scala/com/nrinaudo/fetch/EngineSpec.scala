@@ -11,7 +11,6 @@ import org.scalacheck.Gen
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import unfiltered.jetty.Server
-import utest.*
 
 trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
   def httpEngine: HttpEngine
