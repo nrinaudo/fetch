@@ -4,6 +4,8 @@ import java.nio.charset.Charset
 
 import fastparse._
 
+import scala.util.Try
+
 /** Collection of implicit header formats for known content negotiation headers. */
 object Conneg {
   /** Implicit format for the `Accept` content negotiation header. */
@@ -43,7 +45,10 @@ object Conneg {
       case Conneg(t, q) => writer(t) -> q
     }))
 
-    override def read(value: String): Option[Seq[Conneg[T]]] = parseFully(parser, value)
+    // TODO: the Try...getOrElse bit is nasty. fastparse doesn't currently allow us to fail within a call to map
+    // - that is, it does not have a flatMap method - and Charsets can throw exceptions when the name is legal but not
+    // that of a known charset.
+    override def read(value: String): Option[Seq[Conneg[T]]] = Try(parseFully(parser, value)).getOrElse(None)
   }
 }
 
