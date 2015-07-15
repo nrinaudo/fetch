@@ -27,7 +27,8 @@ package object grammar {
   val param: Parser[(String, String)] = token ~ "=" ~ (token | quotedString).?.map(_.getOrElse(""))
   val params: Parser[Map[String, String]] = param.rep(0, ";").map(_.foldLeft(Map.empty[String, String])(_ + _))
 
-  val mediaType: Parser[(String, String, Seq[(String, String)])] = token ~ "/" ~ token ~ (";" ~ params).?.map(_.getOrElse(List.empty).toSeq)
+  val mediaType: Parser[(String, String, Map[String, String])] =
+    token ~ "/" ~ token ~ (";" ~ params).?.map(_.getOrElse(List.empty).foldLeft(Map.empty[String, String])(_ + _))
 
   // TODO: both languageTag and qValue are incorrect: they do not check for max size.
   val languageTag: Parser[String] = P(CharIn('a' to 'z', 'A' to 'Z')).rep(1).!

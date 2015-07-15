@@ -12,7 +12,6 @@ object Conneg {
   implicit val MediaTypes: ValueFormat[Seq[Conneg[MediaType]]] = new ValueFormat[Seq[Conneg[MediaType]]] {
     override def write(value: Seq[Conneg[MediaType]]): Option[String] =
       Some(grammar.connegs(value.map {
-        // TODO: this should not rely on toString but rather on serialization methods in grammar.
         case Conneg(t, q) => t.toString -> q
       }))
     override def read(value: String): Option[Seq[Conneg[MediaType]]] = parseFully(parser, value)

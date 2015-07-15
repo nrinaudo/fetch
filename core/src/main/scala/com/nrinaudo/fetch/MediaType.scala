@@ -8,10 +8,10 @@ import fastparse._
 object MediaType {
   // - MediaType implementations ---------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  /** Specific media type, with both a main- and sub-type (such as `text-plain`, for example). */
+  /** Specific media type, with both a main- and sub-type (such as `text/plain`, for example). */
   final case class Specific(main: String, sub: String, params: Parameters = Parameters.empty)
     extends MediaType {
-    override def rawType: String = "%s/%s" format (main, sub)
+    override def rawType: String = s"$main/$sub"
     override def params(values: Parameters): MediaType = copy(params = values)
 
     /** Matches any instance of [[Specific]] with the same main- and sub-type. */
@@ -23,7 +23,8 @@ object MediaType {
 
   /** Media range, with a main-type only (such as `text/ *`, for example). */
   final case class Range(main: String, params: Parameters = Parameters.empty) extends MediaType {
-    override def rawType: String = "%s/*" format main
+    override def rawType: String = s"$main/*"
+
     override def params(values: Parameters): MediaType = copy(params = values)
 
     /** Matches any instance of either [[Specific]] or [[Range]] that have the same main type. */
@@ -52,12 +53,11 @@ object MediaType {
   // -------------------------------------------------------------------------------------------------------------------
   private[fetch] val parser: Parser[MediaType] = grammar.mediaType.map {
     case (main, sub, ps) =>
-      val params = Parameters(ps.foldLeft(Map.empty[String, String])(_ + _))
       ((main, sub) match {
         case ("*", "*") => Everything
         case (_, "*")   => Range(main)
         case (_, _)     => Specific(main, sub)
-      }).params(params)
+      }).params(Parameters(ps))
   }
 
   /** Attempts to extract a media type from the specified string. */
