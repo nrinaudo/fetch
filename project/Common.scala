@@ -6,8 +6,8 @@ object Common extends Build {
     <url>https://github.com/nrinaudo/fetch</url>
       <licenses>
         <license>
-          <name>GNU Library or Lesser General Public License (LGPL)</name>
-          <url>http://www.gnu.org/licenses/lgpl.html</url>
+          <name>MIT License</name>
+          <url>http://www.opensource.org/licenses/mit-license.php</url>
         </license>
       </licenses>
       <scm>
