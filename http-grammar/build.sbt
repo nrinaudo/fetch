@@ -1,6 +1,6 @@
 name := "http-grammar"
 
-libraryDependencies += "com.lihaoyi" %% "fastparse" % "0.1.7"
+libraryDependencies += "com.lihaoyi" %% "fastparse" % "0.2.1"
 
 libraryDependencies += "org.scalatest"  %% "scalatest"  % "2.2.5"  % "test"
 

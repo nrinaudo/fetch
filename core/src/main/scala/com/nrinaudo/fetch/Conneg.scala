@@ -2,7 +2,7 @@ package com.nrinaudo.fetch
 
 import java.nio.charset.Charset
 
-import fastparse._
+import fastparse.all._
 
 import scala.util.Try
 

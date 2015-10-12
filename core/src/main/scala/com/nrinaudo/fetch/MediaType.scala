@@ -2,7 +2,7 @@ package com.nrinaudo.fetch
 
 import java.nio.charset.Charset
 
-import fastparse._
+import fastparse.all._
 
 /** Defines [[MediaType]] implementations as well as known types. */
 object MediaType {

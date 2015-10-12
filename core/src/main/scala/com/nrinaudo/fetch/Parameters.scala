@@ -1,6 +1,6 @@
 package com.nrinaudo.fetch
 
-import fastparse.Parser
+import fastparse.all._
 
 object Parameters {
   val empty: Parameters = Parameters(Map.empty)

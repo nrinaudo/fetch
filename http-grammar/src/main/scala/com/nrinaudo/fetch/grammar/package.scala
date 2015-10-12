@@ -2,7 +2,8 @@ package com.nrinaudo.fetch
 
 import java.text.DecimalFormat
 
-import fastparse._
+import fastparse.all._
+import fastparse.parsers.Intrinsics.{CharIn, CharPred, CharsWhile}
 
 /** Implements parsers for the various elements of the HTTP grammar as defined in [[http://tools.ietf.org/html/rfc2616 RFC 2616]]. */
 package object grammar {

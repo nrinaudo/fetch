@@ -1,7 +1,7 @@
 package com.nrinaudo.fetch.grammar
 
-import fastparse.Result.Success
-import fastparse._
+import fastparse.all._
+import fastparse.core.Result.Success
 import org.scalacheck.Gen, Gen._
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FunSpec, Matchers}

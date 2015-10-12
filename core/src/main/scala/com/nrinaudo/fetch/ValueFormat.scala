@@ -3,7 +3,7 @@ package com.nrinaudo.fetch
 import java.nio.charset.Charset
 
 import com.nrinaudo
-import fastparse.Parser
+import fastparse.all._
 import simulacrum._
 
 import scala.annotation.implicitNotFound

@@ -1,6 +1,6 @@
 package com.nrinaudo.fetch
 
-import fastparse._
+import fastparse.all._
 
 /** Tools for creating instances of [[Language]]. */
 object Language {

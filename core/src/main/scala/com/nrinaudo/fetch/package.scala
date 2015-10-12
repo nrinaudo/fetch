@@ -5,9 +5,8 @@ import java.nio.charset.Charset
 import java.util.Locale
 
 import com.nrinaudo.fetch.Request.HttpEngine
-import fastparse.Parser
-import fastparse.Result.Success
-import fastparse.parsers.Terminals.{Pass, End}
+import fastparse.all._
+import fastparse.core.Result.Success
 
 import scala.language.implicitConversions
 
@@ -23,7 +22,7 @@ package object fetch {
 
   // - Parsing helpers -------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  private[fetch] def parseFully[T](parser: Parser[T], str: String): Option[T] = (parser ~ End).parse(str, 0, false) match {
+  private[fetch] def parseFully[T](parser: Parser[T], str: String): Option[T] = (parser ~ End).parse(str, 0) match {
     case Success(t, _) => Some(t)
     case _             => None
   }
