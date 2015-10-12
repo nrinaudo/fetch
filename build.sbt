@@ -1,7 +1,8 @@
 import SonatypeKeys._
 
 lazy val root = Project(id = "fetch",
-                        base = file(".")).aggregate(core, json4sNative, json4sJackson, sample, tagsoup).settings(packagedArtifacts := Map.empty)
+                        base = file(".")).aggregate(core, json4sNative, json4sJackson, sample, tagsoup, httpGrammar)
+  .settings(noPublishSettings:_*)
 
 lazy val core = project dependsOn httpGrammar
 
@@ -18,4 +19,11 @@ lazy val tagsoup = Project(id   = "tagsoup",
                                  base = file("tagsoup")) dependsOn(core)
 
 lazy val sample = Project(id   = "sample",
-                          base = file("sample")) dependsOn(core, json4sJackson) settings(packagedArtifacts := Map.empty)
+                          base = file("sample")).dependsOn(core, json4sJackson).settings(noPublishSettings:_*)
+
+
+lazy val noPublishSettings = Seq(
+  publish         := (),
+  publishLocal    := (),
+  publishArtifact := false
+)
