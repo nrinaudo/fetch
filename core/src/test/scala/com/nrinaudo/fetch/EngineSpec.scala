@@ -14,6 +14,7 @@ import unfiltered.jetty.Server
 trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with GeneratorDrivenPropertyChecks {
   def httpEngine: HttpEngine
   def name: String
+  implicit val charset = Charset.forName("UTF-8")
 
 
   // - Test HTTP server ------------------------------------------------------------------------------------------------
