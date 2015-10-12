@@ -7,10 +7,10 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FunSpec, Matchers}
 
 object HttpGrammarSpec {
-  val tokenChar: Gen[Char]  = oneOf(((32.toChar to 126.toChar).toSet &~ Separators).toSeq)
+  val tokenChar: Gen[Char]  = oneOf(((32 to 126).map(_.toChar).toSet &~ Separators).toSeq)
   // TODO: this is not entirely RFC compliant, as technically, ASCII control chars are supported.
   // This is currently ignored and known to break, but considered not to be worth the hassle.
-  val quotableChar: Gen[Char] = oneOf(32.toChar to 126.toChar)
+  val quotableChar: Gen[Char] = oneOf((32 to 126).map(_.toChar))
 
   def listBetween[T](min: Int, max: Int, gen: Gen[T]): Gen[List[T]] = for {
     size <- choose(min, max)

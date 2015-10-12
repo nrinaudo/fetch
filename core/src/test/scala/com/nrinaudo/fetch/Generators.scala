@@ -17,7 +17,7 @@ object Generators {
   implicit val arbParam: Arbitrary[Param] = Arbitrary {
     for {
       name <-  identifier
-      value <- nonEmptyListOf(oneOf(32.toChar to 126.toChar)).map(_.mkString)
+      value <- nonEmptyListOf(oneOf((32 to 126).map(_.toChar))).map(_.mkString)
     } yield Param(name, value)
   }
 
