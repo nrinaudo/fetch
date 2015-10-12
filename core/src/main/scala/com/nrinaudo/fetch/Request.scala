@@ -53,7 +53,7 @@ object Request {
     new Request[Response[Response.Entity]](url, Method.GET, Parameters.empty, normalize(engine))
 
   // TODO: have the version number be dynamic, somehow.
-  val UserAgent = "Fetch/0.2"
+  val UserAgent = "Fetch/0.3"
 }
 
 /** Represents an HTTP request.
