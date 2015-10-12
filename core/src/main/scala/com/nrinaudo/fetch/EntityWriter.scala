@@ -8,41 +8,30 @@ import simulacrum.typeclass
 import scala.annotation.implicitNotFound
 
 object EntityWriter {
-  def text[A](f: (A, Writer) => Unit): TextEntityWriter[A] = new TextEntityWriter[A] {
-    override def length(a: A, charset: Charset) = None
-    override def write(a: A, out: Writer) = f(a, out)
+  def binary[A](f: (A, OutputStream) => Unit): EntityWriter[A] = new EntityWriter[A] {
+    override def length(a: A) = None
+    override def write(a: A, out: OutputStream): Unit = f(a, out)
+    override def mediaType: MediaType = MediaType.OctetStream
+  }
+
+  def text[A](f: (A, Writer) => Unit): EntityWriter[A] = new EntityWriter[A] {
+    override def length(a: A) = None
+    override def write(a: A, out: OutputStream) = {
+      val writer = new OutputStreamWriter(out, charset)
+      f(a, writer)
+      writer.flush()
+    }
     override def mediaType = MediaType.PlainText
   }
 
-  //implicit val string: EntityWriter[String] = text((s, o) => o.write(s))
-  def string(m: MediaType): EntityWriter[String] = new TextEntityWriter[String] {
-    override def length(str: String, charset: Charset) = Some(str.getBytes(charset).length.toLong)
-    override def write(str: String, out: Writer)       = out.write(str)
-    override val mediaType                             = m
-  }
+  implicit val chars: EntityWriter[Reader] = text((in, out) => writeChars(in, out))
 
-  def stream(m: MediaType): EntityWriter[InputStream] = new EntityWriter[InputStream] {
-    override def length(a: InputStream)                    = None
-    override def write(in: InputStream, out: OutputStream) = writeBytes(in, out)
-    override val mediaType                                 = m
-  }
+  implicit val string: EntityWriter[String] = text((s, o) => o.write(s))
 
-  def reader(m: MediaType): EntityWriter[Reader] = new TextEntityWriter[Reader] {
-    override def length(in: Reader, charset: Charset) = None
-    override def write(in: Reader, out: Writer)       = writeChars(in, out)
-    override def mediaType                            = m
-  }
+  implicit val bytes: EntityWriter[InputStream] = binary((in, out) => writeBytes(in, out))
 
-  def file(m: MediaType): EntityWriter[File] = new EntityWriter[File] {
-    override def write(file: File, out: OutputStream) = {
-      val in = new BufferedInputStream(new FileInputStream(file))
-      try {writeBytes(in, out)}
-      finally {in.close()}
-    }
-
-    override def length(file: File) = Some(file.length())
-    override def mediaType          = m
-  }
+  implicit val file: EntityWriter[File] =
+    bytes.contramap((f: File) => new BufferedInputStream(new FileInputStream(f))).withLength(f => Some(f.length))
 }
 
 @implicitNotFound(msg = "Cannot find an EntityWriter instance for ${A}")
@@ -50,43 +39,31 @@ object EntityWriter {
   def write(a: A, out: OutputStream): Unit
   def length(a: A): Option[Long]
   def mediaType: MediaType
-}
-
-/** Specialised version of [[EntityWriter]] for text entities.
-  *
-  * It's important to realise that the charset information is taken from the [[TextEntityWriter.mediaType]] value.
-  * If none is set, then [[TextEntityWriter.defaultCharset]] will be used when writing the entity.
-  */
-trait TextEntityWriter[A] extends EntityWriter[A] {
-  // - Charset management ----------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
-  /** Returns the charset to use when writing this entity.
-    *
-    * If none was set, returns [[defaultCharset]].
-    */
+  def defaultCharset: Charset = DefaultCharset
   def charset: Charset = mediaType.charset.getOrElse(defaultCharset)
 
-  /** Returns the charset to use when none was set.
-    *
-    * Returns `UTF-8` if not overridden.
-    */
-  def defaultCharset: Charset = DefaultCharset
-
-
-  // - EntityWriter implementation -------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
-  override final def write(a: A, out: OutputStream) = {
-    val writer = new OutputStreamWriter(out, charset)
-    write(a, writer)
-    writer.flush()
+  def withDefaultCharset(charset: Charset): EntityWriter[A] = new EntityWriter[A] {
+    override def write(a: A, out: OutputStream) = self.write(a, out)
+    override def mediaType = self.mediaType
+    override def length(a: A) = self.length(a)
+    override def defaultCharset: Charset = charset
   }
 
-  override final def length(a: A) = length(a, charset)
+  def contramap[B](f: B => A): EntityWriter[B] = new EntityWriter[B] {
+    override def length(b: B) = self.length(f(b))
+    override def mediaType = self.mediaType
+    override def write(b: B, out: OutputStream) = self.write(f(b), out)
+  }
 
+  def withMediaType(m: MediaType): EntityWriter[A] = new EntityWriter[A] {
+    override def mediaType: MediaType = m
+    override def length(a: A) = self.length(a)
+    override def write(a: A, out: OutputStream) = self.write(a, out)
+  }
 
-
-  // - Abstract methods ------------------------------------------------------------------------------------------------
-  // -------------------------------------------------------------------------------------------------------------------
-  def write(a: A, out: Writer): Unit
-  def length(a: A, charset: Charset): Option[Long]
+  def withLength(f: A => Option[Long]): EntityWriter[A] = new EntityWriter[A] {
+    override def write(a: A, out: OutputStream) = self.write(a, out)
+    override def mediaType = self.mediaType
+    override def length(a: A) = f(a)
+  }
 }

@@ -5,7 +5,6 @@ import java.util.Date
 
 import com.nrinaudo.fetch.Generators._
 import com.nrinaudo.fetch.Request._
-import com.sun.xml.internal.bind.v2.TODO
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
@@ -61,7 +60,6 @@ trait EngineSpec extends FunSpec with BeforeAndAfterAll with Matchers with Gener
     // - Entity submission / reception ---------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
     it("should correctly read and write entity bodies, regardless of the request and response encoding") {
-      implicit val writer = EntityWriter.string(MediaType.PlainText.charset(Charset.forName("UTF-8")))
       forAll(arbitrary[String].suchThat(_.nonEmpty), arbitrary[Encoding], arbitrary[Encoding]) { (entity, reqEncoding, resEncoding) =>
         val response = request("body").acceptEncoding(resEncoding).encoding(reqEncoding).PUT(entity)
 

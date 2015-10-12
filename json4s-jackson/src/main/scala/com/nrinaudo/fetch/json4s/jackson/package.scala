@@ -15,11 +15,9 @@ package object jackson {
       m
     }
 
-    implicit def writer(implicit formats: Formats): EntityWriter[JValue] = new TextEntityWriter[JValue] {
-      override def mediaType                             = MediaType.Json.charset(DefaultCharset)
-      override def write(a: JValue, out: java.io.Writer) = mapper.writeValue(out, Extraction.decompose(a))
-      override def length(a: JValue, charset: Charset)   = None
-    }
+    implicit def writer(implicit formats: Formats): EntityWriter[JValue] = EntityWriter.text((j: JValue, out) =>
+      mapper.writeValue(out, Extraction.decompose(j))
+    ).withMediaType(MediaType.Json.charset(Charset.forName("UTF-8")))
 
     implicit val reader: EntityReader[JValue] = EntityReader.chars(in => JsonMethods.parse(ReaderInput(in)))
 }
