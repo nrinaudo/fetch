@@ -1,16 +1,18 @@
-package com.nrinaudo.fetch.json4s
+package com.nrinaudo.fetch.json4s.native
 
+import org.scalatest.{Matchers, BeforeAndAfterAll, FunSpec}
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalacheck.{Gen, Arbitrary}
+import org.json4s.JsonAST._
+import unfiltered.filter.Planify
 import java.io.{OutputStreamWriter, Reader}
-
+import unfiltered.response.{HttpResponse, ResponseWriter}
+import unfiltered.request.{Path, Seg}
+import com.nrinaudo.fetch._
+import org.json4s.JsonAST.JString
 import com.nrinaudo.fetch.Request
 import com.nrinaudo.fetch.net.UrlEngine
-import org.json4s.JsonAST.{JString, _}
-import org.scalacheck.{Gen, Arbitrary}
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
-import unfiltered.filter.Planify
-import unfiltered.request.{Path, Seg}
-import unfiltered.response.{HttpResponse, ResponseWriter}
+import scala.concurrent.Await
 
 class ReaderResponse(val reader: Reader) extends ResponseWriter {
   override def respond(res: HttpResponse[Any]): Unit = {
@@ -30,6 +32,7 @@ class ReaderResponse(val reader: Reader) extends ResponseWriter {
 class ConnectorSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks with BeforeAndAfterAll {
   implicit val formats = org.json4s.DefaultFormats
   implicit val engine = UrlEngine()
+
   val server = unfiltered.jetty.Server.anylocal.plan(Planify {
     unfiltered.kit.GZip {
       case req @ Path(Seg("echo" :: Nil)) => new ReaderResponse(req.reader)
@@ -56,7 +59,7 @@ class ConnectorSpec extends FunSpec with Matchers with GeneratorDrivenPropertyCh
 
   describe("The json4s-native connector") {
     it("should serialize / deserialize as expected") {
-      forAll(json) { json =>
+      forAll(json) {json =>
         request(json) should be(json)
       }
     }

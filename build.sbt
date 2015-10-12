@@ -1,26 +1,23 @@
-import SonatypeKeys._
-
-lazy val root = Project(id = "fetch",
-                        base = file(".")).aggregate(core, json4sNative, json4sJackson, sample, tagsoup, httpGrammar)
+lazy val root = Project(id = "fetch", base = file("."))
+  .aggregate(core, json4sNative, json4sJackson, tagsoup, httpGrammar)
   .settings(noPublishSettings:_*)
 
-lazy val core = project dependsOn httpGrammar
+lazy val core = project.dependsOn(httpGrammar)
 
 lazy val httpGrammar = Project(id   = "http-grammar",
                                 base = file("http-grammar"))
 
 lazy val json4sNative = Project(id   = "json4s-native",
-                                base = file("json4s-native")) dependsOn(core)
+                                base = file("json4s-native")).dependsOn(core)
 
 lazy val json4sJackson = Project(id   = "json4s-jackson",
-                                 base = file("json4s-jackson")) dependsOn(core)
+                                 base = file("json4s-jackson")).dependsOn(core)
 
-lazy val tagsoup = Project(id   = "tagsoup",
-                                 base = file("tagsoup")) dependsOn(core)
+lazy val tagsoup = project.dependsOn(core)
 
-lazy val sample = Project(id   = "sample",
-                          base = file("sample")).dependsOn(core, json4sJackson).settings(noPublishSettings:_*)
-
+lazy val docs = project.dependsOn(core, tagsoup, json4sNative, json4sJackson)
+  .settings(unidocSettings:_*)
+  .settings(noPublishSettings:_*)
 
 lazy val noPublishSettings = Seq(
   publish         := (),

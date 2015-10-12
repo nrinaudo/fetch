@@ -11,3 +11,16 @@ script:
     sbt coverageAggregate
 after_success:
   - sbt coveralls
+script:
+  - sbt clean coverage test coverageReport coverageAggregate
+before_install:
+  - pip install --user codecov
+after_success:
+  - codecov
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/b7dcd854b987168e105e
+    on_success: change
+    on_failure: always
+    on_start: never
