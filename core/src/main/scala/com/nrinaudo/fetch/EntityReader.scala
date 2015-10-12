@@ -18,7 +18,7 @@ object EntityReader {
     override def read(input: Reader): A = f(input)
   }
 
-  /** {{{EntityReader}}} implementation that turns an entity body into a [[String]]. */
+  /** {{{EntityReader}}} implementation that turns an entity body into a `String`. */
   implicit val stringReader: EntityReader[String] = chars { input =>
     val writer = new StringWriter()
     writeChars(input, writer)
@@ -58,7 +58,7 @@ trait BinaryEntityReader[A] extends EntityReader[A] {
   override final def read(input: InputStream, mediaType: Option[MediaType]): A =
     read(input)
 
-  /** Turns the specified stream of bytes into a valid instance of ${A}.
+  /** Turns the specified stream of bytes into a valid instance of `A`.
     *
     * The stream parameter is managed by the caller and should not be closed by implementations.
     */
@@ -72,7 +72,7 @@ trait TextEntityReader[A] extends EntityReader[A] {
   override final def read(input: InputStream, mediaType: Option[MediaType]): A =
     read(new InputStreamReader(input, (for(t <- mediaType; c <- t.charset) yield c).getOrElse(defaultCharset)))
 
-  /** Turns the specified stream of characters into a valid instance of ${A}.
+  /** Turns the specified stream of characters into a valid instance of `A`.
     *
     * The stream parameter is managed by the caller and should not be closed by implementations.
     */

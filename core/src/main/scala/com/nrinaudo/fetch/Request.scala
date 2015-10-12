@@ -221,8 +221,7 @@ case class Request[A](url: Url, method: Method, headers: Parameters, run: (Url, 
   // -------------------------------------------------------------------------------------------------------------------
   /** Sets the value of the specified header.
     *
-    * This method expects an appropriate implicit [[ValueWriter]] to be in scope. Standard formats are declared
-    * in [[Headers$ Headers]].
+    * This method expects an appropriate implicit [[ValueWriter]] to be in scope.
     */
   def header[T: ValueWriter](name: String, value: T): Request[A] = headers(headers.set(name, value))
 

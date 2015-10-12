@@ -133,7 +133,7 @@ case class Status(code: Int) {
     *
     *  req.map {
     *    case Status.Ok(res) => res.body.as[String]
-    *    case res            => throw new Exception(s"Unexpected status: ${res.status}")
+    *    case res            => throw new Exception("Unexpected status: " + res.status)
     *  }
     * }}}
     */

@@ -127,7 +127,7 @@ sealed trait MediaType {
     */
   def unapply(mediaType: MediaType): Option[MediaType]
 
-  /** Convenience method that behaves exactly as [[MediaType.unapply]] on instances of [[Response]].
+  /** Convenience method that behaves exactly as `MediaType.unapply` on instances of [[Response]].
     *
     * This is meant to make mapping on instances [[Request]] more convenient: {{{
     *  val req: Request[Response[ResponseEntity]] = ???
@@ -135,7 +135,7 @@ sealed trait MediaType {
     *  req.map {
     *    case MediaType.PlainText(res) => println("Plain text content: " + res.body.as[String])
     *    case MediaType.Text(res)      => println("Text content: " + res.body.as[String])
-    *    case res                      => println(s"Unsupported media type: ${res.contentType}")
+    *    case res                      => println("Unsupported media type: " + res.contentType)
     *  }
     * }}}
     */
