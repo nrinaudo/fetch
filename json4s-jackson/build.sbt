@@ -2,7 +2,7 @@ sonatypeSettings
 
 name := "fetch-json4s-jackson"
 
-libraryDependencies += "org.json4s"     %% "json4s-jackson"    % "3.2.11"
+libraryDependencies += "org.json4s"     %% "json4s-jackson"    % "3.3.0"
 
 libraryDependencies += "org.scalatest"  %% "scalatest"         % "2.2.5"  % "test"
 
