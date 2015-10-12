@@ -1,0 +1,8 @@
+name: Fetch
+markdown: redcarpet
+highlighter: pygments
+baseurl: /fetch
+
+collections:
+  tut:
+    output: true

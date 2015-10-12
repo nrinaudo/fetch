@@ -1,0 +1,982 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>fetch - com.nrinaudo.fetch</title>
+          <meta name="description" content="fetch - com.nrinaudo.fetch" />
+          <meta name="keywords" content="fetch com.nrinaudo.fetch" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'com.nrinaudo.fetch.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../../../lib/package_big.png" />
+        <p id="owner"><a href="../../package.html" class="extype" name="com">com</a>.<a href="../package.html" class="extype" name="com.nrinaudo">nrinaudo</a></p>
+        <h1>fetch</h1><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fetch</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="com.nrinaudo.fetch"><span>fetch</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="com.nrinaudo.fetch.BinaryEntityReader" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="BinaryEntityReader[A]extendsEntityReader[A]"></a>
+      <a id="BinaryEntityReader[A]:BinaryEntityReader[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="BinaryEntityReader.html"><span class="name">BinaryEntityReader</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <a href="EntityReader.html" class="extype" name="com.nrinaudo.fetch.EntityReader">EntityReader</a>[<span class="extype" name="com.nrinaudo.fetch.BinaryEntityReader.A">A</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@BinaryEntityReader[A]extendsEntityReader[A]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Implementations of this trait are used to turn a binary entity body into a more useful type.</p>
+    </li><li name="com.nrinaudo.fetch.Conneg" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Conneg[T]extendsProductwithSerializable"></a>
+      <a id="Conneg[T]:Conneg[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Conneg.html"><span class="name">Conneg</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="value">value: <span class="extype" name="com.nrinaudo.fetch.Conneg.T">T</span></span>, <span name="q">q: <span class="extype" name="scala.Float">Float</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@Conneg[T]extendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Represents an acceptable value for content negotiation headers (<code>Accept*</code>).</p><div class="fullcomment"><div class="comment cmt"><p>Represents an acceptable value for content negotiation headers (<code>Accept*</code>).
+</p></div><dl class="paramcmts block"><dt class="param">value</dt><dd class="cmt"><p>value of the header (see the companion object for header formats).</p></dd><dt class="param">q</dt><dd class="cmt"><p>weight of the value, as a float between 0 and 1 inclusive. Bigger weights tell remote servers that
+              the corresponding value is more desirable than values associated with lower weights.</p></dd></dl></div>
+    </li><li name="com.nrinaudo.fetch.ETag" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ETagextendsAnyRef"></a>
+      <a id="ETag:ETag"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ETag.html"><span class="name">ETag</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@ETagextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Represents HTTP <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.11" target="_blank">entity tags</a>.</p>
+    </li><li name="com.nrinaudo.fetch.Encoding" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="EncodingextendsAnyRef"></a>
+      <a id="Encoding:Encoding"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Encoding.html"><span class="name">Encoding</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@EncodingextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Handles HTTP <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.11" target="_blank">content encoding</a>.</p>
+    </li><li name="com.nrinaudo.fetch.EntityReader" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="EntityReader[A]extendsAnyRef"></a>
+      <a id="EntityReader[A]:EntityReader[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="EntityReader.html"><span class="name">EntityReader</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@EntityReader[A]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Type class used to turn an entity body into something more useful.</p><div class="fullcomment"><div class="comment cmt"><p>Type class used to turn an entity body into something more useful.</p><p>There are two types of entity bodies: binary and text ones. Binary entities are composed of raw bytes, while text
+ones are composed of characters.</p><p>Instances of </p><pre>EntityReader</pre><p> are typically created through the companion's object helper methods.</p><p>EntityReader
+}}}
+</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@implicitNotFound</span><span class="args">(<span>
+      
+      <span class="defval" name="&quot;Cannot find an EntityReader instance for ${A}&quot;">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="com.nrinaudo.fetch.EntityWriter" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="EntityWriter[A]extendsAnyRef"></a>
+      <a id="EntityWriter[A]:EntityWriter[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="EntityWriter.html"><span class="name">EntityWriter</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@EntityWriter[A]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@implicitNotFound</span><span class="args">(<span>
+      
+      <span class="defval" name="&quot;Cannot find an EntityWriter instance for ${A}&quot;">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="com.nrinaudo.fetch.Language" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="LanguageextendsProductwithSerializable"></a>
+      <a id="Language:Language"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Language.html"><span class="name">Language</span></a><span class="params">(<span name="main">main: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="sub">sub: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@LanguageextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Represents an entity's language.</p><div class="fullcomment"><div class="comment cmt"><p>Represents an entity's language.</p><p>These can be used for content negotiation or
+to describe the language in which a response is written.
+</p></div></div>
+    </li><li name="com.nrinaudo.fetch.MediaType" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MediaTypeextendsAnyRef"></a>
+      <a id="MediaType:MediaType"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MediaType.html"><span class="name">MediaType</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@MediaTypeextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Method" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MethodextendsAnyRef"></a>
+      <a id="Method:Method"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Method.html"><span class="name">Method</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@MethodextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Parameters" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ParametersextendsProductwithSerializable"></a>
+      <a id="Parameters:Parameters"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Parameters.html"><span class="name">Parameters</span></a><span class="params">(<span name="values">values: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@ParametersextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Stores a list of name / value pairs.</p><div class="fullcomment"><div class="comment cmt"><p>Stores a list of name / value pairs.</p><p>Values are stored in their serialized forms as <code>String</code>, but can be manipulated as more specific types provided
+corresponding instances of <a href="ValueReader.html" class="extype" name="com.nrinaudo.fetch.ValueReader">ValueReader</a> and <a href="ValueWriter.html" class="extype" name="com.nrinaudo.fetch.ValueWriter">ValueWriter</a> are in scope. Default implementations of these
+can be found in <a href="ValueFormat$.html" class="extype" name="com.nrinaudo.fetch.ValueFormat">ValueFormat</a>.
+</p></div></div>
+    </li><li name="com.nrinaudo.fetch.Protocol" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ProtocolextendsAnyRef"></a>
+      <a id="Protocol:Protocol"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed abstract </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Protocol.html"><span class="name">Protocol</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@ProtocolextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Represents a valid URL protocol.</p><div class="fullcomment"><div class="comment cmt"><p>Represents a valid URL protocol.</p><p>Supported protocols are declared in the <a href="Protocol$.html" class="extype" name="com.nrinaudo.fetch.Protocol">companion object</a>.</p><p><code>Protocol</code> instances can be used to easily create <a href="Url.html" class="extype" name="com.nrinaudo.fetch.Url">urls</a>:</p><pre>Protocol.Http.host(<span class="lit">"github.com"</span>)</pre></div></div>
+    </li><li name="com.nrinaudo.fetch.QueryString" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="QueryStringextendsAnyRef"></a>
+      <a id="QueryString:QueryString"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="QueryString.html"><span class="name">QueryString</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@QueryStringextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Represents an <a href="Url.html" class="extype" name="com.nrinaudo.fetch.Url">Url</a>'s query string.</p>
+    </li><li name="com.nrinaudo.fetch.Request" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Request[A]extendsProductwithSerializable"></a>
+      <a id="Request[A]:Request[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Request.html"><span class="name">Request</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="url">url: <a href="Url.html" class="extype" name="com.nrinaudo.fetch.Url">Url</a></span>, <span name="method">method: <a href="Method.html" class="extype" name="com.nrinaudo.fetch.Method">Method</a></span>, <span name="headers">headers: <a href="Parameters.html" class="extype" name="com.nrinaudo.fetch.Parameters">Parameters</a></span>, <span name="run">run: (<a href="Url.html" class="extype" name="com.nrinaudo.fetch.Url">Url</a>, <a href="Method.html" class="extype" name="com.nrinaudo.fetch.Method">Method</a>, <span class="extype" name="scala.Option">Option</span>[<a href="Request$$Entity.html" class="extype" name="com.nrinaudo.fetch.Request.Entity">Entity</a>], <a href="Parameters.html" class="extype" name="com.nrinaudo.fetch.Parameters">Parameters</a>) ⇒ <span class="extype" name="com.nrinaudo.fetch.Request.A">A</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@Request[A]extendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Represents an HTTP request.</p><div class="fullcomment"><div class="comment cmt"><p>Represents an HTTP request.</p><p>Instances are created through the companion object. Once an instance is obtained, the request can be
+configured through &quot;raw&quot; modification methods (</p><pre>method</pre><p>, </p><pre>headers</pre><p>...) as well as specialised helpers such
+as </p><pre>GET</pre><p>, </p><pre>acceptGzip</pre><p> or </p><pre>/</pre><p>.</p><p>/
+}}}</p><p>acceptGzip
+}}}</p><p>GET
+}}}</p><p>headers
+}}}
+as </p><pre>GET</pre><p>, </p><pre>acceptGzip</pre><p> or </p><pre>/</pre><p>.</p><p>/
+}}}</p><p>acceptGzip
+}}}</p><p>GET
+}}}</p><p>method
+}}}
+as </p><pre>GET</pre><p>, </p><pre>acceptGzip</pre><p> or </p><pre>/</pre><p>.</p><p>/
+}}}</p><p>acceptGzip
+}}}</p><p>GET
+}}}
+</p></div></div>
+    </li><li name="com.nrinaudo.fetch.Response" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Response[A]extendsProductwithSerializable"></a>
+      <a id="Response[A]:Response[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Response.html"><span class="name">Response</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="status">status: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>, <span name="headers">headers: <a href="Parameters.html" class="extype" name="com.nrinaudo.fetch.Parameters">Parameters</a></span>, <span name="body">body: <span class="extype" name="com.nrinaudo.fetch.Response.A">A</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@Response[A]extendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Represents an HTTP response.</p>
+    </li><li name="com.nrinaudo.fetch.Status" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="StatusextendsProductwithSerializable"></a>
+      <a id="Status:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Status.html"><span class="name">Status</span></a><span class="params">(<span name="code">code: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@StatusextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Represents an HTTP status code, as defined in
+<a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6.1.1" target="_blank">RFC 2616</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Represents an HTTP status code, as defined in
+<a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6.1.1" target="_blank">RFC 2616</a>.</p><p>This class and its companion objects provide various extraction helpers to ease pattern matching.
+For example: </p><pre><span class="kw">val</span> res: Response[ResponseEntity] = ???
+
+res.status <span class="kw">match</span> {
+  <span class="kw">case</span> Status.Success(_) <span class="kw">=&gt;</span> println(<span class="lit">"Success"</span>)
+  <span class="kw">case</span> _                 <span class="kw">=&gt;</span> println(<span class="lit">"Not success"</span>)
+}</pre><p>It's also possible to pattern match directly on instances of <a href="Response.html" class="extype" name="com.nrinaudo.fetch.Response">Response</a>, which can be useful when
+<a href="Request.html#map[B](f:A=&gt;B):com.nrinaudo.fetch.Request[B]" class="extmbr" name="com.nrinaudo.fetch.Request#map">mapping</a> on <a href="Request.html" class="extype" name="com.nrinaudo.fetch.Request">requests</a>: </p><pre><span class="kw">val</span> res: Request[Response[ResponseEntity]] = ???
+
+res map {
+  <span class="cmt">// Match on the 2xx group</span>
+  <span class="kw">case</span> res @ Status.Success(_)       <span class="kw">=&gt;</span> println(<span class="lit">"Success: "</span> + res.body.as[<span class="std">String</span>])
+  <span class="cmt">// Match on HTTP 500</span>
+  <span class="kw">case</span> Status.InternalServerError(_) <span class="kw">=&gt;</span> println(<span class="lit">"Internal server error"</span>)
+  <span class="cmt">// Match on everything else</span>
+  <span class="kw">case</span> _                             <span class="kw">=&gt;</span> println(<span class="lit">"Something else entirely"</span>)
+}</pre><p>See the <a href="Status$.html" class="extype" name="com.nrinaudo.fetch.Status">companion object</a> for known status codes.
+</p></div></div>
+    </li><li name="com.nrinaudo.fetch.TextEntityReader" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="TextEntityReader[A]extendsEntityReader[A]"></a>
+      <a id="TextEntityReader[A]:TextEntityReader[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="TextEntityReader.html"><span class="name">TextEntityReader</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <a href="EntityReader.html" class="extype" name="com.nrinaudo.fetch.EntityReader">EntityReader</a>[<span class="extype" name="com.nrinaudo.fetch.TextEntityReader.A">A</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@TextEntityReader[A]extendsEntityReader[A]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Implementations of this trait are used to turn a text entity body into a more useful type.</p>
+    </li><li name="com.nrinaudo.fetch.TextEntityWriter" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="TextEntityWriter[A]extendsEntityWriter[A]"></a>
+      <a id="TextEntityWriter[A]:TextEntityWriter[A]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="TextEntityWriter.html"><span class="name">TextEntityWriter</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <a href="EntityWriter.html" class="extype" name="com.nrinaudo.fetch.EntityWriter">EntityWriter</a>[<span class="extype" name="com.nrinaudo.fetch.TextEntityWriter.A">A</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@TextEntityWriter[A]extendsEntityWriter[A]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Specialised version of </p><div class="fullcomment"><div class="comment cmt"><p>Specialised version of </p><pre>EntityWriter</pre><p> for text entities.</p><p>It's important to realise that the charset information is taken from the </p><pre>#mediaType</pre><p> value. If none is set,
+then </p><pre>#defaultCharset</pre><p> will be used when writing the entity.</p><p>#defaultCharset
+}}}</p><p>#mediaType
+}}}
+then </p><pre>#defaultCharset</pre><p> will be used when writing the entity.</p><p>#defaultCharset
+}}}</p><p>EntityWriter
+}}}</p><p>It's important to realise that the charset information is taken from the </p><pre>#mediaType</pre><p> value. If none is set,
+then </p><pre>#defaultCharset</pre><p> will be used when writing the entity.</p><p>#defaultCharset
+}}}</p><p>#mediaType
+}}}
+then </p><pre>#defaultCharset</pre><p> will be used when writing the entity.</p><p>#defaultCharset
+}}}
+</p></div></div>
+    </li><li name="com.nrinaudo.fetch.Url" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="UrlextendsProductwithSerializable"></a>
+      <a id="Url:Url"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="Url.html"><span class="name">Url</span></a><span class="params">(<span name="protocol">protocol: <a href="Protocol.html" class="extype" name="com.nrinaudo.fetch.Protocol">Protocol</a></span>, <span name="host">host: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="port">port: <span class="extype" name="scala.Int">Int</span></span>, <span name="path">path: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">List()</span></span>, <span name="query">query: <a href="QueryString.html" class="extype" name="com.nrinaudo.fetch.QueryString">QueryString</a> = <span class="symbol"><span class="name"><a href="QueryString$.html">QueryString()</a></span></span></span>, <span name="fragment">fragment: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>] = <span class="symbol">None</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@UrlextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.UrlEncoder" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="UrlEncoderextendsObject"></a>
+      <a id="UrlEncoder:UrlEncoder"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="UrlEncoder.html"><span class="name">UrlEncoder</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@UrlEncoderextendsObject" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.ValueFormat" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ValueFormat[T]extendsValueReader[T]withValueWriter[T]"></a>
+      <a id="ValueFormat[T]:ValueFormat[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ValueFormat.html"><span class="name">ValueFormat</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="ValueReader.html" class="extype" name="com.nrinaudo.fetch.ValueReader">ValueReader</a>[<span class="extype" name="com.nrinaudo.fetch.ValueFormat.T">T</span>] with <a href="ValueWriter.html" class="extype" name="com.nrinaudo.fetch.ValueWriter">ValueWriter</a>[<span class="extype" name="com.nrinaudo.fetch.ValueFormat.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@ValueFormat[T]extendsValueReader[T]withValueWriter[T]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Compounds a <a href="ValueReader.html" class="extype" name="com.nrinaudo.fetch.ValueReader">ValueReader</a> and <a href="ValueWriter.html" class="extype" name="com.nrinaudo.fetch.ValueWriter">ValueWriter</a>.</p>
+    </li><li name="com.nrinaudo.fetch.ValueReader" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ValueReader[T]extendsAnyRef"></a>
+      <a id="ValueReader[T]:ValueReader[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ValueReader.html"><span class="name">ValueReader</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@ValueReader[T]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Used to read parameter values from an instance of <a href="Parameters.html" class="extype" name="com.nrinaudo.fetch.Parameters">Parameters</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Used to read parameter values from an instance of <a href="Parameters.html" class="extype" name="com.nrinaudo.fetch.Parameters">Parameters</a>.</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@implicitNotFound</span><span class="args">(<span>
+      
+      <span class="defval" name="&quot;Cannot find a ValueReader type class for ${T}&quot;">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="com.nrinaudo.fetch.ValueWriter" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ValueWriter[T]extendsAnyRef"></a>
+      <a id="ValueWriter[T]:ValueWriter[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="ValueWriter.html"><span class="name">ValueWriter</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@ValueWriter[T]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Used to write parameter values to an instance of <a href="Parameters.html" class="extype" name="com.nrinaudo.fetch.Parameters">Parameters</a>.</p><div class="fullcomment"><div class="comment cmt"><p>Used to write parameter values to an instance of <a href="Parameters.html" class="extype" name="com.nrinaudo.fetch.Parameters">Parameters</a>.</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@implicitNotFound</span><span class="args">(<span>
+      
+      <span class="defval" name="&quot;Cannot find a ValueWriter type class for ${T}&quot;">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="com.nrinaudo.fetch.Conneg" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Conneg"></a>
+      <a id="Conneg:Conneg"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Conneg$.html"><span class="name">Conneg</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@Conneg" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Collection of implicit header formats for known content negotiation headers.</p>
+    </li><li name="com.nrinaudo.fetch#DefaultCharset" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DefaultCharset:java.nio.charset.Charset"></a>
+      <a id="DefaultCharset:Charset"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">DefaultCharset</span><span class="result">: <span class="extype" name="java.nio.charset.Charset">Charset</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@DefaultCharset:java.nio.charset.Charset" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Charset used for request or response entities when none is specified.</p>
+    </li><li name="com.nrinaudo.fetch.ETag" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ETag"></a>
+      <a id="ETag:ETag"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ETag$.html"><span class="name">ETag</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@ETag" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Encoding" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Encoding"></a>
+      <a id="Encoding:Encoding"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Encoding$.html"><span class="name">Encoding</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@Encoding" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.EntityReader" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="EntityReader"></a>
+      <a id="EntityReader:EntityReader"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="EntityReader$.html"><span class="name">EntityReader</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@EntityReader" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.EntityWriter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="EntityWriter"></a>
+      <a id="EntityWriter:EntityWriter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="EntityWriter$.html"><span class="name">EntityWriter</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@EntityWriter" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.HttpDate" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="HttpDate"></a>
+      <a id="HttpDate:HttpDate"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="HttpDate$.html"><span class="name">HttpDate</span></a><span class="result"> extends <a href="ValueFormat.html" class="extype" name="com.nrinaudo.fetch.ValueFormat">ValueFormat</a>[<span class="extype" name="java.util.Date">Date</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@HttpDate" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">HTTP formatter for dates.</p><div class="fullcomment"><div class="comment cmt"><p>HTTP formatter for dates. This is not in the default imports as it's a cumbersome format that is unlikely to be
+anybody's choice.
+</p></div></div>
+    </li><li name="com.nrinaudo.fetch.Language" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Language"></a>
+      <a id="Language:Language"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Language$.html"><span class="name">Language</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@Language" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Tools for creating instances of <a href="Language.html" class="extype" name="com.nrinaudo.fetch.Language">Language</a>.</p>
+    </li><li name="com.nrinaudo.fetch.MediaType" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MediaType"></a>
+      <a id="MediaType:MediaType"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MediaType$.html"><span class="name">MediaType</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@MediaType" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Defines <a href="MediaType.html" class="extype" name="com.nrinaudo.fetch.MediaType">MediaType</a> implementations as well as known types.</p>
+    </li><li name="com.nrinaudo.fetch.Method" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Method"></a>
+      <a id="Method:Method"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Method$.html"><span class="name">Method</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@Method" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Parameters" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Parameters"></a>
+      <a id="Parameters:Parameters"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Parameters$.html"><span class="name">Parameters</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@Parameters" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Protocol" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Protocol"></a>
+      <a id="Protocol:Protocol"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Protocol$.html"><span class="name">Protocol</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@Protocol" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Declares known protocols and provides convenience methods.</p>
+    </li><li name="com.nrinaudo.fetch.QueryString" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="QueryString"></a>
+      <a id="QueryString:QueryString"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="QueryString$.html"><span class="name">QueryString</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@QueryString" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Request" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Request"></a>
+      <a id="Request:Request"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Request$.html"><span class="name">Request</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@Request" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Response" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Response"></a>
+      <a id="Response:Response"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Response$.html"><span class="name">Response</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@Response" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Status"></a>
+      <a id="Status:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Status$.html"><span class="name">Status</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Defines known HTTP status codes, as well as pattern match helpers.</p>
+    </li><li name="com.nrinaudo.fetch.Url" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Url"></a>
+      <a id="Url:Url"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Url$.html"><span class="name">Url</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@Url" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.ValueFormat" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ValueFormat"></a>
+      <a id="ValueFormat:ValueFormat"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ValueFormat$.html"><span class="name">ValueFormat</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@ValueFormat" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.ValueReader" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ValueReader"></a>
+      <a id="ValueReader:ValueReader"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ValueReader$.html"><span class="name">ValueReader</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@ValueReader" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.ValueWriter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ValueWriter"></a>
+      <a id="ValueWriter:ValueWriter"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="ValueWriter$.html"><span class="name">ValueWriter</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@ValueWriter" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.net" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="net"></a>
+      <a id="net:net"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="net/package.html"><span class="name">net</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@net" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch#writeBytes" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="writeBytes(in:java.io.InputStream,out:java.io.OutputStream):Unit"></a>
+      <a id="writeBytes(InputStream,OutputStream):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">writeBytes</span><span class="params">(<span name="in">in: <span class="extype" name="java.io.InputStream">InputStream</span></span>, <span name="out">out: <span class="extype" name="java.io.OutputStream">OutputStream</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@writeBytes(in:java.io.InputStream,out:java.io.OutputStream):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Writes the content of the specified input stream to the specified output stream.</p><div class="fullcomment"><div class="comment cmt"><p>Writes the content of the specified input stream to the specified output stream.
+Note that this method does not wrap its arguments in buffered streams, nor will it close either stream.
+</p></div></div>
+    </li><li name="com.nrinaudo.fetch#writeChars" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="writeChars(in:java.io.Reader,out:java.io.Writer):Unit"></a>
+      <a id="writeChars(Reader,Writer):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">writeChars</span><span class="params">(<span name="in">in: <span class="extype" name="java.io.Reader">Reader</span></span>, <span name="out">out: <span class="extype" name="java.io.Writer">Writer</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.package@writeChars(in:java.io.Reader,out:java.io.Writer):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Writes the content of the specified reader to the specified writer.</p><div class="fullcomment"><div class="comment cmt"><p>Writes the content of the specified reader to the specified writer.
+Note that this method does not wrap its arguments in buffered implementations, nor will it close either stream.
+</p></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

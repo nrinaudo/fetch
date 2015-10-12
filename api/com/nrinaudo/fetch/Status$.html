@@ -1,0 +1,1251 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>Status - com.nrinaudo.fetch.Status</title>
+          <meta name="description" content="Status - com.nrinaudo.fetch.Status" />
+          <meta name="keywords" content="Status com.nrinaudo.fetch.Status" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'com.nrinaudo.fetch.Status$';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <a href="Status.html" title="See companion class"><img alt="Object/Class" src="../../../lib/object_to_class_big.png" /></a>
+        <p id="owner"><a href="../../package.html" class="extype" name="com">com</a>.<a href="../package.html" class="extype" name="com.nrinaudo">nrinaudo</a>.<a href="package.html" class="extype" name="com.nrinaudo.fetch">fetch</a></p>
+        <h1><a href="Status.html" title="See companion class">Status</a></h1><h3><span class="morelinks"><div>
+            Related Docs:
+            <a href="Status.html" title="See companion class">class Status</a>
+            | <a href="package.html" class="extype" name="com.nrinaudo.fetch">package fetch</a>
+          </div></span></h3><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Status</span><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Defines known HTTP status codes, as well as pattern match helpers.</p></div><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="com.nrinaudo.fetch.Status"><span>Status</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="com.nrinaudo.fetch.Status.Extractor" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ExtractorextendsAnyRef"></a>
+      <a id="Extractor:Extractor"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="Status$$Extractor.html"><span class="name">Extractor</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@ExtractorextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Helper for status group extractors.</p><div class="fullcomment"><div class="comment cmt"><p>Helper for status group extractors.</p><p>For example, the following code will create an extractor for the <code>2xx</code> group (<a href="Status$$Success$.html" class="extype" name="com.nrinaudo.fetch.Status.Success">Status.Success</a>, essentially):</p><pre><span class="kw">object</span> Success <span class="kw">extends</span> Extractor(_.isSuccess)</pre><p>This can then be used as follows: </p><pre><span class="kw">val</span> res: Response[ResponseEntity] = ???
+
+<span class="cmt">// Pattern match against a status</span>
+res.status <span class="kw">match</span> {
+  <span class="kw">case</span> Success(s) <span class="kw">=&gt;</span> println(<span class="lit">"Success"</span>)
+  <span class="kw">case</span> _          <span class="kw">=&gt;</span> println(<span class="lit">"Not success"</span>)
+}
+
+<span class="cmt">// Pattern match against a Response</span>
+res <span class="kw">match</span> {
+  <span class="kw">case</span> Success(res) <span class="kw">=&gt;</span> println(<span class="lit">"Success"</span>)
+  <span class="kw">case</span> _            <span class="kw">=&gt;</span> println(<span class="lit">"Not success"</span>)
+}</pre></div></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@##():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.nrinaudo.fetch.Status#Accepted" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Accepted:com.nrinaudo.fetch.Status"></a>
+      <a id="Accepted:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Accepted</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@Accepted:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#BadGateway" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BadGateway:com.nrinaudo.fetch.Status"></a>
+      <a id="BadGateway:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">BadGateway</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@BadGateway:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#BadRequest" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BadRequest:com.nrinaudo.fetch.Status"></a>
+      <a id="BadRequest:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">BadRequest</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@BadRequest:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status.ClientError" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ClientError"></a>
+      <a id="ClientError:ClientError"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Status$$ClientError$.html"><span class="name">ClientError</span></a><span class="result"> extends <a href="Status$$Extractor.html" class="extype" name="com.nrinaudo.fetch.Status.Extractor">Extractor</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@ClientError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Used to pattern match <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">statuses</a> and <a href="Response.html" class="extype" name="com.nrinaudo.fetch.Response">responses</a> on the <code>4xx</code> group.</p>
+    </li><li name="com.nrinaudo.fetch.Status#Conflict" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Conflict:com.nrinaudo.fetch.Status"></a>
+      <a id="Conflict:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Conflict</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@Conflict:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#Created" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Created:com.nrinaudo.fetch.Status"></a>
+      <a id="Created:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Created</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@Created:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status.Error" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Error"></a>
+      <a id="Error:Error"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Status$$Error$.html"><span class="name">Error</span></a><span class="result"> extends <a href="Status$$Extractor.html" class="extype" name="com.nrinaudo.fetch.Status.Extractor">Extractor</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@Error" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Used to pattern match <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">statuses</a> and <a href="Response.html" class="extype" name="com.nrinaudo.fetch.Response">responses</a> on the <code>4xx</code> and <code>5xx</code> groups.</p>
+    </li><li name="com.nrinaudo.fetch.Status#ExpectationFailed" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ExpectationFailed:com.nrinaudo.fetch.Status"></a>
+      <a id="ExpectationFailed:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ExpectationFailed</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@ExpectationFailed:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#Forbidden" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Forbidden:com.nrinaudo.fetch.Status"></a>
+      <a id="Forbidden:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Forbidden</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@Forbidden:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#Found" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Found:com.nrinaudo.fetch.Status"></a>
+      <a id="Found:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Found</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@Found:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#GatewayTimeout" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="GatewayTimeout:com.nrinaudo.fetch.Status"></a>
+      <a id="GatewayTimeout:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">GatewayTimeout</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@GatewayTimeout:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#Gone" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Gone:com.nrinaudo.fetch.Status"></a>
+      <a id="Gone:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Gone</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@Gone:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#HttpVersionNotSupported" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="HttpVersionNotSupported:com.nrinaudo.fetch.Status"></a>
+      <a id="HttpVersionNotSupported:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">HttpVersionNotSupported</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@HttpVersionNotSupported:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#InternalServerError" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="InternalServerError:com.nrinaudo.fetch.Status"></a>
+      <a id="InternalServerError:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">InternalServerError</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@InternalServerError:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#LengthRequired" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="LengthRequired:com.nrinaudo.fetch.Status"></a>
+      <a id="LengthRequired:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">LengthRequired</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@LengthRequired:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#MethodNotAllowed" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MethodNotAllowed:com.nrinaudo.fetch.Status"></a>
+      <a id="MethodNotAllowed:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MethodNotAllowed</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@MethodNotAllowed:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#MovedPermanently" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MovedPermanently:com.nrinaudo.fetch.Status"></a>
+      <a id="MovedPermanently:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MovedPermanently</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@MovedPermanently:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#MultipleChoices" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MultipleChoices:com.nrinaudo.fetch.Status"></a>
+      <a id="MultipleChoices:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MultipleChoices</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@MultipleChoices:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#NoContent" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NoContent:com.nrinaudo.fetch.Status"></a>
+      <a id="NoContent:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">NoContent</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@NoContent:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#NonAuthoritativeInformation" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NonAuthoritativeInformation:com.nrinaudo.fetch.Status"></a>
+      <a id="NonAuthoritativeInformation:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">NonAuthoritativeInformation</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@NonAuthoritativeInformation:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#NotAcceptable" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NotAcceptable:com.nrinaudo.fetch.Status"></a>
+      <a id="NotAcceptable:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">NotAcceptable</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@NotAcceptable:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#NotFound" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NotFound:com.nrinaudo.fetch.Status"></a>
+      <a id="NotFound:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">NotFound</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@NotFound:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#NotImplemented" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NotImplemented:com.nrinaudo.fetch.Status"></a>
+      <a id="NotImplemented:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">NotImplemented</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@NotImplemented:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#NotModified" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NotModified:com.nrinaudo.fetch.Status"></a>
+      <a id="NotModified:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">NotModified</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@NotModified:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#Ok" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Ok:com.nrinaudo.fetch.Status"></a>
+      <a id="Ok:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Ok</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@Ok:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#PartialContent" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PartialContent:com.nrinaudo.fetch.Status"></a>
+      <a id="PartialContent:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">PartialContent</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@PartialContent:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#PaymentRequired" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PaymentRequired:com.nrinaudo.fetch.Status"></a>
+      <a id="PaymentRequired:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">PaymentRequired</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@PaymentRequired:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#PreconditionFailed" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PreconditionFailed:com.nrinaudo.fetch.Status"></a>
+      <a id="PreconditionFailed:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">PreconditionFailed</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@PreconditionFailed:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#ProxyAuthenticationRequired" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ProxyAuthenticationRequired:com.nrinaudo.fetch.Status"></a>
+      <a id="ProxyAuthenticationRequired:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ProxyAuthenticationRequired</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@ProxyAuthenticationRequired:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status.Redirection" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Redirection"></a>
+      <a id="Redirection:Redirection"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Status$$Redirection$.html"><span class="name">Redirection</span></a><span class="result"> extends <a href="Status$$Extractor.html" class="extype" name="com.nrinaudo.fetch.Status.Extractor">Extractor</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@Redirection" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Used to pattern match <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">statuses</a> and <a href="Response.html" class="extype" name="com.nrinaudo.fetch.Response">responses</a> on the <code>3xx</code> group.</p>
+    </li><li name="com.nrinaudo.fetch.Status#RequestEntityTooLarge" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RequestEntityTooLarge:com.nrinaudo.fetch.Status"></a>
+      <a id="RequestEntityTooLarge:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">RequestEntityTooLarge</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@RequestEntityTooLarge:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#RequestRangeNotSatisfiable" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RequestRangeNotSatisfiable:com.nrinaudo.fetch.Status"></a>
+      <a id="RequestRangeNotSatisfiable:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">RequestRangeNotSatisfiable</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@RequestRangeNotSatisfiable:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#RequestTimeout" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RequestTimeout:com.nrinaudo.fetch.Status"></a>
+      <a id="RequestTimeout:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">RequestTimeout</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@RequestTimeout:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#RequestUriTooLong" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RequestUriTooLong:com.nrinaudo.fetch.Status"></a>
+      <a id="RequestUriTooLong:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">RequestUriTooLong</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@RequestUriTooLong:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#ResetContent" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ResetContent:com.nrinaudo.fetch.Status"></a>
+      <a id="ResetContent:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ResetContent</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@ResetContent:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#SeeOther" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SeeOther:com.nrinaudo.fetch.Status"></a>
+      <a id="SeeOther:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">SeeOther</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@SeeOther:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status.ServerError" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ServerError"></a>
+      <a id="ServerError:ServerError"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Status$$ServerError$.html"><span class="name">ServerError</span></a><span class="result"> extends <a href="Status$$Extractor.html" class="extype" name="com.nrinaudo.fetch.Status.Extractor">Extractor</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@ServerError" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Used to pattern match <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">statuses</a> and <a href="Response.html" class="extype" name="com.nrinaudo.fetch.Response">responses</a> on the <code>5xx</code> group.</p>
+    </li><li name="com.nrinaudo.fetch.Status#ServiceUnavailable" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ServiceUnavailable:com.nrinaudo.fetch.Status"></a>
+      <a id="ServiceUnavailable:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ServiceUnavailable</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@ServiceUnavailable:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status.Success" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Success"></a>
+      <a id="Success:Success"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Status$$Success$.html"><span class="name">Success</span></a><span class="result"> extends <a href="Status$$Extractor.html" class="extype" name="com.nrinaudo.fetch.Status.Extractor">Extractor</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@Success" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Used to pattern match <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">statuses</a> and <a href="Response.html" class="extype" name="com.nrinaudo.fetch.Response">responses</a> on the <code>2xx</code> group.</p>
+    </li><li name="com.nrinaudo.fetch.Status#TemporaryRedirect" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TemporaryRedirect:com.nrinaudo.fetch.Status"></a>
+      <a id="TemporaryRedirect:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">TemporaryRedirect</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@TemporaryRedirect:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#Unauthorized" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Unauthorized:com.nrinaudo.fetch.Status"></a>
+      <a id="Unauthorized:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Unauthorized</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@Unauthorized:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#UnsupportedMediaType" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="UnsupportedMediaType:com.nrinaudo.fetch.Status"></a>
+      <a id="UnsupportedMediaType:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">UnsupportedMediaType</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@UnsupportedMediaType:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.nrinaudo.fetch.Status#UseProxy" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="UseProxy:com.nrinaudo.fetch.Status"></a>
+      <a id="UseProxy:Status"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">UseProxy</span><span class="result">: <a href="Status.html" class="extype" name="com.nrinaudo.fetch.Status">Status</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@UseProxy:com.nrinaudo.fetch.Status" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@clone():Object" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@notify():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@toString():String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@wait():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.nrinaudo.fetch.Status$@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.Serializable">
+              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
