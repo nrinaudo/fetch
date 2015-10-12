@@ -28,7 +28,7 @@ object Common extends Build {
                           xerial.sbt.Sonatype.sonatypeSettings ++
                           Seq(organization      :=  "com.nrinaudo",
                              version            :=  "0.3.0-SNAPSHOT",
-                             scalaVersion       :=  "2.11.6",
+                             scalaVersion       :=  "2.11.7",
                              scalacOptions      ++= Seq("-deprecation",
                               "-encoding", "UTF-8",
                               "-feature",
@@ -45,7 +45,7 @@ object Common extends Build {
                               "-Xfuture"),
                              incOptions          := incOptions.value.withNameHashing(true),
                              libraryDependencies ++= Seq(
-                               "com.github.mpilquist" %% "simulacrum" % "0.3.0",
+                               "com.github.mpilquist" %% "simulacrum" % "0.4.0",
                                compilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full)
                              ),
                              pomExtra            := pom)
