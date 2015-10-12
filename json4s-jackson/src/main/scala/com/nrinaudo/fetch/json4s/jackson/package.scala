@@ -17,7 +17,7 @@ package object jackson {
 
     implicit def writer(implicit formats: Formats): EntityWriter[JValue] = EntityWriter.text((j: JValue, out) =>
       mapper.writeValue(out, Extraction.decompose(j))
-    ).withMediaType(MediaType.Json.charset(Charset.forName("UTF-8")))
+    ).withMediaType(MediaType.Json.charset(DefaultCharset))
 
-    implicit val reader: EntityReader[JValue] = EntityReader.chars(in => JsonMethods.parse(ReaderInput(in)))
+    implicit val reader: EntityReader[JValue] = EntityReader.chars(in => JsonMethods.parse(ReaderInput(in)))(DefaultCharset)
 }

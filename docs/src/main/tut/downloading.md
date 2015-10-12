@@ -6,7 +6,6 @@ section: tutorial
 
 ```tut:silent
 import com.nrinaudo.fetch._
-import com.nrinaudo.fetch.net._
 
 implicit val engine = net.UrlEngine(5000, 5000)
 

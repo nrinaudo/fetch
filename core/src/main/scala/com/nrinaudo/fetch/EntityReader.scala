@@ -6,7 +6,6 @@ import java.nio.charset.Charset
 import simulacrum.typeclass
 
 import scala.annotation.implicitNotFound
-import scala.io.Codec
 
 object EntityReader {
   /** Creates a new [[EntityReader]] that reads data from a byte stream. */
