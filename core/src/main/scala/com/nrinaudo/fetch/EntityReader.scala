@@ -37,14 +37,14 @@ object EntityReader {
   }))
 }
 
-/** Typeclass used to turn an entity body into something more useful.
+/** Type class used to turn an entity body into something more useful.
   *
   * There are two types of entity bodies: binary and text ones. Binary entities are composed of raw bytes, while text
   * ones are composed of characters.
   *
   * Instances of {{{EntityReader}}} are typically created through the companion's object helper methods.
   */
-@implicitNotFound(msg = "Cannot find an EntityReader typeclass for ${A}")
+@implicitNotFound(msg = "Cannot find an EntityReader instance for ${A}")
 @typeclass sealed trait EntityReader[A] { self =>
   def read(input: InputStream, mediaType: Option[MediaType]): A
 

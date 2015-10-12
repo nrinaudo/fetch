@@ -38,7 +38,7 @@ object EntityWriter {
   }
 }
 
-@implicitNotFound(msg = "Cannot find an EntityWriter typeclass for ${A}")
+@implicitNotFound(msg = "Cannot find an EntityWriter instance for ${A}")
 @typeclass trait EntityWriter[A] {
   def write(a: A, out: OutputStream): Unit
   def length(a: A): Option[Long]
