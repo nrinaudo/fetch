@@ -8,17 +8,17 @@ import simulacrum.typeclass
 import scala.annotation.implicitNotFound
 
 object EntityReader {
-  /** Creates a new {{{EntityReader}}} that reads data from a byte stream. */
+  /** Creates a new [[EntityReader]] that reads data from a byte stream. */
   def bytes[A](f: InputStream => A): EntityReader[A] = new BinaryEntityReader[A] {
     override def read(input: InputStream): A = f(input)
   }
 
-  /** Creates a new {{{EntityReader}}} that reads data from a character stream. */
+  /** Creates a new [[EntityReader]] that reads data from a character stream. */
   def chars[A](f: Reader => A): EntityReader[A] = new TextEntityReader[A] {
     override def read(input: Reader): A = f(input)
   }
 
-  /** {{{EntityReader}}} implementation that turns an entity body into a `String`. */
+  /** [[EntityReader]] implementation that turns an entity body into a `String`. */
   implicit val stringReader: EntityReader[String] = chars { input =>
     val writer = new StringWriter()
     writeChars(input, writer)
@@ -42,7 +42,7 @@ object EntityReader {
   * There are two types of entity bodies: binary and text ones. Binary entities are composed of raw bytes, while text
   * ones are composed of characters.
   *
-  * Instances of {{{EntityReader}}} are typically created through the companion's object helper methods.
+  * Instances of [[EntityReader]] are typically created through the companion's object helper methods.
   */
 @implicitNotFound(msg = "Cannot find an EntityReader instance for ${A}")
 @typeclass sealed trait EntityReader[A] { self =>

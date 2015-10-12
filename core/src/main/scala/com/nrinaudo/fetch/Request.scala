@@ -56,12 +56,7 @@ object Request {
   val UserAgent = "Fetch/0.3"
 }
 
-/** Represents an HTTP request.
-  *
-  * Instances are created through the companion object. Once an instance is obtained, the request can be
-  * configured through "raw" modification methods ({{{method}}}, {{{headers}}}...) as well as specialised helpers such
-  * as {{{GET}}}, {{{acceptGzip}}} or {{{/}}}.
-  */
+/** Represents an HTTP request. */
 case class Request[A](url: Url, method: Method, headers: Parameters, run: (Url, Method, Option[Entity], Parameters) => A) {
   // - Execution -------------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
@@ -195,7 +190,7 @@ case class Request[A](url: Url, method: Method, headers: Parameters, run: (Url, 
     *
     * This maps to the [[http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.11 Content-Encoding]] header.
     *
-    * Since {{{Encoding.Identity}}} is the default value, passing that as argument will cause the corresponding HTTP
+    * Since [[Encoding.Identity]] is the default value, passing that as argument will cause the corresponding HTTP
     * header to be unset.
     */
   def encoding(encoding: Encoding): Request[A] = {
@@ -209,10 +204,10 @@ case class Request[A](url: Url, method: Method, headers: Parameters, run: (Url, 
   /** Returns the content-encoding used by this request. */
   def encoding: Encoding = header[Encoding]("Content-Encoding").getOrElse(Encoding.Identity)
 
-  /** Encodes all request entities using {{{Encoding.Gzip}}}. */
+  /** Encodes all request entities using [[Encoding.Gzip]]. */
   def gzip: Request[A] = encoding(Encoding.Gzip)
 
-  /** Encodes all request entities using {{{Encoding.Deflate}}}. */
+  /** Encodes all request entities using [[Encoding.Deflate]]. */
   def deflate: Request[A] = encoding(Encoding.Deflate)
 
 

@@ -8,6 +8,13 @@ import simulacrum.typeclass
 import scala.annotation.implicitNotFound
 
 object EntityWriter {
+  def text[A](f: (A, Writer) => Unit): TextEntityWriter[A] = new TextEntityWriter[A] {
+    override def length(a: A, charset: Charset) = None
+    override def write(a: A, out: Writer) = f(a, out)
+    override def mediaType = MediaType.PlainText
+  }
+
+  //implicit val string: EntityWriter[String] = text((s, o) => o.write(s))
   def string(m: MediaType): EntityWriter[String] = new TextEntityWriter[String] {
     override def length(str: String, charset: Charset) = Some(str.getBytes(charset).length.toLong)
     override def write(str: String, out: Writer)       = out.write(str)
@@ -39,23 +46,23 @@ object EntityWriter {
 }
 
 @implicitNotFound(msg = "Cannot find an EntityWriter instance for ${A}")
-@typeclass trait EntityWriter[A] {
+@typeclass trait EntityWriter[A] { self =>
   def write(a: A, out: OutputStream): Unit
   def length(a: A): Option[Long]
   def mediaType: MediaType
 }
 
-/** Specialised version of {{{EntityWriter}}} for text entities.
+/** Specialised version of [[EntityWriter]] for text entities.
   *
-  * It's important to realise that the charset information is taken from the {{{#mediaType}}} value. If none is set,
-  * then {{{#defaultCharset}}} will be used when writing the entity.
+  * It's important to realise that the charset information is taken from the [[TextEntityWriter.mediaType]] value.
+  * If none is set, then [[TextEntityWriter.defaultCharset]] will be used when writing the entity.
   */
 trait TextEntityWriter[A] extends EntityWriter[A] {
   // - Charset management ----------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
   /** Returns the charset to use when writing this entity.
     *
-    * If none was set, returns {{{#defaultCharset}}}.
+    * If none was set, returns [[defaultCharset]].
     */
   def charset: Charset = mediaType.charset.getOrElse(defaultCharset)
 
