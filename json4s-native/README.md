@@ -15,7 +15,7 @@ libraryDependencies += "com.nrinaudo" %% "fetch-json4s-native" % "0.2.0"
 
 ## Sample usage
 ```scala
-import com.nrinaudo.fetch.json4s._
+import fetch.json4s._
 
 // Request and JSON object.
 val req:  Request    = ???

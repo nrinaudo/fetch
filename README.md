@@ -73,7 +73,7 @@ instances of `EntityReader` can be used to transform a `Response.Entity` into a 
 Using the [json4s-jackson](json4s-jackson) Fetch module, for example, one would write:
 
 ```scala
-import com.nrinaudo.fetch.json4s._
+import fetch.json4s._
 
 def createRequest = ???
 
