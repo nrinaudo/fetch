@@ -39,6 +39,9 @@ case class Url(protocol: Protocol, host: String, port: Int, path: List[String] =
   def addSegment(value: String): Url = path(path :+ value :_*)
   def query(value: QueryString): Url = copy(query = value)
   def param[T: ValueWriter](name: String, values: T*): Url = query(query.set(name, values: _*))
+  def resolve(address: String): Option[Url] =
+    try { Url.fromUri(toURI.resolve(new URI(address))) }
+    catch { case _: Exception => None }
 
 
   def /(segment: String): Url = addSegment(segment)

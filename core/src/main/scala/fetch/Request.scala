@@ -107,6 +107,7 @@ case class Request[A](url: Url, method: Method, headers: Parameters, run: (Url, 
   def /(segment: String): Request[A] = url(url / segment)
   def ?(value: QueryString): Request[A] = url(url ? value)
   def &[T: ValueWriter](param: (String, T)): Request[A] = url(url & param)
+  def resolve(address: String): Option[Request[A]] = url.resolve(address).map(u => url(u))
 
 
 
