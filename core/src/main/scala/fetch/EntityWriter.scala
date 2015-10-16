@@ -42,11 +42,11 @@ object EntityWriter {
   def defaultCharset: Charset = DefaultCharset
   def charset: Charset = mediaType.charset.getOrElse(defaultCharset)
 
-  def withDefaultCharset(charset: Charset): EntityWriter[A] = new EntityWriter[A] {
+  def withDefaultCharset(c: Charset): EntityWriter[A] = new EntityWriter[A] {
     override def write(a: A, out: OutputStream) = self.write(a, out)
     override def mediaType = self.mediaType
     override def length(a: A) = self.length(a)
-    override def defaultCharset: Charset = charset
+    override def defaultCharset: Charset = c
   }
 
   def contramap[B](f: B => A): EntityWriter[B] = new EntityWriter[B] {
