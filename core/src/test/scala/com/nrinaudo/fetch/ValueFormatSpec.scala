@@ -6,7 +6,7 @@ import org.scalacheck.Arbitrary
 import scala.Some
 
 class ValueFormatSpec extends FunSpec with Matchers with GeneratorDrivenPropertyChecks {
-  def cycle[A](value: A, format: ValueFormat[A]): Unit = {
+  def cycle[A](value: A, format: ValueFormat[A]) = {
     format.write(value).flatMap(format.read) should be(Some(value))
   }
 

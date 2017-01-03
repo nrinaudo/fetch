@@ -2,14 +2,14 @@ sonatypeSettings
 
 name := "fetch-json4s-jackson"
 
-libraryDependencies += "org.json4s"     %% "json4s-jackson"    % "3.3.0"
+libraryDependencies += "org.json4s"     %% "json4s-jackson"    % "3.5.0"
 
-libraryDependencies += "org.scalatest"  %% "scalatest"         % "2.2.5"  % "test"
+libraryDependencies += "org.scalatest"  %% "scalatest"         % "3.0.1"  % "test"
 
-libraryDependencies += "org.scalacheck" %% "scalacheck"        % "1.12.2" % "test"
+libraryDependencies += "org.scalacheck" %% "scalacheck"        % "1.13.4" % "test"
 
-libraryDependencies += "net.databinder" %% "unfiltered-filter" % "0.8.4"  % "test"
+libraryDependencies += "ws.unfiltered"  %% "unfiltered-filter" % "0.9.0-beta2"  % "test"
 
-libraryDependencies += "net.databinder" %% "unfiltered-jetty"  % "0.8.4"  % "test"
+libraryDependencies += "ws.unfiltered"  %% "unfiltered-jetty"  % "0.9.0-beta2"  % "test"
 
 libraryDependencies += "org.slf4j"      %  "slf4j-nop"         % "1.7.12" % "test"
