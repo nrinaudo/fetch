@@ -12,6 +12,6 @@ libraryDependencies += "ws.unfiltered"         %% "unfiltered-filter"        % "
 
 libraryDependencies += "ws.unfiltered"         %% "unfiltered-jetty"         % "0.9.0-beta2"  % "test"
 
-libraryDependencies += "org.slf4j"              %  "slf4j-nop"                % "1.7.12"  % "test"
+libraryDependencies += "org.slf4j"              %  "slf4j-nop"                % "1.7.22"  % "test"
 
-libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
+libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.5"
