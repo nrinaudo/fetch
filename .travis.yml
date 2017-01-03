@@ -1,13 +1,25 @@
 language: scala
+sudo: false
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot/
+before_cache:
+  # Tricks to avoid unnecessary cache updates
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+  - find $HOME/.sbt -name "*.lock" -delete
+
 scala:
-  - 2.11.6
+  - 2.11.8
 jdk:
-  - openjdk6
-  - openjdk7
   - oraclejdk7
   - oraclejdk8
+matrix:
+  include:
+  - scala: 2.12.0
+    jdk: oraclejdk8
 script:
-  - sbt clean coverage test &&
-    sbt coverageAggregate
+  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test &&
+    sbt ++$TRAVIS_SCALA_VERSION coverageAggregate
 after_success:
   - sbt coveralls
