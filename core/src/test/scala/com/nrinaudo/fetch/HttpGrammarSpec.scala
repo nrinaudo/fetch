@@ -5,8 +5,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalacheck.Gen
 
 object HttpGrammarSpec {
-  def tokenChar: Gen[Char]  = Gen.oneOf(((32.toChar to 126.toChar).toSet &~ HttpGrammar.Separators).toSeq)
-  def qdtextChar: Gen[Char] = Gen.oneOf(((0.toChar to 127.toChar).toSet - '\"' - '\\').toSeq)
+  def tokenChar: Gen[Char]  = Gen.oneOf(((32 to 126).map(_.toChar).toSet &~ HttpGrammar.Separators).toSeq)
+  def qdtextChar: Gen[Char] = Gen.oneOf(((0 to 127).map(_.toChar).toSet - '\"' - '\\').toSeq)
   // TODO: this is not entirely RFC compliant, as technically, ASCII control chars are supported.
   // This is currently ignored and known to break, but considered not to be worth the hassle.
   def char: Gen[Char]       = Gen.choose(32.toChar, 126.toChar)

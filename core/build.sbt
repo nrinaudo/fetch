@@ -14,4 +14,9 @@ libraryDependencies += "ws.unfiltered"         %% "unfiltered-jetty"         % "
 
 libraryDependencies += "org.slf4j"              %  "slf4j-nop"                % "1.7.22"  % "test"
 
-libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.5"
+libraryDependencies ++= {
+  CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, scalaMajor)) if scalaMajor >= 11 => Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.5")
+    case _                                         => Seq.empty
+  }
+}
